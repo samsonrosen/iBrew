@@ -21,7 +21,7 @@ from iBrewFolders import AppFolders
 import re
 import random
 
-#import traceback
+import traceback
 
 #------------------------------------------------------
 # iBrew
