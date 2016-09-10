@@ -476,7 +476,7 @@ class iBrewConsole:
                     self.client.connect()
                 except Exception, e:
                     logging.debug(e)
-                    logging.info("iBrew: Could not not connect to [" + self.client.host + "]")
+                    logging.info("iBrew: Could not connect to [" + self.client.host + "]")
                     return
 
             if command == "connect" or command == "console" or ((command == "sweep" or command == "monitor") and not self.console):

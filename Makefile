@@ -1,6 +1,6 @@
 all:	setup readme clean
 
-mac:	clean buildmac cleanmac diskimage
+mac:	clean bonjour buildmac cleanmac diskimage
 
 readme:
 	@python ibrew license > LICENSE
@@ -23,6 +23,12 @@ clean:
 	@rm -f *.spec 
 	@rm -rf build
 	@rm -rf test
+
+windows:
+	@pip install win-inet-pton
+
+bonjour:
+	@curl https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/pybonjour/pybonjour-1.1.1.zip > pybonjour-1.1.1.zip
 
 cleanmac:
 	@echo iBrew: Cleaning up MacOS
