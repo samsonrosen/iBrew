@@ -817,7 +817,7 @@ class iBrewConsole:
         print
         print "  iBrew Web Server"
         print
-        print "  Usage: iBrew (dump) (fahrenheid) web (port) (host)"
+        print "  Usage: ibrew (dump) (fahrenheid) web (port) (host)"
         print
         print "    web                    start web interface & rest api"
         print "    port                   optional port number, default 2082"
@@ -826,7 +826,7 @@ class iBrewConsole:
         print
         print "  iBrew Command Line"
         print
-        print "  Usage: iBrew (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)"
+        print "  Usage: ibrew (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)"
         print
         print "    dump                   dump message enabled"
         print "    shout                  sends commands and quits not waiting for a reply"

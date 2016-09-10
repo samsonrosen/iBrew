@@ -81,7 +81,7 @@ See the console section for the commands
 
   iBrew Web Server
 
-  Usage: iBrew (dump) (fahrenheid) web (port) (host)
+  Usage: ibrew (dump) (fahrenheid) web (port) (host)
 
     web                    start web interface & rest api
     port                   optional port number, default 2082
@@ -90,7 +90,7 @@ See the console section for the commands
 
   iBrew Command Line
 
-  Usage: iBrew (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)
+  Usage: ibrew (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)
 
     dump                   dump message enabled
     shout                  sends commands and quits not waiting for a reply
