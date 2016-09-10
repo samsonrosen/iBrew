@@ -575,19 +575,28 @@ class SmarterClient:
         if self.host == "":
             self.host = Smarter.DirectHost
 
-        """
-        from wireless import Wireless
-        wireless = Wireless()
-        wirelessname = wireless.current()
-        if wirelessname is not None:
-            if (wirelessname[0:14] == Smarter.DeviceStringCoffee or wirelessname[0:11] == Smarter.DeviceStringKettle) and self.host == Smarter.DirectHost:
-                self.isDirect = True
+        if self.host == Smarter.DirectHost:
+            if platform.system() == "Darwin" or platform.system() == "Linux":
+                # yeah, it only accept one wifi...
+
+                # loop over interfaces.. interfaces()
+                from wireless import Wireless
+                wireless = Wireless()
+                wirelessname = wireless.current()
+                if wirelessname is not None:
+                    if (wirelessname[0:14] == Smarter.DeviceStringCoffee or wirelessname[0:11] == Smarter.DeviceStringKettle) and self.host == Smarter.DirectHost:
+                        self.isDirect = True
+                    else:
+                        self.isDirect = False
+                else:
+                    self.isDirect = False
+            elif platform.system() == "Windows":
+                self.isDirect = False
+                # Netsh WLAN show interfaces grep it contains "iKettle 2.0" or "Smarter...
             else:
                 self.isDirect = False
         else:
             self.isDirect = False
-        """
-        self.isDirect = False
         
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

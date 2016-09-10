@@ -1,3 +1,4 @@
+# coding: utf-8
 
 import sys
 import time
@@ -20,7 +21,6 @@ from iBrewFolders import AppFolders
 import re
 import random
 
-
 #import traceback
 
 #------------------------------------------------------
@@ -30,7 +30,7 @@ import random
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright © 2016 Tristan (@monkeycat.nl)
+# Copyright Â© 2016 Tristan (@monkeycat.nl)
 #
 # Kettle Rattle (rev 6)
 #------------------------------------------------------
@@ -43,25 +43,8 @@ import random
 
 
 iBrewApp          = "iBrew: iKettle 2.0 & Smarter Coffee Interface"
-iBrewInfo         = "iBrew: Brewing on the 7th day © 2016 Tristan (@monkeycat.nl)"
+iBrewInfo         = "iBrew: Brewing on the 7th day Â© 2016 Tristan (@monkeycat.nl)"
 iBrewContribute   = "Please contribute any discoveries on https://github.com/Tristan79/iBrew/issues"
-
-def get_actual_preferred_encoding():
-	preferred_encoding = locale.getpreferredencoding()
-	if platform.system() == "Darwin":
-            print ("sds")
-        preferred_encoding = "utf-8"
-	return preferred_encoding
-	
-def fix_output_encoding():
-    print "sdddsds"
-    # this reads the environment and inits the right locale
-    locale.setlocale(locale.LC_ALL, "")
-    # try to make stdout/stderr encodings happy for unicode printing
-    preferred_encoding = get_actual_preferred_encoding()
-    sys.stdout = codecs.getwriter(preferred_encoding)(sys.stdout)
-    sys.stderr = codecs.getwriter(preferred_encoding)(sys.stderr)
-
 
 class iBrewConsole:
 
@@ -347,7 +330,7 @@ class iBrewConsole:
 
             if command == "shout":
                 if self.console or numarg == 0:
-                    print "iBrew: Can't hear you. Drinking tea at a dinner on the other side of the universe…"
+                    print "iBrew: Can't hear you. Drinking tea at a dinner on the other side of the universeâ€¦"
                     return
                 if numarg > 0:
                     command = arguments[0].lower()
@@ -363,7 +346,7 @@ class iBrewConsole:
 
             if command == "coffee":
                 if self.console or numarg == 0:
-                    print "iBrew: Nah, I want hot chocolade…"
+                    print "iBrew: Nah, I want hot chocoladeâ€¦"
                     return
                 if numarg > 0:
                     command = arguments[0].lower()
@@ -393,7 +376,7 @@ class iBrewConsole:
                                 sim += " ".rjust(random.randint(0,4)," ") + borreltext.upper()
                             else:
                                 sim += " ".rjust(random.randint(0,4)," ") + borreltext
-                    print "iBrew: Starting simulation of boiling water…\n\n" + sim
+                    print "iBrew: Starting simulation of boiling waterâ€¦\n\n" + sim
                     return
                 
                 if numarg > 0:
@@ -408,7 +391,7 @@ class iBrewConsole:
 
             if command == "slow":
                 if self.console or numarg == 0:
-                    print "iBrew: As you command, but it can take a while…"
+                    print "iBrew: As you command, but it can take a whileâ€¦"
                     return
                 if numarg > 0:
                     command = arguments[0].lower()
@@ -423,7 +406,7 @@ class iBrewConsole:
 
             if command == "fahrenheid":
                 if numarg == 0 and not self.console:
-                    print "iBrew: Kelvin… stop that!"
+                    print "iBrew: Kelvinâ€¦ stop that!"
                     return
                 else:
                     Smarter.fahrenheid = True
@@ -438,7 +421,7 @@ class iBrewConsole:
 
             if command == "celsius":
                 if numarg == 0 and not self.console:
-                    print "iBrew: But i'm freezing… and so confused. Please turn me on!"
+                    print "iBrew: But i'm freezingâ€¦ and so confused. Please turn me on!"
                     return
                 else:
                     Smarter.fahrenheid = False
@@ -755,7 +738,6 @@ class iBrewConsole:
             
        
     def run(self,arguments):
-        fix_output_encoding()
         AppFolders.makeFolders()
 
         #Configure logging
@@ -880,8 +862,8 @@ class iBrewConsole:
         print "    base                   show watersensor base value"
         print "    base [base]            store watersensor base value"
         print "    calibrate              calibrates watersensor"
-        print "    celsius                use celsius ºC [console only]"
-        print "    fahrenheid             use fahrenheid ºF [console only]"
+        print "    celsius                use celsius °C [console only]"
+        print "    fahrenheid             use fahrenheid °F [console only]"
         print "    formula (temperature (keepwarm))] heat kettle in formula mode"
         print "    heat (temperature)(keepwarm))    heat kettle"
         print "    stop kettle            stops heating"

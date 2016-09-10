@@ -1,51 +1,17 @@
 #!/usr/bin/env python
+# -*- coding: utf8 -*-
 
 import sys
+import os
 import platform
 import signal
 
-import rumps
 import logging
 import logging.handlers
-import time
-from PyObjCTools import AppHelper
-import webbrowser
-import os
-import sys
+
 from iBrewFolders import AppFolders
-
-rumps.debug_mode(True)  # turn on command line logging information for development - default is off
-
-class MacGui(rumps.App):
-    def __init__(self, apiServer):
-        super(MacGui, self).__init__("iBrew", icon=AppFolders.appBase() + "/web/static/icons/logo.png", quit_button=None)
-        self.apiServer = apiServer
-        self.menu = [
-            'iBrew Web Interface',
-            None
-        ]         
-
-    @rumps.clicked("iBrew Web Interface")
-    def web(self, sender):
-        webbrowser.open("http://localhost:{0}".format(2080), new=0)
-
-    @rumps.clicked("Quit")
-    def quit(self, sender):
-        if self.apiServer:
-            self.apiServer.kill()
-        #AppHelper.stopEventLoop()
-        rumps.quit_application()
-        sys.exit()
-    
-    @rumps.notifications
-    def notifications(self, notification):  # function that reacts to incoming notification dicts
-        print notification
-    
-    def onebitcallback(self, sender):  # functions don't have to be decorated to serve as callbacks for buttons
-        print 4848484            # this function is specified as a callback when creating a MenuItem below
-
-
-from iBrewConsole import *
+#why was it console and it worked?
+from iBrewWeb import *
 
 class Launcher():    
     def signal_handler(self, signal, frame):
@@ -65,9 +31,9 @@ class Launcher():
         logging.info("iBrew: Starting Web Interface & REST API on port 2080")
     
     def go(self):
-        if platform.system() != "Darwin":
-            print "iBrew: MacOS Only"
-            return
+        #if platform.system() != "Darwin":
+        #    print "iBrew: MacOS Only"
+        #    return
         
         AppFolders.makeFolders()
         
@@ -108,9 +74,13 @@ class Launcher():
         t.start()
         logging.info("GUI Started")
         if platform.system() == "Darwin":
+            from iBrewWin import MacGui
             MacGui(self.web).run()
+        elif platform.system() == "Windows":
+            from iBrewWin import WinGui
+            WinGui(self.web).run()
         else:
-            print "MacOS Only"
+            print "MacOS & Windows only"
 
 Launcher().go()
 
