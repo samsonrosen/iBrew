@@ -10,6 +10,8 @@ import datetime
 import logging
 import logging.handlers
 
+import win_inet_pton
+
 from ConfigParser import SafeConfigParser
 
 import threading
@@ -38,6 +40,7 @@ def threadsafe_function(fn):
         try:
             r = fn(*args, **kwargs)
         except Exception as e:
+            logging.debug(traceback.format_exc())
             logging.debug(e)
             raise e
         finally:
@@ -256,6 +259,7 @@ class SmarterClient:
                 try:
                     self.writeLock.acquire()
                 except Exception, e:
+                    logging.debug(traceback.format_exc())
                     logging.debug(e)
                     logging.error("[" + self.host + "] ERROR")
                     self.disconnect()
@@ -276,6 +280,7 @@ class SmarterClient:
                         # ...else got one! yeah! print it!
   
                 except Exception, e:
+                    logging.debug(traceback.format_exc())
                     logging.debug(e)
                     logging.error("[" + self.host + "] ERROR")
 
@@ -315,6 +320,7 @@ class SmarterClient:
                         pass #self.device_history()
                         
                 except Exception, e:
+                    logging.debug(traceback.format_exc())
                     logging.debug(e)
                     logging.error("[" + self.host + "] ERROR")
                     self.disconnect()
@@ -558,9 +564,7 @@ class SmarterClient:
             self.writeLock.release()
             raise SmarterErrorOld("Could not read message disconnected")
         self.writeLock.release()
-        
-        
- 
+         
     @threadsafe_function
     def connect(self):
         if self.dump:
@@ -570,7 +574,8 @@ class SmarterClient:
         
         if self.host == "":
             self.host = Smarter.DirectHost
-  
+
+        """
         from wireless import Wireless
         wireless = Wireless()
         wirelessname = wireless.current()
@@ -581,6 +586,8 @@ class SmarterClient:
                 self.isDirect = False
         else:
             self.isDirect = False
+        """
+        self.isDirect = False
         
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -589,7 +596,8 @@ class SmarterClient:
             self.connected = True
             self.sessionCount = 1
         except socket.error, msg:
-            loggin.debug(msg)
+            logging(traceback.format_exc())
+            logging(msg)
             logging.error("[" + self.host + "] Could not connect to + " + self.host)
             raise SmarterErrorOld("Could not connect to + " + self.host)
 
@@ -600,7 +608,8 @@ class SmarterClient:
                 self.monitor = threading.Thread(target=self.monitor_device)
                 self.monitor.start()
             except Exception, e:
-                loggin.debug(e)
+                loggins.debug(traceback.format_exc())
+                loggins.debug(e)
                 logging.error("[" + self.host + "] Could not start monitor")
                 raise SmarterErrorOld("Could not start monitor")
 
