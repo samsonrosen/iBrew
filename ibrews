@@ -1,0 +1,23 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*
+
+from iBrewConsole import *
+
+#------------------------------------------------------
+# iBrew
+#
+# Interface to iKettle 2.0 & SmarterCoffee Devices
+#
+# https://github.com/Tristan79/iBrew
+#
+# Copyright © 2016 Tristan (@monkeycat.nl)
+#
+# Kettle Rattle (rev 6)
+#------------------------------------------------------
+
+#------------------------------------------------------
+# MAIN
+#------------------------------------------------------
+
+iBrewConsole().run(sys.argv[1:])
+

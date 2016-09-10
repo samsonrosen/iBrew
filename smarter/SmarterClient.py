@@ -7,6 +7,9 @@ import string
 import random
 import time
 import datetime
+import logging
+import logging.handlers
+
 from ConfigParser import SafeConfigParser
 
 import threading
@@ -35,8 +38,7 @@ def threadsafe_function(fn):
         try:
             r = fn(*args, **kwargs)
         except Exception as e:
-            print(traceback.format_exc())
-            #print str(e)
+            logging.debug(e)
             raise e
         finally:
             lock.release()
@@ -205,6 +207,7 @@ class SmarterClient:
         self.run                        = False
         
         self.init()
+        self.settingsPath               = "devices/"
 
 
     def __del__(self):
@@ -233,7 +236,8 @@ class SmarterClient:
 
     def monitor_device(self):
         if self.dump:
-            print "[" + self.host + ":" + '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()) + "] Monitor Running"
+            logging.info("[" + self.host + "] Monitor Running")
+        
         previousResponse = ""
         previousWaterSensor = self.waterSensor
         
@@ -251,7 +255,9 @@ class SmarterClient:
         while self.run:
                 try:
                     self.writeLock.acquire()
-                except:
+                except Exception, e:
+                    logging.debug(e)
+                    logging.error("[" + self.host + "] ERROR")
                     self.disconnect()
                     #print(traceback.format_exc())
  
@@ -269,8 +275,10 @@ class SmarterClient:
                         # call monitor function
                         # ...else got one! yeah! print it!
   
-                except:
-                    #print(traceback.format_exc())
+                except Exception, e:
+                    logging.debug(e)
+                    logging.error("[" + self.host + "] ERROR")
+
                     if self.writeLock.locked():
                         self.writeLock.release()
                     self.disconnect()
@@ -306,8 +314,9 @@ class SmarterClient:
                     if monitorCount % timeout == timeout - 50:
                         pass #self.device_history()
                         
-                except:
-                    #print(traceback.format_exc())
+                except Exception, e:
+                    logging.debug(e)
+                    logging.error("[" + self.host + "] ERROR")
                     self.disconnect()
                     self.dump = dump
                     break
@@ -330,7 +339,7 @@ class SmarterClient:
                 prevPreviousTemperature = previousTemperature
                 previousTemperature = self.temperature
         if self.dump:
-            print "[" + self.host + ":" + '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()) + "] Monitor Stopped"
+            logging.info("[" + self.host + "] Monitor Stopped")
  
      #------------------------------------------------------
     # TRANSMISSION
@@ -580,7 +589,9 @@ class SmarterClient:
             self.connected = True
             self.sessionCount = 1
         except socket.error, msg:
-            raise SmarterErrorOld("Could not connect to + " + self.host + " (" + str(msg) + ")")
+            loggin.debug(msg)
+            logging.error("[" + self.host + "] Could not connect to + " + self.host)
+            raise SmarterErrorOld("Could not connect to + " + self.host)
 
 
         if not self.fast:
@@ -588,7 +599,9 @@ class SmarterClient:
             try:
                 self.monitor = threading.Thread(target=self.monitor_device)
                 self.monitor.start()
-            except:
+            except Exception, e:
+                loggin.debug(e)
+                logging.error("[" + self.host + "] Could not start monitor")
                 raise SmarterErrorOld("Could not start monitor")
 
 
@@ -605,9 +618,11 @@ class SmarterClient:
         else:
             return
         config = SafeConfigParser()
-        if not os.path.exists('devices/'):
-                os.makedirs('devices/')
-        config.read('devices/'+self.host+'.conf')
+        
+        
+        if not os.path.exists(self.settingsPath):
+                os.makedirs(self.settingsPath)
+        config.read(self.settingsPath+self.host+'.conf')
         
         try:
             config.add_section(section)
@@ -698,7 +713,7 @@ class SmarterClient:
             config.set(section, 'sessions', str(self.sessionCount))
 
         
-        with open('devices/'+self.host+'.conf', 'w') as f:
+        with open(self.settingsPath+self.host+'.conf', 'w') as f:
             config.write(f)
 
         
@@ -1582,7 +1597,7 @@ class SmarterClient:
             print "  " + str(self.totalCountKeepWarm).rjust(9, ' ') + "  Kept warm"
         print
         print
-        if self.sendCount != 0 and self.readCount != 0:
+        if self.sendCount != 0 or self.readCount != 0:
             print "  Current session"
             print
         #    print "  " + str(self.sessionCount).rjust(10, ' ') + "  Connected"

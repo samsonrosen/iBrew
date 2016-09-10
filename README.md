@@ -77,10 +77,11 @@ See the console section for the commands
 
   iBrew Web Server
 
-  Usage: iBrew (dump) (fahrenheid) web (port) (host)
+  Usage: iBrew web (port) (dump)
 
     web                    start web interface & rest api
     port                   optional port number, default 2082
+    dump                   dump message enabled
 
 
   iBrew Command Line

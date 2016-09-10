@@ -3,9 +3,9 @@
 
 *.DS_Store
 
-iBrewCloudWeb.py
+dist/*
 
-web/cloud.html
+build/*
 
 *.conf
 

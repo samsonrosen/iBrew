@@ -74,7 +74,7 @@ class iBrewJokes:
                 ("I’m sure all coffee beans are juvenile","They’re always getting grounded!"),
                 ("Is coffee your daily grind?","Your coffee machine"),
                 ("Too much of a good thing…","…is simply wonderful!"),
-                ("Oh, divine coffee! They grind thee kneeling,','beat thee with hands praying, and drink tea with eyes to heaven")
+                ("Oh, divine coffee! They grind thee kneeling,","beat thee with hands praying, and drink tea with eyes to heaven")
         ]
         
     hotchocoladeJokes = [("Coffee makes it possible to get out of bed","but chocolate makes it worthwhile"),
