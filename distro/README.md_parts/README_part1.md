@@ -31,13 +31,14 @@ Other systems running python see download from source section.
 
 ### Download from source
 
-You can run iBrew on systems that run python 2.7
+You can run iBrew on systems that run python 2.7 
 
 You can download and unpack the [source](https://github.com/Tristan79/iBrew/archive/master.zip) or download it from github using [Github Desktop](https://desktop.github.com) or manually:
 
 ```
 git clone https://github.com/Tristan79/iBrew.git
 ```
+
 
 #### Setup
 

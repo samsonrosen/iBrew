@@ -71,12 +71,15 @@ class Launcher():
         
         AppFolders.makeFolders()
         
-        if getattr(sys, 'frozen', None):
-            try:
-                os.remove("/usr/local/bin/ibrew")
-                os.symlink(AppFolders.appBase()+"/iBrewConsole","/usr/local/bin/ibrew")
-            except:
-                pass
+        if platform.system() == "Darwin" or platform.system() == "Linux":
+            if getattr(sys, 'frozen', None):
+                try:
+                    # do not touch if its not a symlink...
+                    if os.path.islink("/usr/local/bin/ibrew"):
+                        os.remove("/usr/local/bin/ibrew")
+                        os.symlink(AppFolders.appBase()+"/iBrewConsole","/usr/local/bin/ibrew")
+                except:
+                    pass
    
         logger = logging.getLogger()    
         logger.setLevel(logging.DEBUG)
