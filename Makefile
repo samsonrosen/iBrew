@@ -1,4 +1,4 @@
-all:	readme clean
+all:	setup readme clean
 
 mac:	clean buildmac cleanmac diskimage
 

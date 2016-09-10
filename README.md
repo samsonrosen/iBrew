@@ -10,6 +10,40 @@ This means your machine is free! You can connect it yourself and do whatever you
 
    Signed Me!
 
+#### Brewing on the 7th day 
+
+Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
+
+
+#### Contact
+[Bugs or issues](https://github.com/Tristan79/iBrew/issues). Donations & other questions <tristan@monkeycat.nl>
+If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, please post in the issues.
+
+Still no coffee machine (so no web for that)! I could like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
+
+ 
+#### Downloads & Setup
+  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) 
+  * [Windows](https://github.com/Tristan79/iBrew/blob/master/release/iBrew.zip) (unavailable)
+
+Other systems running python see download from source section.
+
+
+### Download from source
+
+You can run iBrew on systems that run python 2.7
+
+You can download and unpack the [source](https://github.com/Tristan79/iBrew/archive/master.zip) or download it from github using [Github Desktop](https://desktop.github.com) or manually:
+
+```
+git clone https://github.com/Tristan79/iBrew.git
+```
+
+#### Setup
+
+Run `make` and if you want to build the MacOS release run `make mac`
+ 
+ 
 #### Versions
  * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
  * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
@@ -36,36 +70,6 @@ This means your machine is free! You can connect it yourself and do whatever you
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * strip zero from ip
 
-#### Brewing on the 7th day 
-
-Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
-
-#### Contact
-[Bugs or issues](https://github.com/Tristan79/iBrew/issues). Donations & other questions <tristan@monkeycat.nl>
-If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, please post in the issues.
-
-Still no coffee machine (so no web for that)! I could like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
-
-
-## Installation
-
-#### Software Requirements 
-
-* python 2.7
-* python package: wireless
-* python (optional) package: tornado 
-* python (optional) package: pybonjour
-
-#### Download
-You can download and unpack the [source](https://github.com/Tristan79/iBrew/archive/master.zip) or download it from github using [Github Desktop](https://desktop.github.com) or manually:
-
-```
-git clone https://github.com/Tristan79/iBrew.git
-```
-
-#### Setup
-
-Run ```make``` or ```pip install -r requirements.txt``` to fetch missing python packages...
 
 ## Usage
 
@@ -77,7 +81,7 @@ See the console section for the commands
 
   iBrew Web Server
 
-  Usage: iBrew web (port) (dump)
+  Usage: iBrew (dump) (fahrenheid) web (port) (host)
 
     web                    start web interface & rest api
     port                   optional port number, default 2082
