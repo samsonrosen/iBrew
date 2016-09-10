@@ -1,9 +1,13 @@
-# -*- coding: utf8 -*
 
 import sys
 import time
 import datetime
 import logging
+
+import locale
+import platform
+import codecs
+
 import logging.handlers
 
 from smarter.SmarterClient import *
@@ -41,6 +45,22 @@ import random
 iBrewApp          = "iBrew: iKettle 2.0 & Smarter Coffee Interface"
 iBrewInfo         = "iBrew: Brewing on the 7th day © 2016 Tristan (@monkeycat.nl)"
 iBrewContribute   = "Please contribute any discoveries on https://github.com/Tristan79/iBrew/issues"
+
+def get_actual_preferred_encoding():
+	preferred_encoding = locale.getpreferredencoding()
+	if platform.system() == "Darwin":
+            print ("sds")
+        preferred_encoding = "utf-8"
+	return preferred_encoding
+	
+def fix_output_encoding():
+    print "sdddsds"
+    # this reads the environment and inits the right locale
+    locale.setlocale(locale.LC_ALL, "")
+    # try to make stdout/stderr encodings happy for unicode printing
+    preferred_encoding = get_actual_preferred_encoding()
+    sys.stdout = codecs.getwriter(preferred_encoding)(sys.stdout)
+    sys.stderr = codecs.getwriter(preferred_encoding)(sys.stderr)
 
 
 class iBrewConsole:
@@ -735,6 +755,7 @@ class iBrewConsole:
             
        
     def run(self,arguments):
+        fix_output_encoding()
         AppFolders.makeFolders()
 
         #Configure logging
