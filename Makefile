@@ -10,7 +10,7 @@ readme:
 	@python ibrew commands > console.tmp
 	@python ibrew notes > notes.tmp
 	@python ibrew structure > protocol.tmp
-	@cat README.md_parts/README_part1.md usage.tmp README.md_parts/README_part2.md console.tmp README.md_parts/README_part3.md examples.tmp README.md_parts/README_part4.md LICENSE > README.md
+	@cat distro/README.md_parts/README_part1.md usage.tmp distro/README.md_parts/README_part2.md console.tmp distro/README.md_parts/README_part3.md examples.tmp distro/README.md_parts/README_part4.md LICENSE > README.md
 
 setup:
 	@echo iBrew: Fetching python requirements
@@ -22,7 +22,7 @@ clean:
 	@rm -f *.tmp
 	@rm -f *.spec 
 	@rm -rf build
-	@rm -rf dist
+	@rm -rf test
 
 cleanmac:
 	@echo iBrew: Cleaning up MacOS
@@ -36,17 +36,19 @@ cleanmac:
 	
 buildmac:
 	@echo iBrew: Building MacOS package
-	@pip install -q -r package/mac/requirements-mac.txt
+	@pip install -q -r distro/mac/requirements-mac.txt
 	@rm -rf build     
 	@echo Please install upx with: brew install upx
 	@pyinstaller iBrewUI.py -s -w -n iBrew --noupx
 	@pyinstaller ibrew -s -w -n iBrewConsole --noupx
 	@cp -a web dist/iBrew.app/Contents/MacOS
-	@cp package/mac/Info.plist dist/iBrew.app/Contents/
+	@cp distro/mac/Info.plist dist/iBrew.app/Contents/
 	@mv dist/iBrewConsole.app/Contents/MacOS/iBrewConsole dist/iBrew.app/Contents/MacOS
-	@cp package/mac/iBrew.icns dist/iBrew.app/Contents/Resources/icon-windowed.icns
+	@cp distro/mac/iBrew.icns dist/iBrew.app/Contents/Resources/icon-windowed.icns
 	@rm -rf dist/iBrewConsole.app
-	
+	@mkdir -p test
+	@mv dist/iBrew.app test
+	@rm -rf dist
 
 diskimage:
 	#Set up disk image staging folder
@@ -54,8 +56,8 @@ diskimage:
 	mkdir -p dmg/iBrew
 	cp LICENSE dmg/iBrew
 	ln -s /Applications dmg/iBrew/Applications
-	cp -a dist/iBrew.app dmg/iBrew
-	cp package/mac/iBrew.icns dmg/iBrew/.VolumeIcon.icns
+	cp -a test/iBrew.app dmg/iBrew
+	cp distro/mac/iBrew.icns dmg/iBrew/.VolumeIcon.icns
 	SetFile -c icnC dmg/iBrew/.VolumeIcon.icns
 	
 	##generate raw disk image

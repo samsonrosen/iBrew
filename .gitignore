@@ -7,6 +7,8 @@ dist/*
 
 build/*
 
+test/*
+
 *.conf
 
-web/static/.ibrew
+.ibrew
