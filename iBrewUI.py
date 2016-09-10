@@ -68,7 +68,7 @@ class Launcher():
     
         self.web = iBrewWeb()
 
-        signal.signal(signal.SIGINT, self.signal_handler)
+        #signal.signal(signal.SIGINT, self.signal_handler)
         import threading
         t = threading.Thread(target=self.run)
         t.start()

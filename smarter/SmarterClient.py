@@ -17,6 +17,7 @@ except:
     
 from ConfigParser import SafeConfigParser
 
+import traceback
 import threading
 
 from SmarterProtocol import *

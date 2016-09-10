@@ -1,11 +1,18 @@
 # -*- coding: utf8 -*-
 
+import os
+import itertools, glob
+import webbrowser
+import win32api
+import win32con
+import win32gui_struct
+
 try:
     import winxpgui as win32gui
 except ImportError:
     import win32gui
-
-import webbrowser
+    
+from iBrewFolders import AppFolders
 
 class WinGui(object):
     '''TODO'''
@@ -25,12 +32,13 @@ class WinGui(object):
         
         self.apiServer = apiServer
         
-        self.icon = AppFolders.imagePath("logo.ico")
+        self.icon = AppFolders.iconsPath("logo.ico")
+        print self.icon
         self.hover_text = "iBrew"
         #self.on_quit = self.bye    
             
         menu_options = (
-                        ('Show Interface', None, self.show),
+                        ('Interface', None, self.show),
                        )
         
         menu_options = menu_options + (('Quit', None, self.QUIT),)
