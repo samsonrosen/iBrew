@@ -88,6 +88,6 @@ class AppFolders():
         return folder
     
     @staticmethod
-    def imagePath(filename):
-        return os.path.join(AppFolders.appBase(), "static", "images", filename)
+    def iconsPath(filename):
+        return os.path.join(AppFolders.appBase(), "static", "icons", filename)
     
