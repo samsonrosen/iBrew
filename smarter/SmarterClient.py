@@ -10,8 +10,11 @@ import datetime
 import logging
 import logging.handlers
 
-import win_inet_pton
-
+try:
+    import win_inet_pton
+except:
+    pass
+    
 from ConfigParser import SafeConfigParser
 
 import threading

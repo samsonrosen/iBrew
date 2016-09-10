@@ -39,10 +39,7 @@ You can download and unpack the [source](https://github.com/Tristan79/iBrew/arch
 git clone https://github.com/Tristan79/iBrew.git
 ```
 
-
-#### Setup
-
-Run `make` and if you want to build the MacOS release run `make mac`
+Run `make` or use the requirements files.
  
  
 #### Versions

@@ -31,7 +31,7 @@ Other systems running python see download from source section.
 
 ### Download from source
 
-You can run iBrew on systems that run python 2.7
+You can run iBrew on systems that run python 2.7 
 
 You can download and unpack the [source](https://github.com/Tristan79/iBrew/archive/master.zip) or download it from github using [Github Desktop](https://desktop.github.com) or manually:
 
@@ -39,9 +39,7 @@ You can download and unpack the [source](https://github.com/Tristan79/iBrew/arch
 git clone https://github.com/Tristan79/iBrew.git
 ```
 
-#### Setup
-
-Run `make` and if you want to build the MacOS release run `make mac`
+Run `make` or use the requirements files.
  
  
 #### Versions
@@ -129,8 +127,8 @@ you can also use them on the command line as arguments:
     base                   show watersensor base value
     base [base]            store watersensor base value
     calibrate              calibrates watersensor
-    celsius                use celsius ºC [console only]
-    fahrenheid             use fahrenheid ºF [console only]
+    celsius                use celsius °C [console only]
+    fahrenheid             use fahrenheid °F [console only]
     formula (temperature (keepwarm))] heat kettle in formula mode
     heat (temperature)(keepwarm))    heat kettle
     stop kettle            stops heating

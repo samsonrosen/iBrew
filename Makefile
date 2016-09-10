@@ -1,6 +1,13 @@
-all:	setup readme clean
+all:
+	@echo "iBrew setup (linux & mac)"
+	@echo use \"make setup\" to fetch requirements
+	@echo use \"make clean\" to clean temp files
+	@echo use \"make mac\" to make a mac release
+	@echo use \"make readme\" to create a new README.md
+	@echo use \"make bonjour\" to download bonjour
+	@echo use \"make pyinstaller\" to download already patched osx pyinstaller
 
-mac:	clean bonjour buildmac cleanmac diskimage
+mac:	clean buildmac cleanmac diskimage
 
 readme:
 	@python ibrew license > LICENSE
@@ -29,6 +36,9 @@ windows:
 
 bonjour:
 	@curl https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/pybonjour/pybonjour-1.1.1.zip > pybonjour-1.1.1.zip
+
+pyinstaller:
+	@git clone https://github.com/Tristan79/pyinstaller.git
 
 cleanmac:
 	@echo iBrew: Cleaning up MacOS
