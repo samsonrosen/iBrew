@@ -23,7 +23,7 @@ import socket
 try:
     import pybonjour
     have_bonjour = True
-except:
+except Exception:
     have_bonjour = False
 
 class iBrewBonjourThread(threading.Thread):

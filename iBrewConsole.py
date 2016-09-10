@@ -68,7 +68,7 @@ class iBrewConsole:
         while True:
             try:
                 x = raw_input("")
-            except:
+            except Exception:
                 break
     
         self.client.dump = dump
@@ -129,7 +129,7 @@ class iBrewConsole:
             i = raw_input("Please enter YES if you are: ")
             if i != "YES":
                 return
-        except:
+        except Exception:
             return
         print "iBrew: Press ctrl-c to stop"
  
@@ -157,7 +157,7 @@ class iBrewConsole:
                     self.client.dump = False
                     self.client.device_stop()
                     self.client.dump = True
-            except:
+            except Exception:
                 # was it ctrl-c or error???
                 break;
         self.client.dump = dump
@@ -238,7 +238,7 @@ class iBrewConsole:
                         print "You decided to not to agree!"
                         return False
                     email = raw_input("Please answer with YES or NO followed by pressing the ENTER key: ").strip()
-            except:
+            except Exception:
                 print "You decided to not to agree!"
                 return False
             print "Thank you, "+ self.username +" for accepting!"
@@ -249,7 +249,7 @@ class iBrewConsole:
         
             try:
                 config.add_section('license')
-            except:
+            except Exception:
                 pass
 
             config.set('license', 'accepted', 'true')
@@ -262,7 +262,7 @@ class iBrewConsole:
             config.read(AppFolders.settings() + '/.ibrew')
             try:
                 self.username =  config.get('license','name')
-            except:
+            except Exception:
                 if self.ui:
                     self.username = "iBrew"
                 else:
@@ -486,7 +486,7 @@ class iBrewConsole:
  
                 try:
                     self.client.init_default()
-                except:
+                except Exception:
                     #print(traceback.format_exc())
                     print "iBrew: Could not init values"
                     return
@@ -727,7 +727,7 @@ class iBrewConsole:
             else:
                                             try:
                                                 self.client.device_raw(command+''.join(arguments))
-                                            except:
+                                            except Exception:
                                                 print "iBrew: Sending raw command message failed"
         except Exception,e:
             if not self.console:
@@ -769,7 +769,7 @@ class iBrewConsole:
         self.client.fast = True
         try:
             self.execute(arguments)
-        except:
+        except Exception:
             self.console = False
   
   
@@ -780,7 +780,7 @@ class iBrewConsole:
                 # is should be threaded... since the kettle input is still comming as we wait for user input...
                 cursor = self.client.host + ":" + self.client.device + "$"
                 self.execute(raw_input(cursor).strip().split())
-            except:
+            except Exception:
                 break
         if not self.ui:
             

@@ -6,20 +6,28 @@ import os
 import platform
 import signal
 
+import rumps
+
 import logging
 import logging.handlers
 
 from iBrewFolders import AppFolders
-#why was it console and it worked?
 from iBrewWeb import *
 
 class Launcher():    
     def signal_handler(self, signal, frame):
         print "Caught Ctrl-C.  exiting."
-        if self.apiServer:
+        if self.web:
             self.web.kill()
-        sys.exit()
+        sys.exit(-1)
     
+    def __init__(self):
+        self.ui = None
+
+    def exit(self):
+        sys.exit()
+        os.exit()
+
     def run(self):
         
         try:
@@ -27,7 +35,12 @@ class Launcher():
         except Exception, e:
             logging.debug(e)
             logging.info("iBrew: Failed to run Web Interface & REST API on port 2080")
-            return
+            self.web.kill()
+            if self.ui:
+                self.ui.quit_application()
+            print "I never ever had problems not exiting before, fucking python... why not exit?"
+            self.exit()
+            
         logging.info("iBrew: Starting Web Interface & REST API on port 2080")
     
     def go(self):
@@ -44,7 +57,7 @@ class Launcher():
                     if os.path.islink("/usr/local/bin/ibrew"):
                         os.remove("/usr/local/bin/ibrew")
                         os.symlink(AppFolders.appBase()+"/iBrewConsole","/usr/local/bin/ibrew")
-                except:
+                except Exception:
                     pass
    
         logger = logging.getLogger()    
@@ -69,18 +82,25 @@ class Launcher():
         self.web = iBrewWeb()
 
         #signal.signal(signal.SIGINT, self.signal_handler)
-        import threading
-        t = threading.Thread(target=self.run)
-        t.start()
+        #import threading
+        self.t = threading.Thread(target=self.run)
+        self.t.start()
         logging.info("GUI Started")
-        if platform.system() == "Darwin":
-            from iBrewWin import MacGui
-            MacGui(self.web).run()
-        elif platform.system() == "Windows":
-            from iBrewWin import WinGui
-            WinGui(self.web).run()
-        else:
-            print "MacOS & Windows only"
+        try:
+            if platform.system() == "Darwin":
+                from iBrewMac import MacGui
+                self.ui = MacGui(self.web)
+                self.ui.run()
+            elif platform.system() == "Windows":
+                from iBrewWin import WinGui
+                self.ui = WinGui(self.web)
+                self.ui.run()
+            else:
+                print "MacOS & Windows only"
+        except Exception:
+            if self.ui:
+                self.ui.quit_application()
+            self.web.kill()
 
 Launcher().go()
 
