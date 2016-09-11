@@ -19,7 +19,9 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <br>
 <div class="tRow"><div class="tCell">Keep warm</div><div class="tCell"><input type="checkbox" name="df" value="{{ Smarter.check_keepwarm_on(client.defaultKeepWarmTime)  }}"><input type="range" id="dkwt" min="1" value="{{ client.defaultKeepWarmTime }}" max="25" step="1"></div></div>
 <br>
-<div class="tRow"><div class="tCell">Formula Mode</div><div class="tCell"><input type="checkbox" name="df" value="{{ client.defaultFormula }}"><input type="range" id="dft" min="1" value="{{ client.defaultFormulaTemperature }}" max="100" step="1"></div></div>
+<div class="tRow"><div class="tCell">Formula Mode</div><div class="tCell">
+
+<img width="24px" src="{{ static_url('icons/kettle/formula.png') }}"><input type="checkbox" name="df" value="{{ client.defaultFormula }}"><input type="range" id="dft" min="1" value="{{ client.defaultFormulaTemperature }}" max="100" step="1"></div></div>
 </div>
 </div>
 {% end %}
@@ -32,46 +34,64 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 
 {% for i in range(0,12) %}
 {% if i >= client.defaultCups %}
-<img width="24px" src="{{ static_url('icons/coffee/cups/none.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/cups/none.png') }}">
 {% else %}
-<img width="24px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
 {% end %}
-{% if i == 5 %}
+{% if i == 3 or i == 7 %}
 <br>
 {% end %}
-
 {% end %}
 </div></div>
-<br>
-<div class="tRow"><div class="tCell">Hotplate</div><div class="tCell"><input type="checkbox" name="df" value="ddd" {% if Smarter.check_keepwarm_on(client.defaultHotPlate) %}checked{% end %}><input  {% if not Smarter.check_keepwarm_on(client.defaultHotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ client.defaultHotPlate }}" max="40" step="1"></div></div>
-<br>
+
+<div class="tRow"><div class="tCell">Hotplate</div><div class="tCell">
+{% if Smarter.check_keepwarm_on(client.defaultHotPlate) %}
+<img width="48px" src="{{ static_url('icons/coffee/hotplate/on.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/hotplate/off.png') }}">
+{% end %}
+
+<input  {% if not Smarter.check_keepwarm_on(client.defaultHotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ client.defaultHotPlate }}" max="40" step="1"></div></div>
 <div class="tRow"><div class="tCell">Grind Source</div><div class="tCell">
 
-<input type="radio" name="grind" value="beans" {% if client.defaultGrind == Smarter.CoffeeBeans %}checked{% end %}><img width="24px" src="{{ static_url('icons/coffee/beans.png') }}">
-<input type="radio" name="grind" value="filter" {% if client.defaultGrind == Smarter.CoffeeFilter %}checked{% end %}><img width="24px" src="{{ static_url('icons/coffee/filter.png') }}">
 
+{% if client.defaultGrind == Smarter.CoffeeBeans %}
+<img width="48px" src="{{ static_url('icons/coffee/beans.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/filter.png') }}">
+{% end %}
 
 </div></div>
-<br>
 <div class="tRow" {% if client.defaultGrind == Smarter.CoffeeFilter %}style="display: none;"{% end %}><div class="tCell">Grind beans strength</div><div class="tCell">
 
-  <input type="radio" name="strength" value="weak" {% if client.defaultStrength == Smarter.CoffeeWeak %}checked{% end %}>Weak<br>
-  <input type="radio" name="strength" value="medium" {% if client.defaultStrength == Smarter.CoffeeMedium %}checked{% end %}>Medium<br>
-  <input type="radio" name="strength" value="strong" {% if client.defaultStrength == Smarter.CoffeeStrong %}checked{% end %}>Strong<br>
+  <img width="48px" src="{{ static_url('icons/coffee/strength/weak.png') }}">
+  <img width="48px" src="{{ static_url('icons/coffee/strength/medium.png') }}">
+  <img width="48px" src="{{ static_url('icons/coffee/strength/strong.png') }}">
   </div></div>
   
 
 <div class="tRow"><div class="tCell">Mode</div><div class="tCell">
 
-<input type="radio" name="modea" value="carafe" {% if not client.singlecup %}checked{% end %}><img width="24px" src="{{ static_url('icons/coffee/carafe.png') }}">
-<input type="radio" name="modea" value="cup" {% if client.singlecup %}checked{% end %}><img width="24px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+<!--<input type="radio" name="modea" value="carafe" {% if not client.singlecup %}checked{% end %}>-->
+
+{% if not client.singlecup %}
+<img width="48px" src="{{ static_url('icons/coffee/carafe.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+{% end %}
   </div></div>
 
 <div class="tRow"><div class="tCell">Carafe required</div><div class="tCell">
 
-  <input type="checkbox" name="df" value="sss" {% if not client.carafe %}checked{% end %}>  </div></div>
-</div>
+{% if not client.carafe %}
+<img width="48px" src="{{ static_url('icons/coffee/offbase.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/coffee.png') }}">
 {% end %}
+
+ </div></div>
+{% end %}
+</div>
 
 <br>
 <br>
@@ -84,7 +104,7 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <!--{ if client.onBase } -->
 <div class="Title">Calibrate</div>
 <div>
-    <a href="javascript:calibrate('{{ client.host }}')"><img class="IconInfo" src="{{ static_url('icons/kettle/base.png') }}"></a>
+    <a href="javascript:calibrate('{{ client.host }}')"><img class="IconInfo" src="{{ static_url('icons/kettle/calibrate.png') }}"></a>
 </div>
 <br>
 <br>
@@ -94,11 +114,11 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <br>
 {% end %}
 
-{% if client.isKettle %}
+{% if client.isCoffee %}
 <!--{ if client.onBase } -->
 <div class="Title">Descaling</div>
 <div>
-    <a href="javascript:descaling('{{ client.host }}')"><img class="IconInfo" src="{{ static_url('icons/kettle/base.png') }}"></a>
+    <a href="javascript:descaling('{{ client.host }}')"><img class="IconInfo" src="{{ static_url('icons/coffee/descaling.png') }}"></a>
 </div>
 <br>
 <br>

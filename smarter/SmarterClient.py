@@ -1357,11 +1357,10 @@ class SmarterClient:
         if self.fast or self.isCoffee:
             if self.waterLevel == Smarter.CoffeeWaterFull:
                 try:
-                    coffee_brew(12,0,False,Smarter.CoffeeWeak)
- 
+                    self.coffee_brew(12,0,False,Smarter.CoffeeWeak)
                 except:
                     raise SmarterError(CoffeeNoMachineBrew,"Descaling failed")
-           raise SmarterError(CoffeeNoMachineBrew,"Not enough water, please fill to full")
+            raise SmarterError(CoffeeNoMachineBrew,"Not enough water, please fill to full")
         raise SmarterError(CoffeeNoMachineBrew,"You need a coffee machine to descale it")
     
     
