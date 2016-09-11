@@ -15,6 +15,17 @@ This means your machine is free! You can connect it yourself and do whatever you
 Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
 
 
+#### Update
+
+I decided to quit... I have no coffee machine to test it on, and I am not doing test sessions to remote coffee machines again. And I learned enough python. I think its a terrible language, I never had an app crash and not quit on me, or calling sys.exit() and it does NOTHING even in the main thread. utf-8 vs ascii.... wtf... and after the windows debacle I was really done with it. Then the webpage designs. css wtf... how dificult is it so have the correct font size with different screen sizes. Or stay on the same posision. 
+
+It's not my cup of tea. 
+
+So have phun! You can make the web functional yourself (almost all is there to do so and its almost functionally, you can say I quit before the finish line) or just use the command line. Check out the webserver anyway if you want protocol information, every argument and message is clickable, and shows information (well almost all, except wat was left to convert, still in iBrewHelp.py)!  
+
+Well it have been fun. Signed 09/11/2016.
+
+
 #### Contact
 [Bugs or issues](https://github.com/Tristan79/iBrew/issues). Donations & other questions <tristan@monkeycat.nl>
 If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, please post in the issues.
@@ -24,7 +35,7 @@ Still no coffee machine (so no web for that)! I could like to thank Ju4ia for le
  
 #### Downloads & Setup
   * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) 
-  * [Windows](https://github.com/Tristan79/iBrew/blob/master/release/iBrew.zip) (unavailable)
+  * [Windows](https://github.com/Tristan79/iBrew/blob/master/release/iBrew.zip) (unavailable use source, see note)
 
 Other systems running python see download from source section.
 
@@ -40,7 +51,13 @@ git clone https://github.com/Tristan79/iBrew.git
 ```
 
 Run `make` or use the requirements files.
- 
+
+On windows download the additional [win32 package](https://sourceforge.net/projects/pywin32/files/pywin32/).
+Start iBrewUI with python to get a taskbar icon. 
+
+I failed to create a package, I gave up after 8 hours, I just can not get it to work. And windows is fighting me
+every step of the way, with its disaster of an user interface (who designs this? Even getting the theme to a bright color took 30 minutes of my time with some hack, are the persons responsible for choosing the color depressed? And then the jumping windows in the taskbar. I give it a try if I find an old windows xp iso. But not going to touch Win7/8/10/... ever again. I get annoyed when software is working against me. But it is almost never the os usually a stand alone app. But in windows 10 its windows itself fighting me on every step. wtf. It doubles the amount of time spend not coding. After 7 years without it, lets make the rest of my life.
+
  
 #### Versions
  * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
