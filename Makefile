@@ -1,13 +1,15 @@
 all:
 	@echo "iBrew setup (linux & mac)"
 	@echo use \"make setup\" to fetch requirements
-	@echo use \"make clean\" to clean temp files
+	@echo use \"make cleanlin\" to clean temp files
+	@echo use \"make cleanmac\" to clean temp files
+	@echo use \"make cleanwin\" to clean temp files
 	@echo use \"make mac\" to make a mac release
 	@echo use \"make readme\" to create a new README.md
 	@echo use \"make bonjour\" to download bonjour
 	@echo use \"make pyinstaller\" to download already patched osx pyinstaller
 
-mac:	clean buildmac cleanmac diskimage
+mac:	cleanlin buildmac cleanmac diskimage
 
 readme:
 	@python ibrew license > LICENSE
@@ -23,7 +25,7 @@ setup:
 	@echo iBrew: Fetching python requirements
 	@pip install -q -r requirements.txt
 
-clean:
+cleanlin:
 	@echo iBrew: Cleaning up
 	@rm -f *.pyc smarter/*.pyc
 	@rm -f *.tmp
@@ -40,8 +42,15 @@ bonjour:
 pyinstaller:
 	@git clone https://github.com/Tristan79/pyinstaller.git
 
+cleanwin:
+	@echo iBrew: Cleaning up [Windows]
+	@del *.pyc 
+	@del smarter\*.pyc
+	@del *.tmp
+	@del *.spec 
+
 cleanmac:
-	@echo iBrew: Cleaning up MacOS
+	@echo iBrew: Cleaning up [MacOS]
 	@rm -rf ~/Library/Application\ Support/iBrew/logs 
 	@rm -f *.pyc smarter/*.pyc
 	@rm -f *.tmp
