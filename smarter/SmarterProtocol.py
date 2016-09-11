@@ -185,7 +185,7 @@ class SmarterProtocol:
         CommandWifiLeave        : (True,True,[],"Wireless network direct mode"),
         CommandResetSettings    : (True,True,[ResponseCommandStatus],"Reset default user settings"),
         CommandHeat             : (True,False,[ResponseCommandStatus],"Heat kettle"),
-        CommandKettleStop       : (True,False,[ResponseCommandStatus],"Stop heating kettle"),
+        CommandKettleStop       : (True,False,[ResponseCommandStatus],"Stop heating water"),
         CommandHeatFormula      : (True,False,[ResponseCommandStatus],"Heat kettle using formula mode"),
         CommandKettleStoreSettings : (True,False,[ResponseCommandStatus],"Set kettle default user settings"),
         Command20               : (True,False,[ResponseCommandStatus],"Working unknown command (turn on?)"),
