@@ -149,7 +149,6 @@ you can also use them on the command line as arguments:
     fahrenheid             use fahrenheid °F [console only]
     formula (temperature (keepwarm))] heat kettle in formula mode
     heat (temperature)(keepwarm))    heat kettle
-    stop kettle            stops heating
     settings [temperature] [keepwarm] [formula] [formulatemperature] store kettle user settings
     tea [white,green,black,oelong] warms water for tea
 
@@ -167,7 +166,6 @@ you can also use them on the command line as arguments:
     singlecup              return single coffee cup mode
     singlecup [state]      set single coffee cup mode [on or off]
     (strength) [strength]  set strength coffee [weak, medium or strong]
-    stop coffee            stops brewing
     settings [cups] [hotplate] [grind] [strength] store user settings
     timer [time]           add timer
     timers                 show timers

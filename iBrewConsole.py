@@ -710,26 +710,26 @@ class iBrewConsole:
                                                 self.client.device_store_settings(arguments[0],arguments[1],arguments[2],arguments[3])
                                                 if not self.client.dump: self.client.print_settings()
             elif command == "stop" or command == "off":
-                                            if numarg == 0:
-                                                self.client.device_stop()
-                                            else:
-                                                if arguments[0].lower() == "kettle":
-                                                    self.client.kettle_stop()
-                                                elif arguments[0].lower() == "coffee":
-                                                    self.client.coffee_stop()
-                                                else:
-                                                    self.client.device_stop()
+                                            #if numarg == 0:
+                                            self.client.device_stop()
+                                            #else:
+                                            #    if arguments[0].lower() == "kettle":
+                                            #        self.client.kettle_stop()
+                                            #    elif arguments[0].lower() == "coffee":
+                                            #        self.client.coffee_stop()
+                                            #    else:
+                                            #        self.client.device_stop()
                                         
             elif command == "on" or command == "start":
-                                            if numarg == 0:
-                                                self.client.device_start()
-                                            else:
-                                                if arguments[0].lower() == "kettle":
-                                                    self.client.kettle_heat()
-                                                elif arguments[0].lower() == "coffee":
-                                                    self.client.coffee_brew_settings()
-                                                else:
-                                                    self.client.device_start()
+                                            #if numarg == 0:
+                                            self.client.device_start()
+                                            #else:
+                                            #    if arguments[0].lower() == "kettle":
+                                            #        self.client.kettle_heat()
+                                            #    elif arguments[0].lower() == "coffee":
+                                            #        self.client.coffee_brew_settings()
+                                            #    else:
+                                            #        self.client.device_start()
                                                     
 
             elif command == "reset":        self.client.device_reset()
@@ -887,7 +887,6 @@ class iBrewConsole:
         print "    fahrenheid             use fahrenheid °F [console only]"
         print "    formula (temperature (keepwarm))] heat kettle in formula mode"
         print "    heat (temperature)(keepwarm))    heat kettle"
-        print "    stop kettle            stops heating"
         print "    settings [temperature] [keepwarm] [formula] [formulatemperature] store kettle user settings"
         print "    tea [white,green,black,oelong] warms water for tea"
         print
@@ -905,7 +904,6 @@ class iBrewConsole:
         print "    singlecup              return single coffee cup mode"
         print "    singlecup [state]      set single coffee cup mode [on or off]"
         print "    (strength) [strength]  set strength coffee [weak, medium or strong]"
-        print "    stop coffee            stops brewing"
         print "    settings [cups] [hotplate] [grind] [strength] store user settings"
         print "    timer [time]           add timer"
         print "    timers                 show timers"
