@@ -215,8 +215,12 @@ you can also use them on the command line as arguments:
     message 3e     Show protocol message 3a, turn hotplate on
     167E           Send kettle raw stop
     21 30 05 7e    Send kettle raw heat
-    strength weak  Set coffee strength to weak
+    weak           Set coffee strength to weak
     cups 3         Set number of cups to brew
+    brew 4 10 beans strong  Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes
+    join MyWifi p@ssw0rd    Joins MyWifi wireless network using p@ssw0rd as credential
+    singlecup on   Set single cup mode
+    settings 100 20 True 75   Set default user settings for the kettle to...
 
 
 ```

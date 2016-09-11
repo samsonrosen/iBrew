@@ -950,7 +950,11 @@ class iBrewConsole:
         print "    message 3e     Show protocol message 3a, turn hotplate on"
         print "    167E           Send kettle raw stop"
         print "    21 30 05 7e    Send kettle raw heat"
-        print "    strength weak  Set coffee strength to weak"
+        print "    weak           Set coffee strength to weak"
         print "    cups 3         Set number of cups to brew"
+        print "    brew 4 10 beans strong  Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes"
+        print "    join MyWifi p@ssw0rd    Joins MyWifi wireless network using p@ssw0rd as credential"
+        print "    singlecup on   Set single cup mode"
+        print "    settings 100 20 True 75   Set default user settings for the kettle to..."
         print
 
