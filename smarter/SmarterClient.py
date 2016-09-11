@@ -1353,6 +1353,19 @@ class SmarterClient:
             raise SmarterError(CoffeeNoMachineBrew,"You need a coffee machine to brew coffee")
 
 
+    def coffee_descaling(self):
+        if self.fast or self.isCoffee:
+            if self.waterLevel == Smarter.CoffeeWaterFull:
+                try:
+                    coffee_brew(12,0,False,Smarter.CoffeeWeak)
+ 
+                except:
+                    raise SmarterError(CoffeeNoMachineBrew,"Descaling failed")
+           raise SmarterError(CoffeeNoMachineBrew,"Not enough water, please fill to full")
+        raise SmarterError(CoffeeNoMachineBrew,"You need a coffee machine to descale it")
+    
+    
+    
     def coffee_hotplate_off(self):
         if self.fast or self.isCoffee == True:
             self.send_command(Smarter.CommandHotplateOff)

@@ -22,9 +22,6 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <div class="tRow"><div class="tCell">Formula Mode</div><div class="tCell"><input type="checkbox" name="df" value="{{ client.defaultFormula }}"><input type="range" id="dft" min="1" value="{{ client.defaultFormulaTemperature }}" max="100" step="1"></div></div>
 </div>
 </div>
-{% if client.onBase %}
-<a href="javascript:calibrate('{{ client.host }}')"><img height="24px" src="{{ static_url('icons/kettle/base.png') }}"></a>
-{% end %}
 {% end %}
 
 {% if client.isCoffee %}
@@ -82,6 +79,35 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <br>
 <br>
 <br>
+
+{% if client.isKettle %}
+<!--{ if client.onBase } -->
+<div class="Title">Calibrate</div>
+<div>
+    <a href="javascript:calibrate('{{ client.host }}')"><img class="IconInfo" src="{{ static_url('icons/kettle/base.png') }}"></a>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% end %}
+
+{% if client.isKettle %}
+<!--{ if client.onBase } -->
+<div class="Title">Descaling</div>
+<div>
+    <a href="javascript:descaling('{{ client.host }}')"><img class="IconInfo" src="{{ static_url('icons/kettle/base.png') }}"></a>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% end %}
+
 
 <div class="Title">Wireless Network</div>
 <div>

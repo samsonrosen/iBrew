@@ -641,6 +641,12 @@ class iBrewConsole:
                                             else:
                                                 self.client.coffee_filter()
                                                 print "iBrew: Filter used"
+            elif command == "descaling":
+                                            try:
+                                                self.client.coffee_descaling()
+                                            except Exception:
+                                                # no water...?
+                                                print "iBrew: Descaling failed"
             elif command == "brew":
                                             if numarg == 0:
                                                 self.client.coffee_brew_settings()
@@ -870,12 +876,13 @@ class iBrewConsole:
         print "    settings [temperature] [keepwarm] [formula] [formulatemperature] store kettle user settings"
         print
         print "  Smarter Coffee  Commands"
+        print "    beans                  use beans as grinded source"
         print "    brew (cups (hotplate (grind (strength)))) brew coffee"
         print "    brew default           brew coffee with default settings"
         print "    carafe                 returns if carafe is required"
         print "    carafe [state]         set carafe is required [on or off]"
         print "    cups [number]          set number of cups [1..12]"
-        print "    beans                  use beans as grinded source"
+        print "    descaling              descale coffee machine, need full water"
         print "    filter                 use filter as grinded source"
         print "    hotplate off           turn hotplate off"
         print "    hotplate on (minutes)  turn hotplate on (time in minutes)"

@@ -848,6 +848,19 @@ class SmarterProtocol:
     # WATERLEVEL ARGUMENT WRAPPER
     #------------------------------------------------------
 
+
+    CoffeeWaterEmpty = 0x00
+    CoffeeWaterLow   = 0x01
+    CoffeeWaterHalf  = 0x02
+    CoffeeWaterFull  = 0x03
+
+    WaterLevel = {
+        CoffeeWaterEmpty : "empty",
+        CoffeeWaterLow   : "low",
+        CoffeeWaterHalf  : "half",
+        CoffeeWaterFull  : "full"
+    }
+
     def waterlevel(self,level):
         if self.WaterLevel.has_key(level):
             return self.WaterLevel[level]
@@ -963,18 +976,6 @@ class SmarterProtocol:
 
     CoffeeBeans  = True
     CoffeeFilter = False
-
-    CoffeeWaterEmpty = 0x00
-    CoffeeWaterLow   = 0x01
-    CoffeeWaterHalf  = 0x02
-    CoffeeWaterFull  = 0x03
-
-    WaterLevel = {
-        CoffeeWaterEmpty : "empty",
-        CoffeeWaterLow   : "low",
-        CoffeeWaterHalf  : "half",
-        CoffeeWaterFull  : "full"
-    }
 
 
     def grind_to_string(self,grind):
