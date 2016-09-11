@@ -864,9 +864,9 @@ class iBrewWeb(tornado.web.Application):
         try:
             settings = {
                 "debug"         : True,
-                "template_path" : os.path.join(AppFolders.appBase(), 'web'),
-                "static_path"   : os.path.join(AppFolders.appBase(), 'web/static'),
-                "static_url_prefix" : self.webroot + "/static/", }
+                "template_path" : os.path.join(AppFolders.appBase(), 'web/templates'),
+                "static_path"   : os.path.join(AppFolders.appBase(), 'web/resources'),
+                "static_url_prefix" : self.webroot + "/resources/", }
 
             handlers = [
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/status/?",DeviceHandler),

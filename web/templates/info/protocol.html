@@ -1,0 +1,14 @@
+{% set title = "Messages" %} {% include ../wrapper/head.html %}
+{% from smarter.SmarterProtocol import * %}
+<center>
+<div class="Title"><img class="IconMessages" src="{{ static_url('icons/info/messages.png') }}"><div class="TitleMessageSubSubSub">Smarter Coffee & iKettle 2.0</div>Protocol</div>
+
+
+{% raw Smarter.structure().replace("\n","<br>").replace("Messages","<a href=\"/info/messages\">Messages</a>").replace("ARGUMENTS","<a href=\"/info/arguments\">ARGUMENTS</a>") %}
+
+
+{% raw Smarter.notes().replace("\n","<br>") %}
+
+</center>
+
+{% include ../wrapper/foot.html %}

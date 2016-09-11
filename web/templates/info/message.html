@@ -1,0 +1,95 @@
+{% set title = "Message" %} {% include ../wrapper/head.html %}
+{% from smarter.SmarterProtocol import * %}
+
+<br>
+
+<center>
+
+{% if Smarter.message_is_known(id) %}
+
+<a href="/info/messages#{{ Smarter.message_is_type(id).lower() }}"><div class="TitleMessageSubSubSub">{{ Smarter.message_is_type(id) }} Message
+{{ Smarter.number_to_code(id) }}</div></a>
+<br>
+<div class="TitleMessage">{{ Smarter.message_description(id) }}</div>
+<br>
+{% if Smarter.message_coffee(id) %}
+<img class="IconMessage" src="{{ static_url('icons/coffee/coffee.png')}}">
+{% end %}
+{% if Smarter.message_kettle(id) %}
+<img class="IconMessage" src="{{ static_url('icons/kettle/kettle.png')}}">
+{% end %}
+
+<br>
+<br>
+<br>
+{{ Smarter.message_notes(id) }}
+{% if Smarter.message_arguments(id) != [] %}
+<br>
+<br>
+
+
+<div class="TitleMessageSubSub">Arguments</div>
+{% for x in Smarter.message_arguments(id) %}
+<a href="/info/arguments#{{ x[0]  }}">&lt;{{ x[1] }}&gt;</a>
+{% end %}
+<div class="Args">
+{% for x in Smarter.message_arguments(id) %}
+<br><br><span class="TitleMessageSubSub">Argument</span>{% raw Smarter.string_argument(x[0]).replace(' ', '&nbsp').replace("<", "<a href=\"/info/arguments#" + str(x[0]) + "\"> &lt").replace('>', '&gt </a>').replace('”', '”</a>').replace("“", "<a href=\"/info/arguments#" + str(x[0]) + "\">“").replace('\n', '<br>').replace('\r', '<br>')[9:] %}
+{% end %}
+</div>
+{% end %}
+
+<br>
+<br>
+<div class="TitleMessageSubSub">Example</div>
+
+[{{ Smarter.message_example(id) }}]
+
+<br>
+<br>
+
+
+<div class="TitleMessageSubSub">
+{% if Smarter.message_connection(id) and Smarter.message_is_response(id) %}
+<a href="/info/messages#command">Command messages</a>
+{% elif Smarter.message_connection(id) %}
+<a href="/info/messages#response">Response messages</a>
+{% end %}
+</div>
+
+
+
+<div class="tTable">
+{% for i, iid in enumerate(Smarter.message_connection(id)) %}
+
+<div class="tRow">
+
+<div class="CellMessagesDevice">
+{% if Smarter.message_coffee(iid) %}
+<a href="/info/message/{{ Smarter.number_to_code(iid) }}"><img class="DeviceIconSmall" src="{{ static_url('icons/coffee/coffee.png')}}"></a>
+{% end %}
+</div><div class="CellMessagesDevice">
+{% if Smarter.message_kettle(iid) %}
+<a href="/info/message/{{ Smarter.number_to_code(iid) }}"><img class="DeviceIconSmall" src="{{ static_url('icons/kettle/kettle.png')}}"></a>
+{% end %}
+</div>
+
+<div class="CellMessagesID"><a href="/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.number_to_code(iid)}}</a></div>
+<div class="CellMessagesDesc"><a href="/info/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.message_description(iid) }}</a></div></div>
+
+{% end %}
+</div>
+
+{% else %}
+Unknown Message {{ Smarter.number_to_code(id).upper() }}
+{% end %}
+<br><br>
+<div class="TitleMessageSubSub">Know more info about this message?</div><br>Please contact me!<br><br>
+<a href="mailto:tristan@monkeycat.nl?subject=Smarter Protocol Message {{ id }}"><img class="IconMessage" src="{{ static_url('icons/info/contact.png') }}"></a>
+
+
+
+</center>
+<br><br><br>
+
+{% include ../wrapper/foot.html %}

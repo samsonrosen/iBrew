@@ -1234,7 +1234,7 @@ class SmarterProtocol:
         Command22                   : ('PROTOCOL',[],"",""),
         Command23                   : ('PROTOCOL',[],"",""),
         Command30                   : ('PROTOCOL',[ArgUnknown],"",""),
-        CommandKettleStoreSettings  : ('PROTOCOL',[ArgKeepWarmCombi,ArgTemperature,ArgFormula,ArgFormulaTemperature],"1f196401227e","Default user defaults message is [1f0064004b7e]. I think the correct message in v18 is without formula, since that value can take values up to 100 and nothing is returned for the 4th value. <[FORMULA]>"),
+        CommandKettleStoreSettings  : ('PROTOCOL',[ArgKeepWarmCombi,ArgTemperature,ArgFormula,ArgFormulaTemperature],"1f196401227e","Default user defaults message is [1f0064004b7e]. I think the correct message in v18 is without formula, since that value can take values up to 100 and nothing is returned for the 4th value. <[FORMULA]>, I think this is a bug in smarter ios app."),
         CommandKettleHistory        : ('PROTOCOL',[],"","When called will erase this history."),
         CommandKettleSettings       : ('PROTOCOL',[],"","Also return 00 message in an unconfigured state.??? CHECK"),
         CommandStoreBase            : ('PROTOCOL',[ArgWater],"044c",""),

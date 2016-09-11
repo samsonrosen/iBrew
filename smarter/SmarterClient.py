@@ -9,6 +9,7 @@ import time
 import datetime
 import logging
 import logging.handlers
+import platform
 
 try:
     import win_inet_pton

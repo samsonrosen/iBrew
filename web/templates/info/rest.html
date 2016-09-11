@@ -1,0 +1,198 @@
+{% set title = "REST Interface" %} {% include ../wrapper/head.html %}
+
+
+<center>
+
+<div class="TitleApi">REST</div>
+
+<img class="IconInfo" src="{{ static_url('icons/info/rest.png') }}">
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="tTable">
+    <div class="tRow">
+        <div class="CellApiDesc"><img class="IconApi" src="{{ static_url('icons/coffee/coffee.png')}}"><img class="IconApi" src="{{ static_url('icons/kettle/kettle.png')}}"></a></div>
+        <div class="CellApi"></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Version</div>
+        <div class="CellApi"><a href="/api/version">/version</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Joke</div>
+        <div class="CellApi"><a href="/api/joke">/joke</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">List of devices</div>
+        <div class="CellApi"><a href="/api/devices">/devices</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Statistics Server</div>
+        <div class="CellApi"><a href="/api/statistics">/statistics</a></div>
+    </div>
+</div>
+
+<br>
+
+{% for ip in devices %}
+<div class="tTable">
+
+    {% if "SmarterCoffee" == devices[ip] %}
+    <div class="tRow">
+        <div class="CellApiDesc"><img class="IconApi" src="{{ static_url('icons/coffee/coffee.png')}}"></a></div>
+        <div class="CellApi"></div>
+    </div>
+    {% else %}
+    <div class="tRow">
+        <div class="CellApiDesc"><img class="IconApi" src="{{ static_url('icons/kettle/kettle.png')}}"></a></div>
+        <div class="CellApi"></div>
+    </div>
+    {% end %}
+    
+    <div class="tRow">
+        <div class="CellApiDesc">Status</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/status">/status</a></div>
+    </div>
+
+    {% if "SmarterCoffee" == devices[ip] %}
+    <div class="tRow">
+        <div class="CellApiDesc">Start brewing</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/start">/start</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Start brewing default user</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/start">/start</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Stop brewing</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/start">/stop</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Single cup mode</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/singlecup">/singlecup</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Carafe required</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/carafe">/carafe</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set filter</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/filter">/filter</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set beans</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/beans">/beans</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set strength weak</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/weak">/weak</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set strength medium</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/medium">/medium</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set strength strong</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/strong">/strong</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set cups</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/cups">/cups</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Hotplate on</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/hotplate/on">/hotplate/on</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Hotplate off</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/hotplate/off">/hotplate/off</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Set timer</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/timer">/timer</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Delete timer</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/timer/delete">/timer/delete</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Timers</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/timers">/timers</a></div>
+    </div>
+    {% end %}
+    
+    {% if "iKettle 2.0" == devices[ip] %}
+    
+    <div class="tRow">
+        <div class="CellApiDesc">Start heating default</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/start">/start</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Stop heating</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/stop">/stop</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Start heating in formula mode</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/heat">/heat</a></div>
+    </div>
+    <div class="tRow">
+        <div class="CellApiDesc">Calibrate</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/calibrate">/calibrate</a></div>
+    </div>
+    
+    {% end %}
+
+    <div class="tRow">
+        <div class="CellApiDesc">Set Time</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/time">/time</a></div>
+    </div>
+    
+    <div class="tRow">
+        <div class="CellApiDesc">History</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/history">/history</a></div>
+    </div>
+    
+    <div class="tRow">
+        <div class="CellApiDesc">Statistics {{ devices[ip] }} </div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/statistics">/statistics</a></div>
+    </div>
+    
+    <div class="tRow">
+        <div class="CellApiDesc">Default user settings</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/default">/default</a></div>
+    </div>
+
+    <div class="tRow">
+        <div class="CellApiDesc">User settings</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/settings">/settings</a></div>
+    </div>
+
+    <div class="tRow">
+        <div class="CellApiDesc">Scan for wireless network</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/scan">/scan</a></div>
+    </div>
+
+    <div class="tRow">
+        <div class="CellApiDesc">Leave wireless network</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/leave">/leave</a></div>
+    </div>
+
+    <div class="tRow">
+        <div class="CellApiDesc">Joke</div>
+        <div class="CellApi"><a href="/api/{{ escape(ip) }}/joke">/joke</a></div>
+    </div>
+
+ </div>
+<br>
+{% end %}
+
+<center>
+
+{% include ../wrapper/foot.html %}

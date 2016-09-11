@@ -89,5 +89,5 @@ class AppFolders():
     
     @staticmethod
     def iconsPath(filename):
-        return os.path.join(AppFolders.appBase(), "web", "static", "icons", filename)
+        return os.path.join(AppFolders.appBase(), "web", "resources", "icons", filename)
     

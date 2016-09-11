@@ -1,0 +1,164 @@
+{% set title = "Devices" %} {% include wrapper/head.html %}
+{% from smarter.SmarterProtocol import * %}
+
+<script type="text/javascript" language="javascript" charset="utf-8">
+
+var wait_update = 1000;
+var wait_joke   = 60000;
+
+// auto joke timer is not synchronized with the click event (wow that's some sufisasactating... stuff
+function process_joke(joke)     { $('#quote').html( joke.question + '<br>' + joke.answer ); }
+function joke()                 { $.getJSON( '/api/joke', process_joke); }
+function auto_joke()            { joke(); setTimeout(auto_joke, wait_joke);}
+
+function process_update_kettle(status) { if ( status.sensors.base == "On") {
+                                           $('#kettle').attr('src','{{ static_url('icons/kettle/kettle.png')}}');
+                                           if ( status.default.temperature.prefered == 'celsius' ) {
+                                             $('#temperature').html( status.sensors.temperature.raw.celsius + " ºC" ); }
+                                           else
+                                             $('#temperature').html( status.sensors.temperature.raw.fahrenheid + " ºF" );
+                                           $('#water').html( status.sensors.waterlevel.raw-status.sensors.waterlevel.base );
+                                           }
+                                           else {
+                                                $('#water').html( "" );
+                                                $('#temperature').html( "" );
+                                                $('#kettle').attr('src','{{ static_url('icons/kettle/offbase.png')}}');
+                                                
+                                           }
+                                        }
+
+
+    
+function update_kettle(ip)             { $.getJSON( '/api/' + ip + '/status', process_update_kettle); }
+function auto_update_kettle(ip)        { update_kettle(ip); setTimeout(auto_update_kettle, wait_update, ip); }
+
+
+function process_update_coffee(status) { }
+
+function update_cofee(ip)             { $.getJSON( '/api/' + ip + '/status', process_update_cofee); }
+function auto_update_coffee(ip)        { update_cofee(ip); setTimeout(auto_update_cofee, wait_update, ip); }
+
+
+
+
+
+function start(ip)              { $.getJSON( '/api/' + ip + '/start'); }
+function stop(ip)               { $.getJSON( '/api/' + ip + '/stop'); }
+
+$(document).ready(              function() { setTimeout(auto_joke, wait_joke);
+                                {% for ip in clients %}
+                                {% if clients[ip].isKettle %}
+                                    setTimeout(auto_update_kettle, wait_update, '{{ ip }}');
+                                {% elif clients[ip].isCoffee %}
+                                    setTimeout(auto_update_coffee, wait_update, '{{ ip }}');
+                                {% end %}
+                                {% end %}
+                                }
+                 );
+
+</script>
+
+
+
+
+<a href="javascript:joke()">
+<div id="quote">
+'{{ escape(joke[0]) }}...'<br>...{{ escape(joke[1]) }}
+</div>
+</a>
+
+<div align="center">
+{% for ip in clients %}
+
+<a href="{{ ip }}/settings">
+{% if clients[ip].isCoffee %}
+{% if clients[ip].carafe %}
+<img class="devices" id="coffee" src="{{ static_url('icons/coffee/coffee.png')}}"><br>
+{% else %}
+<img class="devices" id="coffee" src="{{ static_url('icons/coffee/carafe.png')}}"><br>
+{% end %}
+{% end %}
+{% if clients[ip].isKettle %}
+  {% if clients[ip].onBase %}
+    {% if clients[ip].kettleStatus == Smarter.KettleHeating %}
+<img class="devices" id="kettle" src="{{ static_url('icons/kettle/heating.gif')}}"><br>
+    {% else %}
+<img class="devices" id="kettle" src="{{ static_url('icons/kettle/kettle.png')}}"><br>
+    {% end %}
+  {% else %}
+<img  class="devices" id="kettle" src="{{ static_url('icons/kettle/offbase.png')}}">
+  {% end %}
+</a>
+
+{% end %}
+
+<a href="javascript:stop('{{ ip }}')"><img height="24px" src="{{ static_url('icons/device/stop.png') }}"></a>
+<a href="javascript:start('{{ ip }}')"><img height="24px" src="{{ static_url('icons/device/start.png') }}"></a>
+
+<br>
+{% if clients[ip].isKettle %}
+{% if clients[ip].onBase %}
+{% if clients[ip].temperature < 33 %}
+<img height="24px" src="{{ static_url('icons/kettle/temperature/low.png')}}">
+{% elif clients[ip].temperature < 66 %}
+<img height="24px" src="{{ static_url('icons/kettle/temperature/middle.png')}}">
+{% else %}
+<img height="24px" src="{{ static_url('icons/kettle/temperature/high.png')}}">
+{% end %}
+<span id="temperature">{{ Smarter.temperature_to_string(clients[ip].temperature) }}</span>
+<img height="24px" src="{{ static_url('icons/kettle/water/water.png')}}">
+<span id="water">{{ str(clients[ip].waterSensor - clients[ip].waterSensorBase) }}</span>
+{% else %}
+<br><br>
+{% end %}
+{% else %}
+<div class="tTable">
+<div id="defadults">
+<br>
+<div class="tRow"><div class="tCell">
+
+{% for i in range(0,12) %}
+{% if i >= clients[ip].cups %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/none.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+{% end %}
+{% if i == 3 or i == 7 %}
+<br>
+{% end %}
+
+{% end %}
+</div></div>
+
+<div class="tRow"><div class="tCell">
+<img width="48px" src="{{ static_url('icons/coffee/filter.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/strength/weak.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/strength/medium.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/strength/strong.png') }}">
+</div></div>
+
+<div class="tRow"><div class="tCell">{% if Smarter.check_keepwarm_on(clients[ip].hotPlate) %}
+<img width="48px" src="{{ static_url('icons/coffee/hotplate/on.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/hotplate/off.png') }}">
+{% end %}<input  {% if not Smarter.check_keepwarm_on(clients[ip].hotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ clients[ip].hotPlate }}" max="40" step="1"></div></div>
+
+<div class="tRow"><div class="tCell">
+{% if not clients[ip].singlecup %}
+<img width="48px" src="{{ static_url('icons/coffee/carafe.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+{% end %}
+
+</div></div>
+
+</div>
+
+{% end %}
+<br><br>
+{% end %}
+
+</div>
+
+{% include wrapper/foot.html %}
+

@@ -1,0 +1,29 @@
+{% set title = "Statistics iBrew Server" %} {% include wrapper/head.html %}
+<center>
+
+<div class="Title">
+Statistics
+</div>
+{% for ip in sorted(clients) %}
+<div class="TitleMessageSub">{% if clients[ip].isCoffee %}
+<img class="IconStats" id="coffee" src="{{ static_url('icons/coffee/coffee.png')}}">
+{% elif clients[ip].isKettle%}
+<img class="IconStats" id="kettle" src="{{ static_url('icons/kettle/kettle.png')}}">
+{% end %}<a href="#{{ ip.replace(".","x") }}">{{ ip }}</a></div><br>
+{% end %}
+<br>
+<br>
+
+
+{% for ip in sorted(clients) %}
+<div id="{{ ip.replace(".","x") }}"></div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+{% module Template('device/body_statistics.html',client=clients[ip]) %}
+{% end %}
+</center>
+{% include wrapper/foot.html %}
