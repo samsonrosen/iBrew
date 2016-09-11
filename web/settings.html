@@ -52,7 +52,7 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 {% end %}
 
 <input  {% if not Smarter.check_keepwarm_on(client.defaultHotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ client.defaultHotPlate }}" max="40" step="1"></div></div>
-<div class="tRow"><div class="tCell">Grind Source</div><div class="tCell">
+<div class="tRow"><div class="tCell">Coffee grind</div><div class="tCell">
 
 
 {% if client.defaultGrind == Smarter.CoffeeBeans %}
@@ -72,7 +72,6 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 
 <div class="tRow"><div class="tCell">Mode</div><div class="tCell">
 
-<!--<input type="radio" name="modea" value="carafe" {% if not client.singlecup %}checked{% end %}>-->
 
 {% if not client.singlecup %}
 <img width="48px" src="{{ static_url('icons/coffee/carafe.png') }}">

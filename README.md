@@ -143,6 +143,7 @@ you can also use them on the command line as arguments:
   iKettle 2.0 Commands
     base                   show watersensor base value
     base [base]            store watersensor base value
+    boil                   heat till 100°C (coffee level)
     calibrate              calibrates watersensor
     celsius                use celsius °C [console only]
     fahrenheid             use fahrenheid °F [console only]
@@ -150,15 +151,17 @@ you can also use them on the command line as arguments:
     heat (temperature)(keepwarm))    heat kettle
     stop kettle            stops heating
     settings [temperature] [keepwarm] [formula] [formulatemperature] store kettle user settings
+    tea [white,green,black,oelong] warms water for tea
 
   Smarter Coffee  Commands
+    beans                  use beans for coffee
     brew (cups (hotplate (grind (strength)))) brew coffee
     brew default           brew coffee with default settings
     carafe                 returns if carafe is required
     carafe [state]         set carafe is required [on or off]
     cups [number]          set number of cups [1..12]
-    beans                  use beans as grinded source
-    filter                 use filter as grinded source
+    descaling              descale coffee machine
+    filter                 use filter for coffee
     hotplate off           turn hotplate off
     hotplate on (minutes)  turn hotplate on (time in minutes)
     singlecup              return single coffee cup mode

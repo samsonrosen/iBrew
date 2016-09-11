@@ -584,14 +584,14 @@ class SmarterProtocol:
         elif self.CoffeeStrong == number:
             return self.CoffeeStringStrong
         else:
-            raise SmarterErrorOld("Invalid coffee strength ["+CoffeeStringWeak+", "+CoffeeStringMedium+", "+CoffeeStringStrong +"] " + self.number_to_code(strength))
+            raise SmarterErrorOld("Invalid coffee strength ["+self.CoffeeStringWeak+", "+self.CoffeeStringMedium+", "+CoffeeStringStrong +"] " + self.number_to_code(strength))
 
     def string_to_strength(self,strength):
-        if strength.strip().lower() == CoffeeStringWeak:
+        if strength.strip().lower() == self.CoffeeStringWeak:
             return self.CoffeeWeak
-        elif strength.strip().lower() == CoffeeStringMedium:
+        elif strength.strip().lower() == self.CoffeeStringMedium:
             return self.CoffeeMedium
-        elif strength.strip().lower() == CoffeeStringStrong:
+        elif strength.strip().lower() == self.CoffeeStringStrong:
             return self.CoffeeStrong
         else:
             raise SmarterErrorOld("Invalid coffee strength ["+self.CoffeeStringWeak+", "+self.CoffeeStringMedium+", "+self.CoffeeStringStrong +"] " + strength)

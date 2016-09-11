@@ -542,9 +542,23 @@ class iBrewConsole:
                                             if numarg >= 2:
                                                 self.client.kettle_heat(Smarter.string_to_temperature(arguments[0]),Smarter.string_to_keepwarm(arguments[1]))
                                             elif numarg == 1:
-                                                self.client.kettle_heat(Smarter.string_to_temperature(arguments[0]),self.client.defaultKeepWarmTime)
+                                                self.client.kettle_heat(Smarter.string_to_temperature(arguments[0]))
                                             else:
                                                 self.client.kettle_heat_default()
+                                    
+            elif command == "tea":
+                                            if numarg == 1:
+                                                if arguments[0] == "white":
+                                                    self.client.kettle_heat_white_tea()
+                                                if arguments[0] == "black":
+                                                    self.client.kettle_heat_black_tea()
+                                                if arguments[0] == "green":
+                                                    self.client.kettle_heat_green_tea()
+                                                if arguments[0] == "oelong":
+                                                    self.client.kettle_heat_oelong_tea()
+                                                
+            elif command == "boil":         self.client.kettle_boil()
+
             elif command == "formula":
                                             if numarg >= 2:
                                                 self.client.kettle_formula_heat(Smarter.string_to_temperature(arguments[0]),Smarter.string_to_keepwarm(arguments[1]))
@@ -867,6 +881,7 @@ class iBrewConsole:
         print "  iKettle 2.0 Commands"
         print "    base                   show watersensor base value"
         print "    base [base]            store watersensor base value"
+        print "    boil                   heat till 100°C (coffee level)"
         print "    calibrate              calibrates watersensor"
         print "    celsius                use celsius °C [console only]"
         print "    fahrenheid             use fahrenheid °F [console only]"
@@ -874,16 +889,17 @@ class iBrewConsole:
         print "    heat (temperature)(keepwarm))    heat kettle"
         print "    stop kettle            stops heating"
         print "    settings [temperature] [keepwarm] [formula] [formulatemperature] store kettle user settings"
+        print "    tea [white,green,black,oelong] warms water for tea"
         print
         print "  Smarter Coffee  Commands"
-        print "    beans                  use beans as grinded source"
+        print "    beans                  use beans for coffee"
         print "    brew (cups (hotplate (grind (strength)))) brew coffee"
         print "    brew default           brew coffee with default settings"
         print "    carafe                 returns if carafe is required"
         print "    carafe [state]         set carafe is required [on or off]"
         print "    cups [number]          set number of cups [1..12]"
-        print "    descaling              descale coffee machine, need full water"
-        print "    filter                 use filter as grinded source"
+        print "    descaling              descale coffee machine"
+        print "    filter                 use filter for coffee"
         print "    hotplate off           turn hotplate off"
         print "    hotplate on (minutes)  turn hotplate on (time in minutes)"
         print "    singlecup              return single coffee cup mode"

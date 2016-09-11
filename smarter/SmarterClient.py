@@ -1181,13 +1181,40 @@ class SmarterClient:
             raise SmarterErrorOld(KettleNoMachineSettings,"You need a Kettle machine to get its settings")
 
 
-    def kettle_heat(self,temperature=100,keepwarm=0):
+    def kettle_heat(self,temperature=100,keepwarma=-1):
+        if keepwarma == -1:
+            keepwarm = self.defaultKeepWarmTime
+        else:
+            keepwarm = keepwarma
         if self.fast or self.isKettle:
             self.send_command(Smarter.CommandHeat,Smarter.temperature_to_raw(temperature)+Smarter.keepwarm_to_raw(keepwarm))
         else:
             raise SmarterError(KettleNoMachineHeat,"You need a kettle to heat it")
 
+    def kettle_heat_black_tea(self):
+        self.kettle_heat(100)
 
+
+    def kettle_heat_green_tea(self):
+        self.kettle_heat(80)
+
+
+    def kettle_heat_white_tea(self):
+        self.kettle_heat(85)
+
+
+    def kettle_heat_oelong(self):
+        self.kettle_heat(90)
+
+
+    def kettle_heat_coffee(self):
+        self.kettle_heat(95)
+
+
+    def kettle_boil(self):
+        self.kettle_heat(100)
+    
+    
     def kettle_heat_default(self):
         self.kettle_heat(self.defaultTemperature,self.defaultKeepWarmTime)
 

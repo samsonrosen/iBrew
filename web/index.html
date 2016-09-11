@@ -112,47 +112,43 @@ $(document).ready(              function() { setTimeout(auto_joke, wait_joke);
 <br><br>
 {% end %}
 {% else %}
-ddd
 <div class="tTable">
 <div id="defadults">
 <br>
-<div class="tRow"><div class="tCell">Cups</div><div class="tCell">
+<div class="tRow"><div class="tCell">
 
 {% for i in range(0,12) %}
-{% if i >= clients[ip].defaultCups %}
-<img width="24px" src="{{ static_url('icons/coffee/cups/none.png') }}">
+{% if i >= clients[ip].cups %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/none.png') }}">
 {% else %}
-<img width="24px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
 {% end %}
-{% if i == 5 %}
+{% if i == 3 or i == 7 %}
 <br>
 {% end %}
 
 {% end %}
 </div></div>
-<br>
-<div class="tRow"><div class="tCell">Hotplate</div><div class="tCell"><input type="checkbox" name="df" value="{{ Smarter.check_keepwarm_on(clients[ip].hotPlate)  }}"><input  {% if not Smarter.check_keepwarm_on(clients[ip].hotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ clients[ip].hotPlate }}" max="40" step="1"></div></div>
-<br>
-<div class="tRow"><div class="tCell">Grind Source</div><div class="tCell">
 
-<input type="radio" name="grind" value="beans" checked="{{ clients[ip].grind == Smarter.CoffeeBeans }}"><img width="24px" src="{{ static_url('icons/coffee/beans.png') }}">
-<input type="radio" name="grind" value="filter" checked={{ clients[ip].grind == Smarter.CoffeeFilter }}"><img width="24px" src="{{ static_url('icons/coffee/filter.png') }}">
-
-
+<div class="tRow"><div class="tCell">
+<img width="48px" src="{{ static_url('icons/coffee/filter.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/strength/weak.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/strength/medium.png') }}">
+<img width="48px" src="{{ static_url('icons/coffee/strength/strong.png') }}">
 </div></div>
-<br>
-<div class="tRow" {% if clients[ip].grind == Smarter.CoffeeFilter %}style="display: none;"{% end %}><div class="tCell">Grind Beans Strength</div><div class="tCell">
 
-  <input type="radio" name="strength" value="weak" checked="{{ clients[ip].strength == Smarter.CoffeeWeak }}">Weak<br>
-  <input type="radio" name="strength" value="medium" checked="{{ clients[ip].strength == Smarter.CoffeeMedium }}">Medium<br>
-  <input type="radio" name="strength" value="strong" checked="{{ clients[ip].strength == Smarter.CoffeeStrong }}">Strong<br>
-  </div></div>
+<div class="tRow"><div class="tCell">{% if Smarter.check_keepwarm_on(clients[ip].hotPlate) %}
+<img width="48px" src="{{ static_url('icons/coffee/hotplate/on.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/hotplate/off.png') }}">
+{% end %}<input  {% if not Smarter.check_keepwarm_on(clients[ip].hotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ clients[ip].hotPlate }}" max="40" step="1"></div></div>
 
-
-<div class="tRow"><div class="tCell">Mode</div><div class="tCell">
-
-<input type="radio" name="gRrind" value="bedans" checked="{{ False == clients[ip].singlecup }}"><img width="24px" src="{{ static_url('icons/coffee/carafe.png') }}">
-<input type="radio" name="gRrind" value="filtder" checked={{ clients[ip].singlecup }}"><img width="24px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+<div class="tRow"><div class="tCell">
+{% if not clients[ip].singlecup %}
+<img width="48px" src="{{ static_url('icons/coffee/carafe.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
+{% end %}
 
 </div></div>
 
