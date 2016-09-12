@@ -389,7 +389,7 @@ class WifiJoinHandler(GenericAPIHandler):
         self.write(response)
 
 
-class WifiLeaveHandler(GenericAPIHandler):
+class CupWifiDirectHandler(GenericAPIHandler):
     def get(self,ip):
         if ip in self.application.clients:
             self.application.clients[ip].wifi_direct()
@@ -916,8 +916,8 @@ class iBrewWeb(tornado.web.Application):
         try:
             settings = {
                 "debug"         : True,
-                "template_path" : os.path.join(AppFolders.appBase(), 'web/templates'),
-                "static_path"   : os.path.join(AppFolders.appBase(), 'web/resources'),
+                "template_path" : os.path.join(AppFolders.appBase(), 'web'),
+                "static_path"   : os.path.join(AppFolders.appBase(), 'resources'),
                 "static_url_prefix" : self.webroot + "/resources/", }
 
             handlers = [
@@ -939,7 +939,7 @@ class iBrewWeb(tornado.web.Application):
                 
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/scan/?",WifiScanHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/join/(.+)/(.*)/?",WifiJoinHandler),
-                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/leave/?",WifiLeaveHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/direct/?",CupWifiDirectHandler),
                 
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/start/?",StartHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/stop/?",StopHandler),

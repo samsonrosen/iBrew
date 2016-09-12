@@ -1233,8 +1233,9 @@ class SmarterClient:
         """
         if not self.isDirect:
             self.__send_command(Smarter.CommandWifiLeave)
+
         else:
-            raise SmarterErrorOld("Already in direct mode")
+            logging.warning("[" + self.host + "] You are already in direct mode")
 
 
 
@@ -1247,7 +1248,7 @@ class SmarterClient:
         if not self.isDirect:
             self.__send_command(Smarter.CommandWifiJoin)
         else:
-            raise SmarterErrorOld("Nothing to rejoin, you are in direct mode")
+            logging.warning("[" + self.host + "] Nothing to rejoin, you are in direct mode")
 
 
 
@@ -1816,9 +1817,10 @@ class SmarterClient:
         Only here because on the display it says beans/filter
         Please use: coffee_pregrind() coffee_weak() coffee_medium() or coffee_strong for coffee type selection
         """
-        if self.isCoffee and not self.grind:
-            self.__send_command(Smarter.CommandGrinder)
-            self.grind = True
+        if self.isCoffee:
+            if not self.grind:
+                self.__send_command(Smarter.CommandGrinder)
+                self.grind = True
         else:
             raise SmarterError(CoffeeNoMachineGrinder,"You need a coffee machine to use the grinder to grind the beans")
 
@@ -1833,9 +1835,10 @@ class SmarterClient:
         Only here because on the display it says beans/filter
         Please use: coffee_pregrind() coffee_weak() coffee_medium() or coffee_strong for coffee type selection
         """
-        if self.isCoffee and self.grind:
-            self.__send_command(Smarter.CommandGrinder)
-            self.grind = False
+        if self.isCoffee:
+            if self.grind:
+                self.__send_command(Smarter.CommandGrinder)
+                self.grind = False
         else:
             raise SmarterError(CoffeeNoMachineGrinder,"You need a coffee machine to use the pre grind beans in the filter")
 

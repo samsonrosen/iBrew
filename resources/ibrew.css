@@ -4,6 +4,22 @@
 *
 ******************/
 
+@font-face {
+  font-family: 'Architects Daughter';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Architects Daughter'), local('ArchitectsDaughter'), url(resources/fonts/ArchitectsDaughter.woff)  format('woff');
+}
+        
+@font-face {
+  font-family: 'Abel';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Abel'), local('Abel-Regular'), url(resources/fonts/Abel.woff) format('woff');
+  
+  
+}
+
 body {
     font-family: 'Abel', sans-serif;
     font-size: 140%

@@ -46,8 +46,8 @@ function weak(ip)                   { $.getJSON( '/api/' + ip + '/weak'); }
 function medium(ip)                 { $.getJSON( '/api/' + ip + '/medium'); }
 function strong(ip)                 { $.getJSON( '/api/' + ip + '/strong'); }
 function onecupmode(ip,state)       { $.getJSON( '/api/' + ip + '/mode/carafe'); }
-function carafemode(ip,state)     { $.getJSON( '/api/' + ip + '/mode/onecup'); }
-function filter(ip,state)           { $.getJSON( '/api/' + ip + '/pregrind'); }
+function carafemode(ip,state)     { $.getJSON( '/api/' + ip + '/mode/cup'); }
+function filter(ip,state)           { $.getJSON( '/api/' + ip + '/filter'); }
 
 
 function start(ip)              { $.getJSON( '/api/' + ip + '/start'); }
@@ -130,7 +130,7 @@ $(document).ready(function()    {
 {% else %}
 
 <div id="toggle">
-{% for i in range(0,clients[ip].cups) %}<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">{% end %}
+<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">{{ clients[ip].cups }}x
 {% if Smarter.CoffeeFilter ==  clients[ip].grind %}<img width="48px" src="{{ static_url('icons/coffee/filter.png') }}">
 {% else %}
 <img width="48px" src="{{ static_url('icons/coffee/strength/' +  Smarter.strength_to_string(clients[ip].strength) + '.png') }}">
