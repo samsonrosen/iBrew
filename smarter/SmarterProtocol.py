@@ -619,6 +619,13 @@ class SmarterProtocol:
         return ((temperature - 32) * 5) / 9
     
     
+    #
+    #  PLEASE CHECK THESE TWO FUNCTIONS OUT>>> THEIR DANCING, .... WEAR AGUN
+    #
+    #
+    #
+    
+    
     def check_temperature_celsius(self,temperature):
         # if fahrenheid then converto...
         # if self.Fahrenheid
@@ -632,9 +639,12 @@ class SmarterProtocol:
     
     def check_temperature(self,temperature):
         if self.Fahrenheid:
-            return self.fahrenheid_to_celsius(temperature)
+            t = self.fahrenheid_to_celsius(temperature)
         else:
-            return temperature
+            t = temperature
+        if t > 100 or t < 0:
+            raise SmarterErrorOld("Temperature out of range [0..100] ºC ")
+        return t
 
 
     def raw_to_temperature(self,raw):
