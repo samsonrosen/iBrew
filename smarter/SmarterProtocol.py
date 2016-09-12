@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 import traceback
 import struct
@@ -38,7 +38,7 @@ CoffeeNoMachineOff              = 56
 CoffeeNoMachineSettings         = 57
 CoffeeNoMachineStoreSettings    = 58
 CoffeeNoMachineHistory          = 59
-CoffeeNoMachineSingleCupMode    = 60
+CoffeeNoMachineCup           = 60
 CoffeeNoMachineCarafe           = 61
 KettleFailedStoreSettings       = 70
 CoffeeFailedStoreSettings       = 90
@@ -131,8 +131,8 @@ class SmarterProtocol:
     CommandHotplateOff        = 0x4a
     CommandCarafe             = 0x4c
     CommandSetCarafe          = 0x4b
-    CommandSingleCupMode      = 0x4f
-    CommandSetSingleCupMode   = 0x4e
+    CommandMode      = 0x4f
+    CommandSetMode   = 0x4e
     CommandStoreTimer         = 0x40
     CommandTimers             = 0x41
     CommandDisableTimer       = 0x43
@@ -168,7 +168,7 @@ class SmarterProtocol:
     ResponseTimers            = 0x42
     ResponseCoffeeHistory     = 0x47
     ResponseCarafe            = 0x4d
-    ResponseSingleCupMode     = 0x50
+    ResponseMode     = 0x50
     
     # kettle
     ResponseKettleStatus      = 0x14
@@ -207,12 +207,12 @@ class SmarterProtocol:
         CommandGrinder          : (False,True,[ResponseCommandStatus],"Toggle grinder"),
         CommandHotplateOn       : (False,True,[ResponseCommandStatus],"Turn on hotplate"),
         CommandCarafe           : (False,True,[ResponseCoffeeStatus,ResponseCommandStatus],"Get coffee carafe required"),
-        CommandSingleCupMode    : (False,True,[ResponseSingleCupMode,ResponseCommandStatus],"Get single coffee cup mode"),
+        CommandMode             : (False,True,[ResponseMode,ResponseCommandStatus],"Get mode"),
         CommandStoreTimer       : (False,True,[ResponseCommandStatus],"Store timer"),
         CommandTimers           : (False,True,[ResponseTimers,ResponseCommandStatus],"Get timers"),
         CommandDisableTimer     : (False,True,[ResponseCommandStatus],"Timer event handled"),
         CommandSetCarafe        : (False,True,[ResponseCommandStatus],"Set coffee carafe required"),
-        CommandSetSingleCupMode : (False,True,[ResponseCommandStatus],"Set single coffee cup mode"),
+        CommandSetMode          : (False,True,[ResponseCommandStatus],"Set mode"),
         CommandCoffeeSettings   : (False,True,[ResponseCoffeeSettings,ResponseCommandStatus],"Get default coffee machine user settings"),
         CommandCoffeeHistory    : (False,True,[ResponseCoffeeHistory],"Get coffee machine history"),
         CommandHotplateOff      : (False,True,[ResponseCommandStatus],"Turn off hotplate"),
@@ -260,7 +260,7 @@ class SmarterProtocol:
     # format: kettle?, coffee? (None is unnknown), minimal length (0 = variable), response to command, description
     ResponseMessages = {
         #incomplete? ... chech the first one...
-        ResponseCommandStatus   : (True,True,3,[CommandDeviceTime,CommandWifiNetwork,CommandWifiPassword,CommandResetSettings,CommandHeat,CommandKettleStop,CommandHeatFormula,CommandKettleStoreSettings,Command20,CommandHeatDefault,Command22,Command23,CommandBase,CommandCalibrate,Command69,CommandStoreTimer,CommandTimers,CommandDisableTimer,Command30,CommandSetCarafe,CommandSetSingleCupMode,CommandStrength,CommandCups,CommandGrinder,CommandHotplateOn,CommandSingleCupMode,CommandCarafe,CommandHotplateOff,CommandCoffeeSettings,CommandBrew,CommandCoffeeStop,CommandBrewDefault],"Command status",[]),
+        ResponseCommandStatus   : (True,True,3,[CommandDeviceTime,CommandWifiNetwork,CommandWifiPassword,CommandResetSettings,CommandHeat,CommandKettleStop,CommandHeatFormula,CommandKettleStoreSettings,Command20,CommandHeatDefault,Command22,Command23,CommandBase,CommandCalibrate,Command69,CommandStoreTimer,CommandTimers,CommandDisableTimer,Command30,CommandSetCarafe,CommandSetMode,CommandStrength,CommandCups,CommandGrinder,CommandHotplateOn,CommandMode,CommandCarafe,CommandHotplateOff,CommandCoffeeSettings,CommandBrew,CommandCoffeeStop,CommandBrewDefault],"Command status",[]),
         ResponseWirelessNetworks: (True,True,0,[CommandWifiScan],"Wireless networks list",[]),
         ResponseKettleHistory   : (True,False,0,[CommandKettleHistory],"Kettle history",[]),
         ResponseCoffeeHistory   : (False,True,0,[CommandCoffeeHistory],"Coffee machine history",[]),
@@ -272,7 +272,7 @@ class SmarterProtocol:
         ResponseCarafe          : (False,True,3,[CommandCarafe],"Carafe required",[]),
         ResponseCoffeeStatus    : (False,True,0,[],"Coffee machine status",[]),
         ResponseCoffeeSettings  : (False,True,6,[CommandCoffeeSettings],"Default coffee machine user settings",[]),
-        ResponseSingleCupMode   : (False,True,3,[CommandSingleCupMode],"Single coffee cup mode",[]),
+        ResponseMode   : (False,True,3,[CommandMode],"Mode",[]),
         ResponseTimers          : (False,True,0,[CommandTimers],"Stored timers",[])
 
     }
@@ -995,6 +995,10 @@ class SmarterProtocol:
            raise SmarterErrorOld("Unknown grind ["+self.CoffeeStringBeans+"/"+self.CoffeeStringFilter+"] " + grind)
 
 
+
+    CoffeeCupMode = True
+    CoffeeCarafeMode = False
+
     def string_coffee_settings(self, cups, strength, grind, hotplate):
         s = ""
         if hotplate >= 5 and hotplate <= 40:
@@ -1130,7 +1134,7 @@ class SmarterProtocol:
     ArgWaterSensorHi= 1035
     ArgIndex        = 1036
     ArgRequired     = 1037
-    ArgSingleCup    = 1038
+    ArgMode    = 1038
     ArgCounter      = 1027
     ArgDB           = 1032
     ArgCoffeeStatus = 1023
@@ -1181,7 +1185,7 @@ class SmarterProtocol:
 
 
         ResponseCarafe              : ('PROTOCOL',[ArgCarafe],"00",""),
-        ResponseSingleCupMode       : ('PROTOCOL',[ArgSingleCup],"01",""),
+        ResponseMode       : ('PROTOCOL',[ArgMode],"01",""),
         ResponseCommandStatus       : ('PROTOCOL',[ArgCommandStatus],"04",""),
         ResponseDeviceInfo          : ('PROTOCOL',[ArgDevice,ArgVersion],"0113","Get the type of the device connected to and it's firmware. It is used for auto discovery over UDP broadcast. This fails on some routers, which don't propagate UDP broadcasts."),
         ResponseWifiFirmware        : ('PROTOCOL',[ArgWifiFirmware],"41542b474d525c6e41542076657273696f6e3a302e34302e302e302841756720203820323031352031343a34353a3538295c6e53444b2076657273696f6e3a312e332e305c6e636f6d70696c652074696d653a41756720203820323031352031373a31393a33385c6e4f4b5c6e",""),
@@ -1219,8 +1223,8 @@ class SmarterProtocol:
         CommandHotplateOff          : ('PROTOCOL',[],"",""),
         CommandCarafe               : ('PROTOCOL',[],"",""),
         CommandSetCarafe            : ('PROTOCOL',[ArgCarafe],"00",""),
-        CommandSingleCupMode        : ('PROTOCOL',[],"",""),
-        CommandSetSingleCupMode     : ('PROTOCOL',[ArgSingleCup],"01",""),
+        CommandMode                 : ('PROTOCOL',[],"",""),
+        CommandSetMode              : ('PROTOCOL',[ArgMode],"01",""),
         CommandStoreTimer           : ('PROTOCOL',[ArgIndex,ArgMinute,ArgHour,ArgUnknown,ArgDay,ArgMonth,ArgCentury,ArgYear],"0401010101011411","Store time in timer schedule"),
         CommandTimers               : ('PROTOCOL',[ArgIndex],"00","Get scheduled timers. If index is not all timers it gets the first timer to go off."),
         CommandDisableTimer         : ('PROTOCOL',[ArgIndex],"00","Clear time event bit in timers schedule??? It beeps that's all then it brews, it needs investigating..."),
@@ -1303,7 +1307,7 @@ class SmarterProtocol:
         ArgFormula            : ('OPTION',"Formula",[(0,"Disabled"),(1,"Enabled")]),
         ArgOffBase            : ('OPTION',"Base",[(0,"Kettle on base"),(MessageOffBase,"Kettle off base")]),
         ArgRequired           : ('OPTION',"Required",[(0,"Carafe Required"),(1,"Can brew without carafe")]),
-        ArgSingleCup          : ('OPTION',"SingleCup",[(0,"Single cup mode off"),(1,"Single cup mode on")]),
+        ArgMode          : ('OPTION',"Mode",[(0,"Carafe mode"),(1,"Cup mode")]),
 
         ArgHotPlateOn         : ('OPTION',"HotplateOn",[(0,"Hotplate on"),(1,"Hotplate off")]),
 

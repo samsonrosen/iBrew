@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 
 from datetime import date
@@ -192,7 +192,6 @@ def encodeDevice(client):
              'firmware'    : encodeFirmware(client.deviceId,client.version)
             }
 
-
 class DeviceHandler(GenericAPIHandler):
     
     def get(self, ip):
@@ -232,6 +231,16 @@ class DeviceHandler(GenericAPIHandler):
                                              }
                             }
             elif client.isCoffee:
+            
+                if client.mode == Smarter.CoffeeCupMode:
+                    mode = 'cup'
+                else:
+                    mode = 'carafe'
+                
+                if client.carafeRequired:
+                    req = "required"
+                else:
+                    req = "optional"
                 response = { 'device'      : encodeDevice(client),
                              'sensors'     : { 'hotplate'   : client.hotPlateOn,
                                                'heater'     : client.heaterOn,
@@ -255,8 +264,8 @@ class DeviceHandler(GenericAPIHandler):
                                                                    'source'     : Smarter.grind_to_string(client.grind),
                                                                    'hotplate'   : client.hotPlate
                                                                  },
-                                               'caraferequired' : client.carafeMode,
-                                               'singlecup'      : client.singlecup
+                                               'carafe'         : req,
+                                               'mode'           : mode
                                              },
                             }
         self.setContentType()
@@ -383,7 +392,7 @@ class WifiJoinHandler(GenericAPIHandler):
 class WifiLeaveHandler(GenericAPIHandler):
     def get(self,ip):
         if ip in self.application.clients:
-            self.application.clients[ip].wifi_leave()
+            self.application.clients[ip].wifi_direct()
             response = { 'success': 'left wireless network' }
         else:
             response = { 'error': 'no device' }
@@ -452,9 +461,20 @@ class StrengthHandler(GenericAPIHandler):
     def get(self,ip,strength):
         if ip in self.application.clients:
             client = self.application.clients[ip]
+            
             if client.isCoffee:
-                client.coffee_strength(strength)
-                response = { 'command status'  : client.commandStatus }
+                if strength == Smarter.CoffeeStringWeak:
+                    client.coffee_weak()
+                    response = { 'command status'  : client.commandStatus }
+                elif strength == Smarter.CoffeeStringMedium:
+                    client.coffee_medium()
+                    response = { 'command status'  : client.commandStatus }
+                elif strength == Smarter.CoffeeStringStrong:
+                    client.coffee_strong()
+                    response = { 'command status'  : client.commandStatus }
+                else:
+                    response = { 'error': 'wrong strength use weak, medium or strong' }   
+                
             else:
                 response = { 'error': 'need coffee machine' }
         else:
@@ -468,7 +488,7 @@ class CupsHandler(GenericAPIHandler):
         if ip in self.application.clients:
             client = self.application.clients[ip]
             if client.isCoffee:
-                client.coffee_strength(strength)
+                client.coffee_cups(Smarter.string_to_cups(cups))
                 response = { 'command status'  : client.commandStatus }
             else:
                 response = { 'error': 'need coffee machine' }
@@ -478,27 +498,12 @@ class CupsHandler(GenericAPIHandler):
         self.write(response)
 
 
-class GrinderHandler(GenericAPIHandler):
-    def get(self,ip,bool):
-        if ip in self.application.clients:
-            client = self.application.clients[ip]
-            if client.isCoffee:
-                client.coffee_grinder(bool)
-                response = { 'command status'  : client.commandStatus }
-            else:
-                response = { 'error': 'need coffee machine' }
-        else:
-            response = { 'error': 'no device' }
-        self.setContentType()
-        self.write(response)
-
-
-class HotPlateHandler(GenericAPIHandler):
+class HotPlateOnHandler(GenericAPIHandler):
     def get(self,ip,timer):
         if ip in self.application.clients:
             client = self.application.clients[ip]
             if client.isCoffee:
-                client.coffee_cups(timer)
+                client.coffee_hotplate_on(timer)
                 response = { 'command status'  : client.commandStatus }
             else:
                 response = { 'error': 'need coffee machine' }
@@ -508,13 +513,28 @@ class HotPlateHandler(GenericAPIHandler):
         self.write(response)
 
 
-class CarafeHandler(GenericAPIHandler):
+class HotPlateOffHandler(GenericAPIHandler):
     def get(self,ip):
         if ip in self.application.clients:
             client = self.application.clients[ip]
             if client.isCoffee:
-                client.coffee_carafe()
-                response = { 'carafe'         : client.carafe,
+                client.coffee_hotplate_off()
+                response = { 'command status'  : client.commandStatus }
+            else:
+                response = { 'error': 'need coffee machine' }
+        else:
+            response = { 'error': 'no device' }
+        self.setContentType()
+        self.write(response)
+
+
+class CarafeOnHandler(GenericAPIHandler):
+    def get(self,ip):
+        if ip in self.application.clients:
+            client = self.application.clients[ip]
+            if client.isCoffee:
+                client.coffee_carafe_required_on()
+                response = { 'carafe' : 'required',
                              'command status' : client.commandStatus }
             else:
                 response = { 'error': 'need coffee machine' }
@@ -524,13 +544,45 @@ class CarafeHandler(GenericAPIHandler):
         self.write(response)
 
 
-class SingleCupHandler(GenericAPIHandler):
+class CarafeOffHandler(GenericAPIHandler):
     def get(self,ip):
         if ip in self.application.clients:
             client = self.application.clients[ip]
             if client.isCoffee:
-                client.coffee_singlecup()
-                response = { 'singlecup'      : client.singlecup,
+                client.coffee_carafe_required_off()
+                response = { 'carafe' : 'optional',
+                             'command status' : client.commandStatus }
+            else:
+                response = { 'error': 'need coffee machine' }
+        else:
+            response = { 'error': 'no device' }
+        self.setContentType()
+        self.write(response)
+
+
+class CarafeModeHandler(GenericAPIHandler):
+    def get(self,ip):
+        if ip in self.application.clients:
+            client = self.application.clients[ip]
+            if client.isCoffee:
+                client.coffee_carafe_mode()
+                response = { 'mode'           : 'carafe',
+                             'command status' : client.commandStatus }
+            else:
+                response = { 'error': 'need coffee machine' }
+        else:
+            response = { 'error': 'no device' }
+        self.setContentType()
+        self.write(response)
+
+
+class CupModeHandler(GenericAPIHandler):
+    def get(self,ip):
+        if ip in self.application.clients:
+            client = self.application.clients[ip]
+            if client.isCoffee:
+                client.coffee_cup_mode()
+                response = { 'mode'      : 'cup',
                              'command status' : client.commandStatus }
             else:
                 response = { 'error': 'need coffee machine' }
@@ -726,7 +778,7 @@ class iBrewWeb(tornado.web.Application):
                             logging.info("[" + ip + "] Auto-connect attempt " + str(self.reconnect_count[ip]))
                         client.connect()
                         try:
-                            threading.Thread(target=client.init_default)
+                            threading.Thread(target=client.device_all_settings)
                         except Exception, e:
                             logging.info(e)
                     except Exception:
@@ -756,7 +808,7 @@ class iBrewWeb(tornado.web.Application):
                     client.settingsPath = AppFolders.settings() + "/"
                     client.connect()
                     self.clients[device[0]] = client
-                    threading.Thread(target=client.init_default)
+                    threading.Thread(target=client.device_all_settings)
                     self.reconnect_count[device[0]] = 0
                     logging.info("iBrew Web Server: " + client.string_connect_status())
                 except Exception:
@@ -783,7 +835,7 @@ class iBrewWeb(tornado.web.Application):
                     client.settingsPath = AppFolders.settings() + "/"
                     client.connect()
                     self.clients[ip] = client
-                    client.init_default()
+                    client.device_all_settings()
                     self.reconnect_count[ip] = 0
                     logging.info("iBrew Web Server: " + client.string_connect_status())
                 except Exception:
@@ -876,11 +928,13 @@ class iBrewWeb(tornado.web.Application):
 
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/beans/?",BeansHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/filter/?",FilterHandler),
-                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/carafe/?",CarafeHandler),
-                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/singlecup/?",SingleCupHandler),
-                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/hotplate/([0-9]+)/?",HotPlateHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/carafe/on/?",CarafeOnHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/carafe/off?",CarafeOffHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/mode/cup/?",CupModeHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/mode/carafe/?",CarafeModeHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/hotplate/on/([0-9]+)/?",HotPlateOnHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/hotplate/off/?",HotPlateOffHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/cups/([0-9]+)/?",CupsHandler),
-                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/grinder/?",GrinderHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/(weak|normal|strong)/?",StrengthHandler),
                 
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/scan/?",WifiScanHandler),

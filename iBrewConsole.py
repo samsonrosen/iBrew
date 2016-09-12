@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 import sys
 import time
@@ -149,7 +149,7 @@ class iBrewConsole:
                     print "iBrew: Probing command: " + Smarter.number_to_code(id)
 
                     # button pressed quit...
-                    self.client.send_command(id)
+                    self.client.device_raw(Smarter.number_to_code(id))
 
                     # check if got also a ???status message... FIX
                     if self.client.commandStatus != Smarter.StatusInvalid:
@@ -485,7 +485,7 @@ class iBrewConsole:
             if command == "connect" or command == "console" or ((command == "sweep" or command == "monitor") and not self.console):
  
                 try:
-                    self.client.init_default()
+                    self.client.device_all_settings()
                 except Exception:
                     #print(traceback.format_exc())
                     print "iBrew: Could not init values"
@@ -583,7 +583,7 @@ class iBrewConsole:
             elif command == "firmware":
                                             self.client.wifi_firmware()
                                             if not self.client.dump: self.client.print_wifi_firmware()
-            elif command == "direct":        self.client.wifi_leave()
+            elif command == "direct":        self.client.wifi_direct()
             elif command == "scan":
                                             self.client.wifi_scan()
                                             if not self.client.dump: self.client.print_wireless_networks()
@@ -600,7 +600,7 @@ class iBrewConsole:
                                             if self.client.isDirect:
                                                 print "iBrew: Can not rejoin if connected directly"
                                             else:
-                                                self.client.wifi_connect()
+                                                self.client.wifi_rejoin()
 
             # Coffee
             elif command == "hotplate":
@@ -619,11 +619,11 @@ class iBrewConsole:
             elif command == "carafe":
                                             if numarg >= 1:
                                                 if arguments[0].lower() == "off":
-                                                    self.client.coffee_carafe_off()
+                                                    self.client.coffee_carafe_required_off()
                                                 elif arguments[0].lower() == "on":
-                                                    self.client.coffee_carafe_on()
+                                                    self.client.coffee_carafe_required_on()
                                             else:
-                                                self.client.coffee_carafe()
+                                                self.client.coffee_carafe_required()
             elif command == "timers":        self.client.coffee_timers()
             elif command == "timer":
                                             if numarg >= 2:
@@ -635,21 +635,21 @@ class iBrewConsole:
                                                 print "iBrew: Not yet implemented"
                                             else:
                                                 print "iBrew: timer needs index (time or delete)"
-            elif command == "singlecup":
+            elif command == "mode":
                                             if numarg >= 1:
-                                                if arguments[0].lower() == "off":
-                                                    self.client.coffee_single_cup_mode_off()
-                                                elif arguments[0].lower() == "on":
-                                                    self.client.coffee_single_cup_mode_on()
+                                                if arguments[0].lower() == "carafe":
+                                                    self.client.coffee_carafe_mode()
+                                                elif arguments[0].lower() == "cup":
+                                                    self.client.coffee_cup_mode()
                                             else:
-                                                self.client.coffee_single_cup_mode()
+                                                self.client.coffee_mode()
             elif command == "beans":
                                             if self.client.grind:
                                                 print "iBrew: Beans already selected"
                                             else:
                                                 self.client.coffee_beans()
                                                 print "iBrew: Beans used"
-            elif command == "filter":
+            elif command == "filter" or command == "pregrind":
                                             if not self.client.grind:
                                                 print "iBrew: Filter already selected"
                                             else:
@@ -678,10 +678,10 @@ class iBrewConsole:
                                             if numarg == 0:
                                                 print "iBrew: specify strength [weak,medium,strong]"
                                             elif numarg >= 1:
-                                                self.client.coffee_strength(arguments[0])
-            elif command == "weak":         self.client.coffee_strength("weak")
-            elif command == "medium":       self.client.coffee_strength("medium")
-            elif command == "strong":       self.client.coffee_strength("strong")
+                                                self.client.coffee_strength(Smarter.string_to_strength(arguments[0]))
+            elif command == "weak":         self.client.coffee_weak()
+            elif command == "medium":       self.client.coffee_medium()
+            elif command == "strong":       self.client.coffee_strong()
             elif command == "cups":
                                             if numarg == 0:
                                                 print "iBrew: specify cups [1..12]"
@@ -898,11 +898,12 @@ class iBrewConsole:
         print "    carafe [state]         set carafe is required [on or off]"
         print "    cups [number]          set number of cups [1..12]"
         print "    descaling              descale coffee machine"
-        print "    filter                 use filter for coffee"
+        print "    filter                 use pregrind beans in filter for coffee"
         print "    hotplate off           turn hotplate off"
         print "    hotplate on (minutes)  turn hotplate on (time in minutes)"
-        print "    singlecup              return single coffee cup mode"
-        print "    singlecup [state]      set single coffee cup mode [on or off]"
+        print "    mode                   return which mode: cup or carafe mode"
+        print "    mode [mode]            set mode: [cup] or [carafe] mode"
+        print "    pregrind               use pregrind beans in filter for coffee"
         print "    (strength) [strength]  set strength coffee [weak, medium or strong]"
         print "    settings [cups] [hotplate] [grind] [strength] store user settings"
         print "    timer [time]           add timer"
@@ -949,10 +950,11 @@ class iBrewConsole:
         print "    167E           Send kettle raw stop"
         print "    21 30 05 7e    Send kettle raw heat"
         print "    weak           Set coffee strength to weak"
+        print "    strength weak  Set coffee strength to weak but do not toggle filter/beans"
         print "    cups 3         Set number of cups to brew"
-        print "    brew 4 10 beans strong  Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes"
-        print "    join MyWifi p@ssw0rd    Joins MyWifi wireless network using p@ssw0rd as credential"
-        print "    singlecup on   Set single cup mode"
+        print "    mode cup       Set cup mode"
+        print "    brew 4 10 beans strong    Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes"
+        print "    join MyWifi p@ssw0rd      Joins MyWifi wireless network using p@ssw0rd as credential"
         print "    settings 100 20 True 75   Set default user settings for the kettle to..."
         print
 

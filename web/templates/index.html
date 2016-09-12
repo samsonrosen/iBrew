@@ -40,12 +40,21 @@ function auto_update_coffee(ip)        { update_cofee(ip); setTimeout(auto_updat
 
 
 
+// Coffee machine control
+function cups(ip,cups)              { $.getJSON( '/api/' + ip + '/cups/' + cups); }
+function weak(ip)                   { $.getJSON( '/api/' + ip + '/weak'); }
+function medium(ip)                 { $.getJSON( '/api/' + ip + '/medium'); }
+function strong(ip)                 { $.getJSON( '/api/' + ip + '/strong'); }
+function onecupmode(ip,state)       { $.getJSON( '/api/' + ip + '/mode/carafe'); }
+function carafemode(ip,state)     { $.getJSON( '/api/' + ip + '/mode/onecup'); }
+function filter(ip,state)           { $.getJSON( '/api/' + ip + '/pregrind'); }
 
 
 function start(ip)              { $.getJSON( '/api/' + ip + '/start'); }
 function stop(ip)               { $.getJSON( '/api/' + ip + '/stop'); }
 
-$(document).ready(              function() { setTimeout(auto_joke, wait_joke);
+$(document).ready(function()    {
+                                setTimeout(auto_joke, wait_joke);
                                 {% for ip in clients %}
                                 {% if clients[ip].isKettle %}
                                     setTimeout(auto_update_kettle, wait_update, '{{ ip }}');
@@ -53,11 +62,18 @@ $(document).ready(              function() { setTimeout(auto_joke, wait_joke);
                                     setTimeout(auto_update_coffee, wait_update, '{{ ip }}');
                                 {% end %}
                                 {% end %}
-                                }
-                 );
+                  
+                  
+                                $("#toggle").click(function(){
+                                    $("#settings").toggle();
+                                });
+                                
+                                });
+
+                  
+
 
 </script>
-
 
 
 
@@ -112,39 +128,58 @@ $(document).ready(              function() { setTimeout(auto_joke, wait_joke);
 <br><br>
 {% end %}
 {% else %}
+
+<div id="toggle">
+{% for i in range(0,clients[ip].cups) %}<img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">{% end %}
+{% if Smarter.CoffeeFilter ==  clients[ip].grind %}<img width="48px" src="{{ static_url('icons/coffee/filter.png') }}">
+{% else %}
+<img width="48px" src="{{ static_url('icons/coffee/strength/' +  Smarter.strength_to_string(clients[ip].strength) + '.png') }}">
+{% end %}
+</div>
+
+<br>
+
+
+
+<div id="settings"   style="display:none;">
+<div class="TitleMessageSubSub">Brew options</div>
+
 <div class="tTable">
 <div id="defadults">
-<br>
-<div class="tRow"><div class="tCell">
 
-{% for i in range(0,12) %}
-{% if i >= clients[ip].cups %}
+<br>
+<div class="tRow"><div class="tCell">Cups</div><div class="tCell">
+
+{% for i in range(1,13) %}
+<a href="javascript:cups('{{ ip }}',{{ i }})">
+{% if i > clients[ip].cups %}
 <img width="48px" src="{{ static_url('icons/coffee/cups/none.png') }}">
 {% else %}
 <img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
 {% end %}
-{% if i == 3 or i == 7 %}
+</a>
+{% if i == 4 or i == 8 %}
 <br>
 {% end %}
 
 {% end %}
 </div></div>
 
-<div class="tRow"><div class="tCell">
-<img width="48px" src="{{ static_url('icons/coffee/filter.png') }}">
-<img width="48px" src="{{ static_url('icons/coffee/strength/weak.png') }}">
-<img width="48px" src="{{ static_url('icons/coffee/strength/medium.png') }}">
-<img width="48px" src="{{ static_url('icons/coffee/strength/strong.png') }}">
+<div class="tRow"><div class="tCell">Source</div><div class="tCell">
+<a href="javascript:filter('{{ ip }}')"><img width="48px" src="{{ static_url('icons/coffee/filter.png') }}"></a>
+<a href="javascript:weak('{{ ip }}')"><img width="48px" src="{{ static_url('icons/coffee/strength/weak.png') }}"></a>
+<a href="javascript:medium('{{ ip }}')"><img width="48px" src="{{ static_url('icons/coffee/strength/medium.png') }}"></a>
+<a href="javascript:strong('{{ ip }}')"><img width="48px" src="{{ static_url('icons/coffee/strength/strong.png') }}"></a>
 </div></div>
 
-<div class="tRow"><div class="tCell">{% if Smarter.check_keepwarm_on(clients[ip].hotPlate) %}
+<div class="tRow"><div class="tCell">Hotplate</div><div class="tCell">{% if Smarter.check_keepwarm_on(clients[ip].hotPlate) %}
 <img width="48px" src="{{ static_url('icons/coffee/hotplate/on.png') }}">
 {% else %}
 <img width="48px" src="{{ static_url('icons/coffee/hotplate/off.png') }}">
 {% end %}<input  {% if not Smarter.check_keepwarm_on(clients[ip].hotPlate)  %}style="display: none;"{% end %} type="range" id="dkwt" min="1" value="{{ clients[ip].hotPlate }}" max="40" step="1"></div></div>
 
-<div class="tRow"><div class="tCell">
-{% if not clients[ip].singlecup %}
+<div class="tRow"><div class="tCell">Mode</div><div class="tCell">
+{% if clients[ip].mode == Smarter.CoffeeCarafeMode %}
 <img width="48px" src="{{ static_url('icons/coffee/carafe.png') }}">
 {% else %}
 <img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">

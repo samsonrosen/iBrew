@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 import os
 import itertools, glob
@@ -21,9 +21,6 @@ class WinGui(object):
     
     FIRST_ID = 1023
     
-    #def bye(self, obj):
-     #   print 'Bye, then.'
-
 
     def show(self, sender):
         webbrowser.open("http://localhost:{0}".format(self.apiServer.port), new=0)
@@ -35,7 +32,6 @@ class WinGui(object):
         self.icon = AppFolders.iconsPath("logo.ico")
         print self.icon
         self.hover_text = "iBrew"
-        #self.on_quit = self.bye    
             
         menu_options = (
                         ('Interface', None, self.show),

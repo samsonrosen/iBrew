@@ -31,7 +31,7 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <div class="tRow"><div class="tCell">Formula Mode</div><div class="CellSettings"><img width="32px" src="{{ static_url('icons/kettle/formula/on.png') }}"></div><div class="tCell">
 
 
-<input type="range" id="dft" min="1" value="" max="100" step="1">
+<input type="range" id="dft" min="5" value="{{ client.defaultFormulaTemperature }}" max="35" step="1">
 {% if client.defaultFormulaTemperature < 33 %}
 <img height="24px" src="{{ static_url('icons/kettle/temperature/low.png')}}">
 {% elif client.defaultFormulaTemperature < 66 %}
@@ -97,7 +97,7 @@ function calibrate(ip)          { $.getJSON( '/api/' + ip + '/calibrate'); }
 <div class="tRow"><div class="tCell">Mode</div><div class="tCell">
 
 
-{% if not client.singlecup %}
+{% if client.mode == Smarter.CoffeeCarafeMode %}
 <img width="48px" src="{{ static_url('icons/coffee/carafe.png') }}">
 {% else %}
 <img width="48px" src="{{ static_url('icons/coffee/cups/one.png') }}">
