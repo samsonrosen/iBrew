@@ -1271,9 +1271,11 @@ class SmarterClient:
         Joins wireless network
         """
         self.fast = False
+        self.__sendLock.acquire()
         self.__send_command(Smarter.CommandWifiNetwork,Smarter.text_to_raw(network))
         self.__send_command(Smarter.CommandWifiPassword,Smarter.text_to_raw(password))
         self.__send_command(Smarter.CommandWifiJoin)
+        self.__sendLock.release()
 
 
 
