@@ -16,7 +16,7 @@ try:
 except Exception:
     pass
     
-from ConfigParser import SafeConfigParser
+from ConfigParser import *
 
 import traceback
 import threading
@@ -64,6 +64,15 @@ def _threadsafe_function(fn):
 #------------------------------------------------------
 
 class SmarterClient:
+    """
+    
+    Class variables:
+    
+ 
+    Please look at __init() and __init__() in the source
+    
+
+    """
     
     def __init(self):
     
@@ -72,18 +81,10 @@ class SmarterClient:
         self.port                       = Smarter.Port
         
         # device
-        self.commandStatus              = Smarter.StatusSucces
-        self.sendMessage                = None
-        self.responseMessage            = None
-        self.readMessage                = None
-        self.statusMessage              = None
         self.historySuccess             = 0
         
         # device info
         self.heaterOn                   = False
-        self.countHeater                = 0
-
-        
         # unknown status byte
         self.unknown                    = 0
     
@@ -91,28 +92,27 @@ class SmarterClient:
         self.isCoffee                   = False
  
         # kettle
+        self.waterSensorBase            = 0
+        self.waterSensor                = 0
+        self.waterSensorStable          = 0
+
+        # status
         self.kettleStatus               = Smarter.KettleReady
         
+        # sensors
         self.onBase                     = False
-        
-        self.countKettleRemoved         = 0
-        
         self.keepWarmOn                 = False
-        self.countKeepWarm              = 0
-        
         self.temperature                = 0
         self.temperatureStable          = 0
         
+        # 'default' user settings
         self.defaultTemperature         = 100
         self.defaultKeepWarmTime        = 0
         self.defaultFormula             = False
         self.defaultFormulaTemperature  = 75
         
-        # watersensor
-        self.waterSensorBase            = 0
-        self.waterSensor                = 0
-        self.waterSensorStable          = 0
-        
+  
+        # coffee
         self.waterLevel                 = 0
 
         # machine user settings
@@ -127,11 +127,11 @@ class SmarterClient:
         self.defaultGrind               = False
         self.defaultHotPlate            = 0
 
-        # status modes
-        self.mode                     = False
+        # coffee modes
+        self.mode                      = False
         self.carafeRequired             = False
 
-        # status
+        # coffee status
         self.cupsBrew                   = 0
         self.waterEnough                = False
         self.carafe                     = True
@@ -141,46 +141,52 @@ class SmarterClient:
         self.grinderOn                  = False
         self.working                    = False
         
-        self.countCarafeRemoved         = 0
-        self.countCupsBrew              = 0
-        self.countGrinderOn             = 0
-        self.countHotPlateOn            = 0
         
         # Wifi
         self.Wifi                       = []
         self.WifiFirmware               = "None"
         isDirect                        = False
 
-        self.writeLock                  = threading.Lock()
-        self.socketLock                 = threading.Lock()
+        self.__writeLock                  = threading.Lock()
+        self.__socketLock                 = threading.Lock()
     
 
-        
+        # already written to total from session
+        self.__deltaSendCount             = 0
+        self.__deltaReadCount             = 0
+        self.__deltaReadBytesCount        = 0
+        self.__deltaSendBytesCount        = 0
+        self.__deltaCountCarafeRemove     = 0
+        self.__deltaCountCupsBrew         = 0
+        self.__deltaCountGrinderOn        = 0
+        self.__deltaCountHotPlateOn       = 0
+        self.__deltaCountKettleRemoved    = 0
+        self.__deltaCountHeater           = 0
+        self.__deltaCountKeepWarm         = 0
+        self.__deltaSessionCount          = 0
+
         # session
+        self.commandCount               = dict()
+        self.responseCount              = dict()
+    
         self.sendCount                  = 0
         self.readCount                  = 0
         self.sendBytesCount             = 0
         self.readBytesCount             = 0
 
-        # already written to total from session
-        self.deltaSendCount             = 0
-        self.deltaReadCount             = 0
-        self.deltaReadBytesCount        = 0
-        self.deltaSendBytesCount        = 0
+        self.countHeater                = 0
 
-
-        self.deltaCountCarafeRemoved         = 0
-        self.deltaCountCupsBrew              = 0
-        self.deltaCountGrinderOn             = 0
-        self.deltaCountHotPlateOn            = 0
-        self.deltaCountKettleRemoved         = 0
-        self.deltaCountHeater                = 0
-        self.deltaCountKeepWarm              = 0
-        self.deltaSessionCount               = 0
-
-        self.commandCount               = dict()
-        self.responseCount              = dict()
-
+        # coffee session counters
+        self.countCarafeRemoved         = 0
+        self.countCupsBrew              = 0
+        self.countGrinderOn             = 0
+        self.countHotPlateOn            = 0
+    
+        # kettle session counters
+        self.countKeepWarm              = 0
+        self.countKettleRemoved         = 0
+   
+    
     def __init__(self):
         """
         Initializing SmarterClient
@@ -219,15 +225,17 @@ class SmarterClient:
 
         
         # Threading info
-        self.writeLock                  = threading.Lock()
-        self.socketLock                 = threading.Lock()
-        self.connected                  = False
-        self.monitor                    = None
-        self.socket                     = None
-        self.run                        = False
+        self.__writeLock                  = threading.Lock()
+        self.__socketLock                 = threading.Lock()
+        self.connected                    = False
+        self.monitor                      = None
+        self.__socket                     = None
+        
+        # monitor run
+        self.run                          = False
         
         self.__init()
-        self.settingsPath               = "devices/"
+        self.settingsPath               = ""
 
 
     def __del__(self):
@@ -249,44 +257,47 @@ class SmarterClient:
         
         if not os.path.exists(self.settingsPath):
                 os.makedirs(self.settingsPath)
+        
         config.read(self.settingsPath+self.host+'.conf')
         
         try:
             config.add_section(section)
-        except Exception:
+        except DuplicateSectionError:
             pass
 
+
+        ### THESE EXCEPTIONS NEED TO BE CHANGED FIX
         try:
-            self.totalSendCount = int(config.get(section, 'send')) + self.sendCount - self.deltaSendCount
-            self.deltaSendCount += self.sendCount - self.deltaSendCount
+            self.totalSendCount = int(config.get(section, 'send')) + self.sendCount - self.__deltaSendCount
+            self.__deltaSendCount += self.sendCount - self.__deltaSendCount
             config.set(section, 'send', str(self.totalSendCount))
         except Exception:
             config.set(section, 'send', str(self.sendCount))
         
         try:
-            self.totalReadCount = int(config.get(section, 'read')) + self.readCount - self.deltaReadCount
-            self.deltaReadCount += self.readCount - self.deltaReadCount
+            self.totalReadCount = int(config.get(section, 'read')) + self.readCount - self.__deltaReadCount
+            self.__deltaReadCount += self.readCount - self.__deltaReadCount
             config.set(section, 'read', str(self.totalReadCount))
         except Exception:
             config.set(section, 'read', str(self.readCount))
 
         try:
-            self.totalReadBytesCount = int(config.get(section, 'readbytes')) + self.readBytesCount - self.deltaReadBytesCount
-            self.deltaReadBytesCount += self.readBytesCount - self.deltaReadBytesCount
+            self.totalReadBytesCount = int(config.get(section, 'readbytes')) + self.readBytesCount - self.__deltaReadBytesCount
+            self.__deltaReadBytesCount += self.readBytesCount - self.__deltaReadBytesCount
             config.set(section, 'readbytes', str(self.totalReadBytesCount))
         except Exception:
             config.set(section, 'readbytes', str(self.readBytesCount))
 
         try:
-            self.totalSendBytesCount = int(config.get(section, 'sendbytes')) + self.sendBytesCount - self.deltaSendBytesCount
-            self.deltaSendBytesCount += self.sendBytesCount - self.deltaSendBytesCount
+            self.totalSendBytesCount = int(config.get(section, 'sendbytes')) + self.sendBytesCount - self.__deltaSendBytesCount
+            self.__deltaSendBytesCount += self.sendBytesCount - self.__deltaSendBytesCount
             config.set(section, 'sendbytes', str(self.totalSendBytesCount))
         except Exception:
             config.set(section, 'sendbytes', str(self.sendBytesCount))
 
         try:
-            self.totalCountHeater = int(config.get(section, 'heater')) + self.countHeater - self.deltaCountHeater
-            self.deltaCountHeater += self.countHeater - self.deltaCountHeater
+            self.totalCountHeater = int(config.get(section, 'heater')) + self.countHeater - self.__deltaCountHeater
+            self.__deltaCountHeater += self.countHeater - self.__deltaCountHeater
             config.set(section, 'heater', str(self.totalCountHeater))
         except Exception:
             config.set(section, 'heater', str(self.countHeater))
@@ -294,15 +305,15 @@ class SmarterClient:
 
         if self.isKettle:
             try:
-                self.totalCountKettleRemoved = int(config.get(section, 'kettleremoved')) + self.countKettleRemoved - self.deltaCountKettleRemoved
-                self.deltaCountKettleRemoved += self.countKettleRemoved - self.deltaCountKettleRemoved
+                self.totalCountKettleRemoved = int(config.get(section, 'kettleremoved')) + self.countKettleRemoved - self.__deltaCountKettleRemoved
+                self.__deltaCountKettleRemoved += self.countKettleRemoved - self.__deltaCountKettleRemoved
                 config.set(section, 'kettleremoved', str(self.totalCountKettleRemoved))
             except Exception:
                 config.set(section, 'kettleremoved', str(self.countKettleRemoved))
 
             try:
-                self.totalCountKeepWarm = int(config.get(section, 'keepwarm')) + self.countKeepWarm - self.deltaCountKeepWarm
-                self.deltaCountKeepWarm += self.countKeepWarm - self.deltaCountKeepWarm
+                self.totalCountKeepWarm = int(config.get(section, 'keepwarm')) + self.countKeepWarm - self.__deltaCountKeepWarm
+                self.__deltaCountKeepWarm += self.countKeepWarm - self.__deltaCountKeepWarm
                 config.set(section, 'keepwarm', str(self.totalCountKeepWarm))
             except Exception:
                 config.set(section, 'keepwarm', str(self.countKeepWarm))
@@ -310,29 +321,29 @@ class SmarterClient:
                 
         if self.isCoffee:
             try:
-                self.totalCountCarafeRemoved = int(config.get(section, 'caraferemoved')) + self.countCarafeRemoved - self.deltaCountCarafeRemoved
-                self.deltaCountCarafeRemoved += self.countCarafeRemoved - self.deltaCountCarafeRemoved
+                self.totalCountCarafeRemoved = int(config.get(section, 'caraferemoved')) + self.countCarafeRemoved - self.__deltaCountCarafeRemoved
+                self.__deltaCountCarafeRemoved += self.countCarafeRemoved - self.__deltaCountCarafeRemoved
                 config.set(section, 'caraferemoved', str(self.totalCountCarafeRemoved))
             except Exception:
                 config.set(section, 'caraferemoved', str(self.countCarafeRemoved))
 
             try:
-                self.totalCountGrinderOn = int(config.get(section, 'grinder')) + self.countGrinderOn - self.deltaCountGrinderOn
-                self.deltaCountGrinderOn += self.countGrinderOn - self.deltaCountGrinderOn
+                self.totalCountGrinderOn = int(config.get(section, 'grinder')) + self.countGrinderOn - self.__deltaCountGrinderOn
+                self.__deltaCountGrinderOn += self.countGrinderOn - self.__deltaCountGrinderOn
                 config.set(section, 'grinder', str(self.totalCountGrinderOn))
             except Exception:
                 config.set(section, 'grinder', str(self.countGrinderOn))
 
             try:
-                self.totalCountHotPlateOn = int(config.get(section, 'hotplate')) + self.countHotPlateOn - self.deltaCountHotPlateOn
-                self.deltaCountHotPlateOn += self.countHotPlateOn - self.deltaCountHotPlateOn
+                self.totalCountHotPlateOn = int(config.get(section, 'hotplate')) + self.countHotPlateOn - self.__deltaCountHotPlateOn
+                self.__deltaCountHotPlateOn += self.countHotPlateOn - self.__deltaCountHotPlateOn
                 config.set(section, 'hotplate', str(self.totalCountHotPlateOn))
             except Exception:
                 config.set(section, 'hotplate', str(self.countHotPlateOn))
 
         try:
-            self.totalSessionCount = int(config.get(section, 'sessions')) + self.sessionCount - self.deltaSessionCount
-            self.deltaSessionCount += self.sessionCount - self.deltaSessionCount
+            self.totalSessionCount = int(config.get(section, 'sessions')) + self.sessionCount - self.__deltaSessionCount
+            self.__deltaSessionCount += self.sessionCount - self.__deltaSessionCount
             config.set(section, 'sessions', str(self.totalSessionCount))
         except Exception:
             config.set(section, 'sessions', str(self.sessionCount))
@@ -373,8 +384,8 @@ class SmarterClient:
         self.run = True
         while self.run:
                 try:
-                    self.writeLock.acquire()
-                except Exception, e:
+                    self.__writeLock.acquire()
+                except ThreadError, e:
                     s = traceback.format_exc()
                     logging.debug(s)
                     logging.debug(e)
@@ -383,7 +394,7 @@ class SmarterClient:
                     #print(traceback.format_exc())
  
                     break
-                    raise SmarterErrorOld("Monitor Error")
+                    raise SmarterError(0,"Monitor Error")
                 try:
                     if not self.connected:
                         #print(traceback.format_exc())
@@ -396,19 +407,19 @@ class SmarterClient:
                         # call monitor function
                         # ...else got one! yeah! print it!
   
-                except Exception, e:
+                except SmarterError, e:
                     s = traceback.format_exc()
                     logging.debug(s)
                     logging.debug(e)
                     logging.error("[" + self.host + "] ERROR")
 
-                    if self.writeLock.locked():
-                        self.writeLock.release()
+                    if self.__writeLock.locked():
+                        self.__writeLock.release()
                     self.disconnect()
                     break
-                    raise SmarterErrorOld("Monitor Error")
+                    raise SmarterError(0,"Monitor Error")
                 
-                self.writeLock.release()
+                self.__writeLock.release()
                 
                 dump = self.dump
                 
@@ -437,7 +448,7 @@ class SmarterClient:
                     if monitorCount % timeout == timeout - 50:
                         pass #self.device_history()
                         
-                except Exception, e:
+                except SmarterError, e:
                     s = traceback.format_exc()
                     logging.debug(s)
                     logging.debug(e)
@@ -445,7 +456,7 @@ class SmarterClient:
                     self.disconnect()
                     self.dump = dump
                     break
-                    raise SmarterErrorOld("Monitor Error")
+                    raise SmarterError(0,"Monitor Error")
 
 
                 self.dump = dump
@@ -473,51 +484,53 @@ class SmarterClient:
 
     # MESSAGE READ
     def __read_message(self):
-        try:
-            message = ""
-            raw = self.socket.recv(1)
-            id = Smarter.raw_to_number(raw)
-            # debug
-            #print "[" + Smarter.number_to_code(id) + "]",
-            minlength = Smarter.message_response_length(id)
-
-            i = 1
-            while raw != Smarter.number_to_raw(Smarter.MessageTail) or (minlength > 0 and raw == Smarter.number_to_raw(Smarter.MessageTail) and i < minlength):
-                message += raw
-                raw = self.socket.recv(1)
+        if self.connected:
+            try:
+                message = ""
+                raw = self.__socket.recv(1)
+                id = Smarter.raw_to_number(raw)
                 # debug
-                #print "[" + Smarter.raw_to_code(raw) + "]",
-                i += 1
-            message += raw
-            self.readMessage = message
-            
-            self.readCount += 1
-            self.readBytesCount += i
-            if id in self.responseCount:
-                self.responseCount[id] += 1
-            else:
-                self.responseCount[id] = 1
- 
-            return message
+                #print "[" + Smarter.number_to_code(id) + "]",
+                minlength = Smarter.message_response_length(id)
 
-        except socket.error, msg:
-            raise SmarterErrorOld("Could not read message") # (" + msg + ")")
+                i = 1
+                while raw != Smarter.number_to_raw(Smarter.MessageTail) or (minlength > 0 and raw == Smarter.number_to_raw(Smarter.MessageTail) and i < minlength):
+                    message += raw
+                    raw = self.__socket.recv(1)
+                    # debug
+                    #print "[" + Smarter.raw_to_code(raw) + "]",
+                    i += 1
+                message += raw
+                
+                self.readCount += 1
+                self.readBytesCount += i
+                if id in self.responseCount:
+                    self.responseCount[id] += 1
+                else:
+                    self.responseCount[id] = 1
+     
+                return message
+            except socket.error, msg:
+                raise SmarterError(0,"Could not read message") # (" + msg + ")")
+            except AttributeError:
+                raise SmarterError(0,"Disconnected")
+        raise SmarterError(0,"Disconnected")
 
 
     # MESSAGE READ PROTOCOL
     def __read(self):
         if not self.connected:
-            raise SmarterErrorOld("Could not read message not connected")
+            raise SmarterError(0,"Could not read message not connected")
    
     
         try:
-            self.socketLock.acquire()
-        except Exception:
-            raise SmarterErrorOld("Could not read message")
+            self.__socketLock.acquire()
+        except ThreadError:
+            raise SmarterError(0,"Could not read message")
     
+        message = self.__read_message()
+        
         if self.connected:
-     
-            message = self.__read_message()
             id = Smarter.raw_to_number(message[0])
             
             if Smarter.message_kettle(id) and not Smarter.message_coffee(id):
@@ -531,7 +544,7 @@ class SmarterClient:
                 elif id == Smarter.ResponseBase:            self.__decode_ResponseBase(message)
                 elif id == Smarter.ResponseTimers:          self.__decode_ResponseTimers(message)
                 elif id == Smarter.ResponseCarafe:          self.__decode_ResponseCarafe(message)
-                elif id == Smarter.ResponseMode:   self.__decode_ResponseMode(message)
+                elif id == Smarter.ResponseMode:            self.__decode_ResponseMode(message)
                 elif id == Smarter.ResponseKettleHistory:   self.__decode_ResponseKettleHistory(message)
                 elif id == Smarter.ResponseCoffeeHistory:   self.__decode_ResponseCoffeeHistory(message)
                 elif id == Smarter.ResponseKettleSettings:  self.__decode_ResponseKettleSettings(message)
@@ -539,10 +552,10 @@ class SmarterClient:
                 elif id == Smarter.ResponseDeviceInfo:      self.__decode_ResponseDeviceInfo(message)
                 elif id == Smarter.ResponseWifiFirmware:    self.__decode_ResponseWifiFirmware(message)
                 elif id == Smarter.ResponseWirelessNetworks:self.__decode_ResponseWirelessNetworks(message)
-            except Exception:
+            except SmarterError:
                 s = traceback.format_exc()
                 logging.debug(s)
-                raise SmarterErrorOld("Could not read message disconnected")
+                raise SmarterError(0,"Could not read message disconnected")
  
             if self.unknown != 0:
                 print "***********************"
@@ -561,22 +574,22 @@ class SmarterClient:
                     if id != Smarter.ResponseCoffeeStatus and id != Smarter.ResponseKettleStatus:
                         self.print_message_read(message)
         
-            self.socketLock.release()
+            self.__socketLock.release()
             return message
         else:
-            self.socketLock.release()
-            raise SmarterErrorOld("Could not read message disconnected")
+            self.__socketLock.release()
+            raise SmarterError(0,"Could not read message disconnected")
 
 
     # MESSAGE SEND
     def __send_message(self,message):
         if len(message) == 0:
-            raise SmarterErrorOld("Cannot send an empty message")
+            raise SmarterError(0,"Cannot send an empty message")
     
         try:
-            self.socket.send(message)
+            self.__socket.send(message)
         except socket.error, msg:
-            raise SmarterErrorOld("Could not send message")
+            raise SmarterError(0,"Could not send message")
 
         self.sendBytesCount += len(message)
     
@@ -587,7 +600,6 @@ class SmarterClient:
         else:
             self.commandCount[id] = 1
 
-        self.sendMessage = message
         if self.dump:
             self.print_message_send(message)
 
@@ -609,81 +621,79 @@ class SmarterClient:
 
     def __send(self,message):
         if not self.connected:
-            raise SmarterErrorOld("Could not write message not connected")
+            raise SmarterError(0,"Could not write message not connected")
         
         try:
-            self.writeLock.acquire()
-        except Exception:
-            raise SmarterErrorOld("Could not write message")
+            self.__writeLock.acquire()
+        except ThreadError:
+            raise SmarterError(0,"Could not write message")
 
         try:
-            self.socketLock.acquire()
-        except Exception:
-            raise SmarterErrorOld("Could not write message")
+            self.__socketLock.acquire()
+        except ThreadError:
+            raise SmarterError(0,"Could not write message")
 
         if self.connected:
             try:
                 self.__send_message(message)
-            except Exception:
-                self.socketLock.release()
-                self.writeLock.release()
+            except SmarterError:
+                self.__socketLock.release()
+                self.__writeLock.release()
                 self.disconnect()
-                raise SmarterErrorOld("Could not send message")
+                raise SmarterError(0,"Could not send message")
             
-            self.socketLock.release()
+            self.__socketLock.release()
         
             if self.shout:
-                self.writeLock.release()
+                self.__writeLock.release()
                 return
 
             try:
-                self.__read()
-            except Exception:
+                message_read = self.__read()
+                data = Smarter.raw_to_number(message_read[0])
+            except SmarterError:
                 self.disconnect()
                 print(traceback.format_exc())
-                raise SmarterErrorOld("Could not write message (no response)")
-            
-            data = Smarter.raw_to_number(self.readMessage[0])
-            
+                raise SmarterError(0,"Could not write message (no response)")
+
             while (data == Smarter.ResponseKettleStatus) or (data == Smarter.ResponseCoffeeStatus):
                 try:
-                    self.__read()
-                except Exception:
-                    self.writeLock.release()
+                    message_read = self.__read()
+                    data = Smarter.raw_to_number(message_read[0])
+                except SmarterError:
+                    self.__writeLock.release()
                     self.disconnect()
-                    raise SmarterErrorOld("Could not write message (no response)")
-                
-                data = Smarter.raw_to_number(self.readMessage[0])
-             
-            self.responseMessage = self.readMessage
-
-            if self.fast:
-                self.writeLock.release()
-                return
+                    raise SmarterError(0,"Could not write message (no response)")
+    
+            if self.fast or data == Smarter.ResponseCommandStatus or len(Smarter.message_connection(Smarter.raw_to_number(message[0]))) == 1:
+                self.__writeLock.release()
+                if data == Smarter.ResponseCommandStatus:
+                    return Smarter.raw_to_number(message_read[1])
+                return Smarter.StatusSucces
             
-            # Smarter.message_connection(raw_to_number(self.readMessage[0])[0]
             try:
-                self.__read()
-            except Exception:
+                message_read = self.__read()
+                data = Smarter.raw_to_number(message_read[0])
+            except SmarterError:
                 self.disconnect()
-                self.writeLock.release()
-                raise SmarterErrorOld("Could not write message (no response)")
-            
+                self.__writeLock.release()
+                raise SmarterError(0,"Could not write message (no response)")
 
-            data = Smarter.raw_to_number(self.readMessage[0])
             while (data != Smarter.ResponseKettleStatus) and (data != Smarter.ResponseCoffeeStatus):
                 try:
-                    self.__read()
-                except Exception:
+                    message_read = self.__read()
+                    data = Smarter.raw_to_number(message_read[0])
+                except SmarterError:
                     self.disconnect()
-                    self.writeLock.release()
-                    raise SmarterErrorOld("Could not write message (no response)")
-                data = Smarter.raw_to_number(self.readMessage[0])
-
+                    self.__writeLock.release()
+                    raise SmarterError(0,"Could not write message (no response)")
         else:
-            self.writeLock.release()
-            raise SmarterErrorOld("Could not read message disconnected")
-        self.writeLock.release()
+            self.__writeLock.release()
+            raise SmarterError(0,"Could not read message disconnected")
+        self.__writeLock.release()
+        if data == Smarter.ResponseCommandStatus:
+            return Smarter.raw_to_number(message_read[1])
+        return Smarter.StatusSucces
     
     
     
@@ -724,9 +734,9 @@ class SmarterClient:
             self.isDirect = False
         
         try:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.settimeout(12)
-            self.socket.connect((self.host, self.port))
+            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__socket.settimeout(12)
+            self.__socket.connect((self.host, self.port))
             self.connected = True
             self.sessionCount = 1
         except socket.error, msg:
@@ -734,7 +744,7 @@ class SmarterClient:
             logging.debug(s)
             logging.debug(msg)
             logging.error("[" + self.host + "] Could not connect to + " + self.host)
-            raise SmarterErrorOld("Could not connect to + " + self.host)
+            raise SmarterError(0,"Could not connect to + " + self.host)
 
 
         if not self.fast:
@@ -742,12 +752,12 @@ class SmarterClient:
             try:
                 self.monitor = threading.Thread(target=self.__monitor_device)
                 self.monitor.start()
-            except Exception, e:
+            except ThreadError, e:
                 s = traceback.format_exc()
                 logging.debug(s)
                 loggins.debug(e)
                 logging.error("[" + self.host + "] Could not start monitor")
-                raise SmarterErrorOld("Could not start monitor")
+                raise SmarterError(0,"Could not start monitor")
 
 
 
@@ -771,18 +781,18 @@ class SmarterClient:
             self.connected = False
             try:
                 if self.monitor:
-                    if self.writeLock.locked():
-                        self.writeLock.release()
-                    if self.socketLock.locked():
-                        self.socketLock.release()
-            except Exception:
+                    if self.__writeLock.locked():
+                        self.__writeLock.release()
+                    if self.__socketLock.locked():
+                        self.__socketLock.release()
+            except ThreadError:
                 raise SmarterError(SmarterClientFailedStopThread,"Could not disconnect from " + self.host)
 
             self.monitor = None
             try:
-                if self.socket:
-                    self.socket.close()
-                    self.socket = None
+                if self.__socket:
+                    self.__socket.close()
+                    self.__socket = None
             # FIX: Also except thread exceptions..
             except socket.error, msg:
                 self.socker = None
@@ -853,8 +863,6 @@ class SmarterClient:
             self.device = Smarter.device_to_string(Smarter.DeviceCoffee)
 
     def __decode_ResponseKettleStatus(self,message):
-        self.statusMessage       = message
-
         self.kettleStatus        = Smarter.raw_to_number(message[1])
             
         if self.kettleStatus == Smarter.KettleHeating:
@@ -894,8 +902,7 @@ class SmarterClient:
         def is_set(x, n):
             return x & 2**n != 0
         
-        self.statusMessage       = message
-        coffeeStatus        = Smarter.raw_to_number(message[1])
+        coffeeStatus = Smarter.raw_to_number(message[1])
         
         if self.carafe != is_set(coffeeStatus,0):
             if not self.carafe:
@@ -1447,7 +1454,7 @@ class SmarterClient:
             if self.onBase:
                 self.__send_command(Smarter.CommandCalibrate)
             else:
-                raise SmarterErrorOld("Can not calibrate with the kettle on the base, please remove")
+                raise SmarterError(0,"Can not calibrate with the kettle on the base, please remove")
         else:
             raise SmarterError(KettleNoMachineSettings,"You need a Kettle to calibrate")
 
@@ -1879,7 +1886,7 @@ class SmarterClient:
             self.coffee_beans()
             self.coffee_strength(Smarter.CoffeeWeak)
         except:
-            raise SmarterErrorOld("Could not set to weak")
+            raise SmarterError(0,"Could not set to weak")
             
 
     def coffee_medium(self):
@@ -1911,7 +1918,7 @@ class SmarterClient:
     #------------------------------------------------------
 
 
-    def print_info(self):
+    def print_info_device(self):
         print Smarter.device_info(self.deviceId,self.version)
 
 
@@ -1922,7 +1929,7 @@ class SmarterClient:
             print "Carafe mode"
 
 
-    def print_carafe(self):
+    def print_carafe_required(self):
         if self.carafeRequired:
             print "Can brew without carafe"
         else:
@@ -2143,9 +2150,9 @@ class SmarterClient:
         elif id == Smarter.ResponseCoffeeHistory:   self.print_coffee_history()
         elif id == Smarter.ResponseKettleSettings:  self.print_kettle_settings()
         elif id == Smarter.ResponseCoffeeSettings:  self.print_coffee_settings()
-        elif id == Smarter.ResponseCarafe:          self.print_carafe()
+        elif id == Smarter.ResponseCarafe:          self.print_carafe_required()
         elif id == Smarter.ResponseMode:          self.print_mode()
-        elif id == Smarter.ResponseDeviceInfo:      self.print_info()
+        elif id == Smarter.ResponseDeviceInfo:      self.print_info_device()
         elif id == Smarter.ResponseBase:            self.print_watersensor_base()
         elif id == Smarter.ResponseKettleStatus:    self.print_short_kettle_status()
         elif id == Smarter.ResponseCoffeeStatus:    self.print_short_coffee_status()

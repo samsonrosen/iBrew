@@ -68,9 +68,14 @@ class iBrewConsole:
         while True:
             try:
                 x = raw_input("")
-            except Exception:
+            except KeyboardInterrupt:
+                self.quit = True
                 break
-    
+            except Exception, e:
+                self.quit = True
+                logging.debug(traceback.format_exc())
+                logging.debug(str(e))
+                break
         self.client.dump = dump
         self.client.dump_status = False
         print
@@ -98,10 +103,9 @@ class iBrewConsole:
             logging.info("iBrew: Failed to run Web Interface & REST API on port " + str(port))
             return
         logging.info("iBrew: Starting Web Interface & REST API on port " + str(port) + ". Press ctrl-c to stop")
-        if not self.ui:
-            self.monitor()
-            self.web.kill()
-            logging.info("iBrew: Stopped Web Interface & REST API on port " + str(port))
+        self.monitor()
+        self.web.kill()
+        logging.info("iBrew: Stopped Web Interface & REST API on port " + str(port))
  
 
     #------------------------------------------------------
@@ -193,7 +197,7 @@ class iBrewConsole:
     def check_license(self):
         self.username = "WebServer"
         
-        if not os.path.isfile(AppFolders.settings() + '/.ibrew') and not self.ui:
+        if not os.path.isfile(AppFolders.settings() + '/.ibrew'):
             self.username = "NOT ACCEPTED"
             self.app_info()
             print
@@ -263,10 +267,7 @@ class iBrewConsole:
             try:
                 self.username =  config.get('license','name')
             except Exception:
-                if self.ui:
-                    self.username = "iBrew"
-                else:
-                    self.username = "NOT ACCEPTED"
+                self.username = "NOT ACCEPTED"
         return True
         
     
@@ -288,15 +289,7 @@ class iBrewConsole:
                 numarg = len(line) - 1
                 arguments = line[1:]
 
-            if command == "ui":
-                if numarg > 0:
-                    command = arguments[0].lower()
-                    arguments = arguments[1:]
-                    numarg -= 1
-                self.ui = True
-            else:
-                self.ui = False
-            
+
             if command == "exit" or command == "quit":
                 self.client.run = False
                 self.quit = True
@@ -791,20 +784,21 @@ class iBrewConsole:
             self.execute(arguments)
         except Exception:
             self.console = False
-  
-  
+    
         if self.console:
             self.quit = False
-        while not self.quit and not self.ui:
+            
+        while not self.quit:
             try:
-                # is should be threaded... since the kettle input is still comming as we wait for user input...
                 cursor = self.client.host + ":" + self.client.device + "$"
                 self.execute(raw_input(cursor).strip().split())
-            except Exception:
-                break
-        if not self.ui:
-            
-            self.client.disconnect()
+            except KeyboardInterrupt:
+                self.quit = True
+            except Exception, e:
+                self.quit = True
+                logging.debug(traceback.format_exc())
+                logging.debug(str(e))
+        self.client.disconnect()
 
         
 #------------------------------------------------------
