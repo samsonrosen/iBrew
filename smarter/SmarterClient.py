@@ -234,6 +234,7 @@ class SmarterClient:
         
         # monitor run
         self.run                          = False
+        self.__utp_ResponseDeviceInfo     = False
         
         self.__init()
         self.settingsPath               = ""
@@ -358,9 +359,76 @@ class SmarterClient:
             self.print_stats()
 
 
+    #------------------------------------------------------
+    # DEVICE INFO UDP
+    #------------------------------------------------------
+
+
+    def find_devices(self):
+        """
+        Find devices using udp
+        """
+        devices = []
+        try:
+            cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            command = Smarter.number_to_raw(Smarter.CommandDeviceInfo) + Smarter.number_to_raw(Smarter.MessageTail)
+            #command = '\x64\x7e'
+  
+            cs.sendto(command, ('255.255.255.255', self.port))
+            cs.settimeout(4)
+
+            # support up to 100 devices
+            for i in range (0,100):
+                message, server = cs.recvfrom(4)
+                # '0x64 type version 0x7e
+                if Smarter.raw_to_number(message[0]) == Smarter.ResponseDeviceInfo and Smarter.raw_to_number(message[3]) == Smarter.MessageTail:
+                    devices.append((server[0],Smarter.raw_to_number(message[1]),Smarter.raw_to_number(message[2])))
+        except socket.error:
+            pass
+        finally:
+            cs.close()
+        return devices
+
+
+
+    def __broadcast_device(self):
+        command = Smarter.number_to_raw(Smarter.ResponseDeviceInfo) + Smarter.number_to_raw(self.deviceId) + Smarter.number_to_raw(self.version+128) + Smarter.number_to_raw(Smarter.MessageTail)
+        while self.run and self.__utp_ResponseDeviceInfo:
+            try:
+                message, address  = self.udp.recvfrom(1024)
+            except socket.error:
+                continue
+            # so what happens....
+            if message[0] == Smarter.number_to_raw(Smarter.CommandDeviceInfo) and message[1] == Smarter.number_to_raw(Smarter.MessageTail):
+                self.udp.sendto(command, address)
+
+
+
+    def broadcast_device_stop(self):
+        self.__utp_ResponseDeviceInfo = False
+
+
+
+    def broadcast_device_start(self):
+        if not __utp_ResponseDeviceInfo:
+            try:
+                self.udp=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                self.udp.settimeout(1)
+                self.udp.bind(('',Smarter.Port))
+                self.broadcast = threading.Thread(target=self.__broadcast_device)
+                self.broadcast.start()
+            except (socker.error, ThreadError), e:
+                print str(e)
+        else:
+            raise SmarterError(0,"UPD Response Device Info already started")
+
+
+
 
     #------------------------------------------------------
-    # CONNECTION
+    # CLIENT CONNECTION
     #------------------------------------------------------
 
 
@@ -500,7 +568,6 @@ class SmarterClient:
                 # debug
                 #print "[" + Smarter.number_to_code(id) + "]",
                 minlength = Smarter.message_response_length(id)
-
                 i = 1
                 while raw != Smarter.number_to_raw(Smarter.MessageTail) or (minlength > 0 and raw == Smarter.number_to_raw(Smarter.MessageTail) and i < minlength):
                     message += raw
@@ -691,8 +758,10 @@ class SmarterClient:
             self.__monitorLock.release()
             raise SmarterError(0,"Could not read message disconnected")
         self.__monitorLock.release()
+
         if data == Smarter.ResponseCommandStatus:
             return Smarter.raw_to_number(message_read[1])
+
         return Smarter.StatusSucces
     
     
@@ -748,7 +817,6 @@ class SmarterClient:
 
 
         if not self.fast:
-            import threading
             try:
                 self.monitor = threading.Thread(target=self.__monitor_device)
                 self.monitor.start()
@@ -799,34 +867,8 @@ class SmarterClient:
                 raise SmarterError(SmarterClientFailedStop,"Could not disconnect from " + self.host + " (" + msg[1] + ")")
 
 
-    def find_devices(self):
-        """
-        Find devices using udp
-        """
-        devices = []
-        try:
-            cs = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            cs.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            cs.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            command = Smarter.number_to_raw(Smarter.CommandDeviceInfo) + Smarter.number_to_raw(Smarter.MessageTail)
-            #command = '\x64\x7e'
-  
-            cs.sendto(command, ('255.255.255.255', self.port))
-            cs.settimeout(4)
 
-            # support up to 100 devices
-            for i in range (0,100):
-                message, server = cs.recvfrom(4)
-                # '0x64 type version 0x7e
-                if Smarter.raw_to_number(message[0]) == Smarter.ResponseDeviceInfo and Smarter.raw_to_number(message[3]) == Smarter.MessageTail:
-                    devices.append((server[0],Smarter.raw_to_number(message[1]),Smarter.raw_to_number(message[2])))
-        except Exception:
-            pass
-        finally:
-            cs.close()
-        return devices
- 
- 
+
     #------------------------------------------------------
     # MESSAGE RESPONSE DECODERS
     #------------------------------------------------------
@@ -1078,6 +1120,7 @@ class SmarterClient:
             raise e
         finally:
             self.__sendLock.release()
+        self.broadcast_device()
 
 
     def device_raw(self,code):
