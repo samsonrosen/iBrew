@@ -144,11 +144,11 @@ class SmarterClient:
         
         # Wifi
         self.Wifi                       = []
-        self.WifiFirmware               = "None"
+        self.WifiFirmware               = ""
         isDirect                        = False
 
-        self.__writeLock                  = threading.Lock()
-        self.__socketLock                 = threading.Lock()
+        self.__monitorLock                  = threading.Lock()
+        self.__readLock                 = threading.Lock()
     
 
         # already written to total from session
@@ -225,8 +225,9 @@ class SmarterClient:
 
         
         # Threading info
-        self.__writeLock                  = threading.Lock()
-        self.__socketLock                 = threading.Lock()
+        self.__monitorLock                  = threading.Lock()
+        self.__readLock                   = threading.Lock()
+        self.__sendLock                   = threading.Lock()
         self.connected                    = False
         self.monitor                      = None
         self.__socket                     = None
@@ -384,7 +385,8 @@ class SmarterClient:
         self.run = True
         while self.run:
                 try:
-                    self.__writeLock.acquire()
+                    self.__sendLock.acquire()
+                    self.__monitorLock.acquire()
                 except ThreadError, e:
                     s = traceback.format_exc()
                     logging.debug(s)
@@ -399,7 +401,6 @@ class SmarterClient:
                     if not self.connected:
                         #print(traceback.format_exc())
                         break
-                    
                     response = self.__read()
                     monitorCount += 1
                     if previousResponse != response:
@@ -413,13 +414,16 @@ class SmarterClient:
                     logging.debug(e)
                     logging.error("[" + self.host + "] ERROR")
 
-                    if self.__writeLock.locked():
-                        self.__writeLock.release()
+                    if self.__sendLock.locked():
+                        self.__sendLock.release()
+                    if self.__monitorLock.locked():
+                        self.__monitorLock.release()
                     self.disconnect()
                     break
                     raise SmarterError(0,"Monitor Error")
                 
-                self.__writeLock.release()
+                self.__monitorLock.release()
+                self.__sendLock.release()
                 
                 dump = self.dump
                 
@@ -428,35 +432,39 @@ class SmarterClient:
                 else:
                     self.dump = False;
 
-                try:
-                    if monitorCount % timeout == timeout - 9:
-                        if self.isKettle:   self.kettle_calibrate_base()
-                        if self.isCoffee:   self.coffee_carafe_required()
- 
-                    if monitorCount % timeout == timeout - 19:
-                        if self.isCoffee:   self.coffee_mode()
- 
-                    if monitorCount % timeout == timeout - 29:
-                        self.device_settings()
- 
-                    if monitorCount % timeout == timeout - 39:
-                        self.__write_stats()
-                    
-                    if monitorCount % timeout == timeout - 49:
-                        pass #self.coffee_timers()
-                    
-                    if monitorCount % timeout == timeout - 50:
-                        pass #self.device_history()
+                if not self.__sendLock.locked():
+                    try:
+                        if monitorCount % timeout == timeout - 9:
+                            if self.isKettle:   self.kettle_calibrate_base()
+                            if self.isCoffee:   self.coffee_carafe_required()
+     
+                        if monitorCount % timeout == timeout - 19:
+                            if self.isCoffee:   self.coffee_mode()
+     
+                        if monitorCount % timeout == timeout - 29:
+                            self.device_settings()
+     
+                        if monitorCount % timeout == timeout - 39:
+                            self.__write_stats()
                         
-                except SmarterError, e:
-                    s = traceback.format_exc()
-                    logging.debug(s)
-                    logging.debug(e)
-                    logging.error("[" + self.host + "] ERROR")
-                    self.disconnect()
-                    self.dump = dump
-                    break
-                    raise SmarterError(0,"Monitor Error")
+                        if monitorCount % timeout == timeout - 49:
+                            pass #self.coffee_timers()
+                        
+                        if monitorCount % timeout == timeout - 50:
+                            # we did not init it to speed up boot time... so init it
+                            if self.WifiFirmware == "":
+                                self.wifi_firmware()
+                            pass #self.device_history()
+                            
+                    except SmarterError, e:
+                        s = traceback.format_exc()
+                        logging.debug(s)
+                        logging.debug(e)
+                        logging.error("[" + self.host + "] ERROR")
+                        self.disconnect()
+                        self.dump = dump
+                        break
+                        raise SmarterError(0,"Monitor Error")
 
 
                 self.dump = dump
@@ -524,7 +532,7 @@ class SmarterClient:
    
     
         try:
-            self.__socketLock.acquire()
+            self.__readLock.acquire()
         except ThreadError:
             raise SmarterError(0,"Could not read message")
     
@@ -574,10 +582,10 @@ class SmarterClient:
                     if id != Smarter.ResponseCoffeeStatus and id != Smarter.ResponseKettleStatus:
                         self.print_message_read(message)
         
-            self.__socketLock.release()
+            self.__readLock.release()
             return message
         else:
-            self.__socketLock.release()
+            self.__readLock.release()
             raise SmarterError(0,"Could not read message disconnected")
 
 
@@ -624,12 +632,7 @@ class SmarterClient:
             raise SmarterError(0,"Could not write message not connected")
         
         try:
-            self.__writeLock.acquire()
-        except ThreadError:
-            raise SmarterError(0,"Could not write message")
-
-        try:
-            self.__socketLock.acquire()
+            self.__monitorLock.acquire()
         except ThreadError:
             raise SmarterError(0,"Could not write message")
 
@@ -637,15 +640,12 @@ class SmarterClient:
             try:
                 self.__send_message(message)
             except SmarterError:
-                self.__socketLock.release()
-                self.__writeLock.release()
+                self.__monitorLock.release()
                 self.disconnect()
                 raise SmarterError(0,"Could not send message")
-            
-            self.__socketLock.release()
         
             if self.shout:
-                self.__writeLock.release()
+                self.__monitorLock.release()
                 return
 
             try:
@@ -661,12 +661,12 @@ class SmarterClient:
                     message_read = self.__read()
                     data = Smarter.raw_to_number(message_read[0])
                 except SmarterError:
-                    self.__writeLock.release()
+                    self.__monitorLock.release()
                     self.disconnect()
                     raise SmarterError(0,"Could not write message (no response)")
     
             if self.fast or data == Smarter.ResponseCommandStatus or len(Smarter.message_connection(Smarter.raw_to_number(message[0]))) == 1:
-                self.__writeLock.release()
+                self.__monitorLock.release()
                 if data == Smarter.ResponseCommandStatus:
                     return Smarter.raw_to_number(message_read[1])
                 return Smarter.StatusSucces
@@ -676,7 +676,7 @@ class SmarterClient:
                 data = Smarter.raw_to_number(message_read[0])
             except SmarterError:
                 self.disconnect()
-                self.__writeLock.release()
+                self.__monitorLock.release()
                 raise SmarterError(0,"Could not write message (no response)")
 
             while (data != Smarter.ResponseKettleStatus) and (data != Smarter.ResponseCoffeeStatus):
@@ -685,12 +685,12 @@ class SmarterClient:
                     data = Smarter.raw_to_number(message_read[0])
                 except SmarterError:
                     self.disconnect()
-                    self.__writeLock.release()
+                    self.__monitorLock.release()
                     raise SmarterError(0,"Could not write message (no response)")
         else:
-            self.__writeLock.release()
+            self.__monitorLock.release()
             raise SmarterError(0,"Could not read message disconnected")
-        self.__writeLock.release()
+        self.__monitorLock.release()
         if data == Smarter.ResponseCommandStatus:
             return Smarter.raw_to_number(message_read[1])
         return Smarter.StatusSucces
@@ -781,10 +781,10 @@ class SmarterClient:
             self.connected = False
             try:
                 if self.monitor:
-                    if self.__writeLock.locked():
-                        self.__writeLock.release()
-                    if self.__socketLock.locked():
-                        self.__socketLock.release()
+                    if self.__monitorLock.locked():
+                        self.__monitorLock.release()
+                    if self.__readLock.locked():
+                        self.__readLock.release()
             except ThreadError:
                 raise SmarterError(SmarterClientFailedStopThread,"Could not disconnect from " + self.host)
 
@@ -1058,19 +1058,26 @@ class SmarterClient:
         """
         Retreive the default values
         """
-        self.fast = False
-        self.shout = False
-        self.device_info()
-        if self.isKettle:
-            self.kettle_settings()
-            self.kettle_calibrate_base()
-        elif self.isCoffee:
-            self.coffee_settings()
-            self.hotPlate = self.defaultHotPlate
-            self.coffee_mode()
-            self.coffee_carafe_required()
-        self.wifi_firmware()
-
+        
+        self.__sendLock.acquire()
+        
+        try:
+            self.fast = False
+            self.shout = False
+            self.device_info()
+            if self.isKettle:
+                self.kettle_settings()
+                self.kettle_calibrate_base()
+            elif self.isCoffee:
+                self.coffee_settings()
+                self.hotPlate = self.defaultHotPlate
+                self.coffee_mode()
+                self.coffee_carafe_required()
+            #self.wifi_firmware()
+        except Exception, e:
+            raise e
+        finally:
+            self.__sendLock.release()
 
 
     def device_raw(self,code):
