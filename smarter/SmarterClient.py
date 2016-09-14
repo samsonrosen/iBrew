@@ -243,7 +243,10 @@ class SmarterClient:
         self.__server_run                 = False
         
         self.__init()
-        self.settingsPath               = ""
+        self.settingsPath                 = ""
+    
+        self.__firewall                   = Smarter.MessagesDebug
+        self.__firewall_relay             = Smarter.MessagesDebug + Smarter.MessagesWifi
 
 
     def __del__(self):

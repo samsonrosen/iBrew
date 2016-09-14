@@ -377,80 +377,128 @@ class SmarterProtocol:
 
     # Fire wall rules and tags...
     GroupWifi           = 1
-    CommandsWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks]
+    MessagesWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks]
     GroupCalibrate      = 2
-    CommandsCalibrate   = [CommandCalibrate,CommandBase,CommandStoreBase,ResponseBase]
+    MessagesCalibrate   = [CommandCalibrate,CommandBase,CommandStoreBase,ResponseBase]
     GroupUnknown        = 3
-    CommandsUnknown     = [Command20,Command22,Command23,Command30,Command69]
+    GroupUnknownKettle  = 26
+    MessagesUnknownKettle = [Command20,Command22,Command23,Command30]
+    MessagesUnknown     = MessagesUnknownKettle + [Command69]
     GroupTimers         = 4
-    CommandsTimers      = [CommandStoreTimer,CommandTimers,CommandDisableTimer,ResponseTimers]
+    MessagesTimers      = [CommandStoreTimer,CommandTimers,CommandDisableTimer,ResponseTimers]
     GroupHistory        = 5
-    CommandsHistory     = [CommandKettleHistory,CommandCoffeeHistory,ResponseKettleHistory,ResponseCoffeeHistory]
+    GroupCoffeeHistory  = 29
+    GroupKettleHistory  = 30
+    MessagesKettleHistory = [CommandKettleHistory,ResponseKettleHistory]
+    MessagesCoffeeHistory = [CommandCoffeeHistory,ResponseCoffeeHistory]
+    MessagesHistory     = MessagesCoffeeHistory + MessagesKettleHistory
     GroupTime           = 6
-    CommandsTime        = [CommandDeviceTime]
+    MessagesTime        = [CommandDeviceTime]
     GroupGet            = 7
-    CommandsGet         = [CommandKettleSettings,CommandCoffeeSettings,ResponseKettleSettings,ResponseCoffeeSettings]
+    GroupCoffeeGet      = 27
+    GroupKettleGet      = 28
+    MessagesKettleGet  = [CommandKettleSettings,ResponseKettleSettings]
+    MessagesCoffeeGet  = [CommandCoffeeSettings,ResponseCoffeeSettings]
+    MessagesGet         = MessagesCoffeeGet + MessagesKettleGet
     GroupStore          = 8
-    CommandsStore       = [CommandKettleStoreSettings,CommandCoffeeStoreSettings,CommandResetSettings]
+    GroupCoffeeStore    = 31
+    GroupKettleStore    = 32
+    MessagesKettleStore = [CommandKettleStoreSettings]
+    MessagesCoffeeStore = [CommandCoffeeStoreSettings]
+    MessagesStore       = MessagesCoffeeStore + MessagesKettleStore
     GroupAll            = 9
-    CommandsAll         = CommandsStore + CommandsGet
-    GroupKettle         = 10
-    __CommandsKettle    = [CommandHeat,CommandHeatFormula,CommandHeatDefault,CommandKettleStop]
-    CommandsKettle      = __CommandsKettle + [ResponseKettleStatus]
-    GroupUpdate         = 11
-    CommandsUpdate      = [CommandUpdate]
+    GroupKettleAll      = 33
+    GroupCoffeeAll      = 34
+    MessagesCoffeeAll   = MessagesCoffeeStore + MessagesCoffeeGet
+    MessagesKettleAll   = MessagesKettleStore + MessagesKettleGet
+    MessagesAll         = MessagesStore + MessagesGet
+    GroupKettleControl = 10
+    __MessagesKettle    = [CommandHeat,CommandHeatFormula,CommandHeatDefault,CommandKettleStop]
+    MessagesKettleControl      = __MessagesKettle + [ResponseKettleStatus]
+    GroupMaintenance         = 11
+    MessagesMaintenance      = [CommandUpdate] + [CommandResetSettings]
     GroupDevice         = 12
-    CommandsDevice      = [CommandDeviceInfo, ResponseCommandStatus]
-    GroupCoffee         = 13
-    __CommandsCoffee    = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff]
-    CommandsCoffee      = __CommandsCoffee + [ResponseCoffeeStatus]
+    MessagesDevice      = [CommandDeviceInfo, ResponseCommandStatus]
+    GroupCoffeeControl         = 13
+    __MessagesCoffee    = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff]
+    MessagesCoffeeControl      = __MessagesCoffee + [ResponseCoffeeStatus]
     
+    MessagesControl    = MessagesCoffeeControl + MessagesKettleControl
+    GroupControl       = 36
     GroupModes          = 14
-    CommandsModesStore  = [CommandSetMode,CommandSetCarafe]
-    CommandsModesGet    = [CommandMode,CommandCarafe,ResponseMode,ResponseCarafe]
-    CommandsModes       = CommandsModesGet + CommandsModesStore
+    MessagesModesStore  = [CommandSetMode,CommandSetCarafe]
+    MessagesModesGet    = [CommandMode,CommandCarafe,ResponseMode,ResponseCarafe]
+    MessagesModes       = MessagesModesGet + MessagesModesStore
     GroupDebug          = 15
-    CommandsDebug       = CommandsUnknown + CommandsTime + CommandsTimers + CommandsHistory + CommandsUpdate
+    MessagesDebug       = MessagesUnknown + MessagesTime + MessagesTimers + MessagesHistory + MessagesMaintenance
     GroupSetup          = 16
-    CommandsSetup       = CommandsWifi + CommandsCalibrate + CommandsStore + CommandsModes
+    MessagesSetup       = MessagesWifi + MessagesCalibrate + MessagesStore + MessagesModes
     GroupNormal         = 17
-    CommandsNormal      = CommandsCoffee + CommandsKettle + CommandsGet + CommandsDevice
+    MessagesNormal      = MessagesCoffeeControl + MessagesKettleControl + MessagesGet + MessagesDevice
     GroupUser           = 18
-    CommandsUser        = CommandsNormal
+    MessagesUser        = MessagesNormal
     GroupAdmin          = 19
-    CommandsAdmin       = CommandsSetup + CommandsNormal
+    MessagesAdmin       = MessagesSetup + MessagesNormal
     GroupGod            = 20
-    CommandsGod         = CommandsAdmin + CommandsDebug
+    MessagesGod         = MessagesAdmin + MessagesDebug
     GroupReadOnly       = 21
-    CommandsReadOnly    = CommandsDebug + CommandsSetup +  __CommandsCoffee + __CommandsKettle + CommandsGet + [CommandDeviceInfo]
+    MessagesReadOnly    = MessagesDebug + MessagesSetup +  __MessagesCoffee + __MessagesKettle + MessagesGet + [CommandDeviceInfo]
     
     GroupModeGet        = 22
     GroupModeStore      = 23
+  
+    GroupKettle         = 24
     
+    GroupShared       = 35
+    MessagesShared    = MessagesWifi + MessagesTime + [Command69] + MessagesDevice + MessagesMaintenance
+
+    MessagesKettle      = MessagesKettleControl + MessagesCalibrate + MessagesShared + MessagesKettleHistory + MessagesUnknownKettle + MessagesKettleStore + MessagesKettleGet
+    GroupCoffee         = 25
+    MessagesCoffee      = MessagesCoffeeControl + MessagesTimers + MessagesModes + MessagesShared + MessagesCoffeeStore + MessagesCoffeeGet +  MessagesCoffeeHistory
+
     Groups = {
-        GroupWifi        : ("Wifi",CommandsWifi),
-        GroupCalibrate   : ("Calibration",CommandsCalibrate),
-        GroupModes       : ("Modes",CommandsModes),
-        GroupCoffee      : ("Coffee",CommandsCoffee),
-        GroupUnknown     : ("Unknown",CommandsUnknown),
-        GroupKettle      : ("Kettle",CommandsKettle),
-        GroupTime        : ("Time",CommandsTime),
-        GroupUpdate      : ("Update",CommandsUpdate),
-        GroupTimers      : ("Timers",CommandsTimers),
-        GroupHistory     : ("History",CommandsHistory),
-        GroupDevice      : ("Device",CommandsDevice),
-        GroupStore       : ("SettingsStore",CommandsStore),
-        GroupGet         : ("SettingsGet",CommandsGet),
-        GroupAll         : ("Settings",CommandsAll),
-        GroupDebug       : ("Debug",CommandsDebug),
-        GroupNormal      : ("Control",CommandsNormal),
-        GroupSetup       : ("Setup",CommandsSetup),
-        GroupUser        : ("User",CommandsUser),
-        GroupAdmin       : ("Admin",CommandsAdmin),
-        GroupGod         : ("God",CommandsGod),
-        GroupReadOnly    : ("ReadOnly",CommandsReadOnly),
-        GroupModeGet     : ("ModesGet",CommandsModesGet),
-        GroupModeStore   : ("ModesStore",CommandsModesStore),
+        GroupWifi        : ("Wifi",MessagesWifi),
+        GroupCalibrate   : ("Calibration",MessagesCalibrate),
+        GroupModes       : ("Modes",MessagesModes),
+        GroupUnknown     : ("Unknown",MessagesUnknown),
+        GroupKettleControl : ("KettleControls",MessagesKettleControl),
+        GroupCoffeeControl : ("CoffeeControls",MessagesCoffeeControl),
+        GroupControl    : ("Controls",MessagesKettleControl),
+        GroupUnknownKettle : ("UnknownKettle",MessagesUnknownKettle),
+
+        # Kinda duplicate... of the other protocol table with commands... (o well :)
+        GroupKettle : ("Kettle",MessagesKettle),
+        GroupCoffee : ("Coffee",MessagesKettle),
+        
+        GroupTime        : ("Time",MessagesTime),
+        GroupTimers      : ("Timers",MessagesTimers),
+        GroupHistory     : ("History",MessagesHistory),
+        GroupKettleHistory     : ("KettleHistory",MessagesKettleHistory),
+        GroupCoffeeHistory     : ("CoffeeHistory",MessagesCoffeeHistory),
+        GroupDevice      : ("Device",MessagesDevice),
+        GroupStore       : ("SettingsStore",MessagesStore),
+        GroupGet         : ("SettingsGet",MessagesGet),
+        GroupAll         : ("Settings",MessagesAll),
+        GroupKettleStore       : ("KettleStore",MessagesKettleStore),
+        GroupKettleGet         : ("KettleGet",MessagesKettleGet),
+        GroupCoffeeStore       : ("CoffeeStore",MessagesCoffeeStore),
+        GroupCoffeeGet         : ("CoffeeGet",MessagesCoffeeGet),
+        GroupCoffeeAll         : ("CoffeeSettings",MessagesCoffeeAll),
+        GroupKettleAll         : ("KettleSettings",MessagesKettleAll),
+        GroupModeGet     : ("ModesGet",MessagesModesGet),
+        GroupModeStore   : ("ModesStore",MessagesModesStore),
+        GroupShared      : ("Shared",MessagesShared),
+        
+        # Users
+        GroupUser        : ("User",MessagesUser),
+        GroupAdmin       : ("Admin",MessagesAdmin),
+        GroupGod         : ("God",MessagesGod),
+
+        # Modes
+        GroupDebug       : ("Debug",MessagesDebug),
+        GroupNormal      : ("Normal",MessagesNormal),
+        GroupSetup       : ("Setup",MessagesSetup),
+        GroupReadOnly    : ("ReadOnly",MessagesReadOnly),
     
     }
     
