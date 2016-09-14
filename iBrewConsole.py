@@ -296,7 +296,7 @@ class iBrewConsole:
                 return
 
 
-            if command != "help" and command != "?" and command != "message" and command != "usage" and command != "commands" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "examples" and command != "messages":
+            if command != "help" and command != "?" and command != "message" and command != "usage" and command != "commands" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "groups" and command != "group" and command != "notes" and command != "examples" and command != "messages":
                 if not self.check_license():
                     return
             
@@ -452,7 +452,7 @@ class iBrewConsole:
             if command == "monitor":
                 self.client.fast = False
 
-            if (not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "examples" and command != "messages":
+            if (not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "groups" and command != "group" and command != "examples" and command != "messages":
 
                 if not self.haveHost and command != "relay":
                     devices = self.client.find_devices()
@@ -514,6 +514,7 @@ class iBrewConsole:
                                             else:
                                                 print Smarter.license()
             elif command == "examples":     self.examples()
+            elif command == "groups":       print Smarter.groups()
             elif command == "messages":
                                             if numarg >= 1 or not self.console:
                                                 print Smarter.messages()
@@ -523,7 +524,18 @@ class iBrewConsole:
                                             if numarg >= 1:
                                                 print Smarter.message(Smarter.code_to_number(arguments[0]))
                                             else:
-                                                print Smarter.all()
+                                                print Smarter.message_all()
+            elif command == "group":
+                                            if numarg >= 1:
+                                                s = None
+                                                try:
+                                                    s = Smarter.group(Smarter.string_to_group(arguments[0]))
+                                                except SmarterError:
+                                                    print "iBrew: Group not available"
+                                                else:
+                                                    print s
+                                            else:
+                                                print Smarter.groups_all()
             elif command == "list":         self.client.print_devices_found(self.client.find_devices())
             elif command == "joke" or command == "quote":
                                             print
@@ -925,12 +937,12 @@ class iBrewConsole:
         print
         print "  Smarter Network Commands [console only]"
         print "    connect (host) (rules) (modifiers) connect to device"
-        print "    block (relay) [rules]  block messages with group or id"
+        #print "    block (relay) [rules]  block messages with group or id"
         print "    disconnect             disconnect connected device"
-        print "    unblock (relay) [rules]  unblock messages group or id"
+        #print "    unblock (relay) [rules]  unblock messages group or id"
         print "    relay (port)           start relay device"
-        print "    relay stop             stop relay device"
-        print "    rules                  show blocking rules"
+        #print "    relay stop             stop relay device"
+        #print "    rules                  show blocking rules"
         print "    stats                  show traffic statistics"
         print
         print "  Block Rules"
@@ -948,9 +960,10 @@ class iBrewConsole:
         print "    [hexdata]              send raw data to device (e.g. \'64 7e\')"
         print "    dump                   toggle \'dump raw messages\'"
         print "    monitor                monitor incomming traffic"
-        print "    patch [modifiers]      patch message"
+#        print "    patch [modifiers]      patch message"
         print "    sweep (id)             [developer only] try (all or start with id) unknown command codes"
         print
+        """
         print "  Modifiers"
         print "   [(var(=value)(,var(=value)))*(:var(=value)(,var(=value))*)]"
         print
@@ -982,10 +995,12 @@ class iBrewConsole:
         print "  Debug Coffee Timer"
         print "    timer [index] (erase|[time]) set/erase timer"
         print "    timers                 show timers"
+        """
         print
         print "  Help Commands"
         print "    examples               show examples of commands"
         print "    groups                 show all groups"
+        print "    group                  show messages in group"
         print "    messages               show all known protocol messages"
         print "    message [id]           show protocol message detail of message [id]"
         print "    notes                  show developer notes on the devices"

@@ -2,7 +2,7 @@
 
 import traceback
 import struct
-import operator
+from operator import itemgetter
 
 #------------------------------------------------------
 # SMARTER PROTOCOL INTERFACE
@@ -388,34 +388,44 @@ class SmarterProtocol:
     CommandsHistory     = [CommandKettleHistory,CommandCoffeeHistory,ResponseKettleHistory,ResponseCoffeeHistory]
     GroupTime           = 6
     CommandsTime        = [CommandDeviceTime]
-    GroupGetSettings    = 7
-    CommandsGetSettings = [CommandKettleSettings,CommandCoffeeSettings,ResponseKettleSettings,ResponseCoffeeSettings]
-    GroupStoreSettings  = 8
-    CommandsStoreSettings = [CommandKettleStoreSettings,CommandCoffeeStoreSettings,CommandResetSettings]
-    GroupSettings       = 9
-    CommandsSettings    = CommandsStoreSettings + CommandsGetSettings
+    GroupGet            = 7
+    CommandsGet         = [CommandKettleSettings,CommandCoffeeSettings,ResponseKettleSettings,ResponseCoffeeSettings]
+    GroupStore          = 8
+    CommandsStore       = [CommandKettleStoreSettings,CommandCoffeeStoreSettings,CommandResetSettings]
+    GroupAll            = 9
+    CommandsAll         = CommandsStore + CommandsGet
     GroupKettle         = 10
-    CommandsKettle      = [CommandHeat,CommandHeatFormula,CommandHeatDefault,CommandKettleStop, ResponseKettleStatus]
+    __CommandsKettle    = [CommandHeat,CommandHeatFormula,CommandHeatDefault,CommandKettleStop]
+    CommandsKettle      = __CommandsKettle + [ResponseKettleStatus]
     GroupUpdate         = 11
     CommandsUpdate      = [CommandUpdate]
     GroupDevice         = 12
     CommandsDevice      = [CommandDeviceInfo, ResponseCommandStatus]
     GroupCoffee         = 13
-    CommandsCoffee      = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff, ResponseCoffeeStatus]
+    __CommandsCoffee    = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff]
+    CommandsCoffee      = __CommandsCoffee + [ResponseCoffeeStatus]
+    
     GroupModes          = 14
-    CommandsModes       = [CommandMode,CommandSetMode,CommandCarafe,CommandSetCarafe,ResponseMode,ResponseCarafe]
+    CommandsModesStore  = [CommandSetMode,CommandSetCarafe]
+    CommandsModesGet    = [CommandMode,CommandCarafe,ResponseMode,ResponseCarafe]
+    CommandsModes       = CommandsModesGet + CommandsModesStore
     GroupDebug          = 15
     CommandsDebug       = CommandsUnknown + CommandsTime + CommandsTimers + CommandsHistory + CommandsUpdate
     GroupSetup          = 16
-    CommandsSetup       = CommandsWifi + CommandsCalibrate + CommandsStoreSettings + CommandsModes
+    CommandsSetup       = CommandsWifi + CommandsCalibrate + CommandsStore + CommandsModes
     GroupNormal         = 17
-    CommandsNormal      = CommandsCoffee + CommandsKettle + CommandsGetSettings + CommandsDevice
+    CommandsNormal      = CommandsCoffee + CommandsKettle + CommandsGet + CommandsDevice
     GroupUser           = 18
     CommandsUser        = CommandsNormal
     GroupAdmin          = 19
     CommandsAdmin       = CommandsSetup + CommandsNormal
     GroupGod            = 20
     CommandsGod         = CommandsAdmin + CommandsDebug
+    GroupReadOnly       = 21
+    CommandsReadOnly    = CommandsDebug + CommandsSetup +  __CommandsCoffee + __CommandsKettle + CommandsGet + [CommandDeviceInfo]
+    
+    GroupModeGet        = 22
+    GroupModeStore      = 23
     
     Groups = {
         GroupWifi        : ("Wifi",CommandsWifi),
@@ -429,15 +439,19 @@ class SmarterProtocol:
         GroupTimers      : ("Timers",CommandsTimers),
         GroupHistory     : ("History",CommandsHistory),
         GroupDevice      : ("Device",CommandsDevice),
-        GroupStoreSettings : ("Write Settings",CommandsStoreSettings),
-        GroupGetSettings   : ("Settings",CommandsGetSettings),
-        GroupSettings    : ("Settings",CommandsSettings),
+        GroupStore       : ("SettingsStore",CommandsStore),
+        GroupGet         : ("SettingsGet",CommandsGet),
+        GroupAll         : ("Settings",CommandsAll),
         GroupDebug       : ("Debug",CommandsDebug),
         GroupNormal      : ("Control",CommandsNormal),
         GroupSetup       : ("Setup",CommandsSetup),
         GroupUser        : ("User",CommandsUser),
         GroupAdmin       : ("Admin",CommandsAdmin),
-        GroupGod         : ("God",CommandsGod)
+        GroupGod         : ("God",CommandsGod),
+        GroupReadOnly    : ("ReadOnly",CommandsReadOnly),
+        GroupModeGet     : ("ModesGet",CommandsModesGet),
+        GroupModeStore   : ("ModesStore",CommandsModesStore),
+    
     }
     
     def groupsCommand(self,id):
@@ -1475,9 +1489,7 @@ class SmarterProtocol:
         d = []
         for b in self.ArgType:
             if self.ArgType[b][0] == 'PROTOCOL':
-                print "YEAH"
                 if id in self.ArgType[b][1]:
-                    print "DSS"
                     d += [b]
         return d
 
@@ -1505,7 +1517,12 @@ class SmarterProtocol:
 
         return [item[0] for item in z]
 
-    # nice printab;e protocol info...
+    #------------------------------------------------------
+    #
+    # Protocol Information Printers
+    #
+    # kinda a real, mess ;-)
+    #------------------------------------------------------
 
     def string_int(self,argument):
         s = ""
@@ -1621,11 +1638,53 @@ class SmarterProtocol:
             s = "No information on: " + self.number_to_code(argument)
         return s + ""
 
-    def all(self):
+
+    def groups(self):
+        s = "\n"
+        s += "  Groups\n"
+        s += "  ___________________________________________\n"
+        
+ 
+        # i really hate python....
+        for g in sorted(self.Groups.items(),key=itemgetter(1)):
+            s += "  " + g[1][0].upper() + "\n"
+        s += "\n"
+        return s
+
+    def string_to_group(self,s):
+        for g in self.Groups:
+            if self.Groups[g][0].lower() == s.lower().strip():
+                return g
+        raise SmarterError(0,"Group not available")
+    
+    def group_to_string(self,group):
+        if self.Groups.has_key(group):
+            return self.Groups[group][0]
+        else:
+            raise SmarterError(0,"Group not available")
+
+    
+    def group(self,group):
+        
+        s = "\n"
+        s += "  Group: " + Smarter.group_to_string(group).upper() + "\n\n"
+        s += "    ID  Message Description\n"
+        s += "    ___________________________________________\n"
+        
+        for id in sorted(self.Groups[group][1]):
+            s += "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id) + "\n"
+        return s + "\n"
+        
+    def groups_all(self):
+        s = ""
+        for g in sorted(self.Groups.items(),key=itemgetter(1)):
+            s += self.group(g[0])
+        return s
+        
+    def messages_all(self):
         s = ""
         for id in range(0,255):
             if self.message_is_known(id):
-                print str(id)
                 s += self.string_argument(id)
         return s
 
@@ -1680,7 +1739,7 @@ class SmarterProtocol:
         return s + "\n"
 
     def protocol(self):
-        return self.structure() + self.messages() + self.all() + self.notes()
+        return self.structure() + self.groups() + self.messages() + self.all() + self.notes()
 
     def structure(self):
         return """

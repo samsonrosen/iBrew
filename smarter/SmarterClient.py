@@ -10,6 +10,7 @@ import datetime
 import logging
 import logging.handlers
 import platform
+from operator import itemgetter
 
 try:
     import win_inet_pton
@@ -1412,7 +1413,6 @@ class SmarterClient:
                 a += x
             elif db and x in string.printable:
                 d += x
-        from operator import itemgetter
     
         # most powerfull wifi on top
         self.Wifi = sorted(w,key=itemgetter(1),reverse=True)
