@@ -439,8 +439,12 @@ class iBrewConsole:
               
             if command == "console" or command == "connect":
                 self.client.disconnect()
+                
+            if command == "disconnect":
+                self.client.disconnect()
+                return
 
-            if command == "connect" or command == "console" or ((command == "sweep" or command == "monitor" or command == "web") and not self.console):
+            if command == "connect" or command == "console" or ((command == "relay" or command == "sweep" or command == "monitor" or command == "web") and not self.console):
                 self.app_info()
                 self.joke()
 
@@ -450,7 +454,7 @@ class iBrewConsole:
 
             if (not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "examples" and command != "messages":
 
-                if not self.haveHost:
+                if not self.haveHost and command != "relay":
                     devices = self.client.find_devices()
                     if self.client.dump:
                         self.client.print_devices_found(devices)
@@ -458,7 +462,8 @@ class iBrewConsole:
                     if len(devices) == 1:
                         self.client.host = devices[0][0]
             
-                if command == "console" or command == "connect":
+            
+                if command == "console" or command == "connect" or command == "relay":
                     self.client.dump_status = False
                     self.console = True
                     self.client.fast = False
@@ -469,7 +474,9 @@ class iBrewConsole:
                         print
                         print "  Starting please wait..."
                         print
-                    self.client.connect()
+                    if command != "relay":
+                        self.client.connect()
+                    
                 except Exception, e:
                     logging.debug(e)
                     logging.info("iBrew: Could not connect to [" + self.client.host + "]")
@@ -490,10 +497,13 @@ class iBrewConsole:
                 self.intro()
                 return
 
+
+            
             if command == "help" or command == "?":
                                             self.usage()
                                             self.commands()
             elif command == "usage":        self.usage()
+            elif command == "relay":        self.client.relay_start()
             elif command == "commands":     self.commands()
             elif command == "protocol":     print Smarter.protocol()
             elif command == "structure":    print Smarter.structure()
@@ -562,7 +572,7 @@ class iBrewConsole:
 
             elif command == "default":      self.client.device_restore_default()
             elif command == "calibrate":
-                                            if self.client.OnBase:
+                                            if self.client.onBase:
                                                 print "Please remove kettle for accurate calibration"
                                             self.client.kettle_calibrate()
             elif command == "base":
@@ -911,12 +921,14 @@ class iBrewConsole:
         print
         print "  Debug Commands"
         print "    [hexdata]              send raw data to device (e.g. \'64 7e\')"
+        print "    disconnect             disconnect connected device [console only]"
         print "    dump                   toggle \'dump raw messages\'"
         print "    console                start console [command line only]"
         print "    connect [host]         connect to device [console only]"
         print "    firmware               show firmware Wifi"
         print "    monitor                monitor incomming traffic"
         print "    protocol               show all protocol information available"
+        print "    relay                  relay device"
         print "    stats                  show traffic statistics"
         print "    sweep (id)             [developer only] try (all or start with id) unknown command codes"
         print
