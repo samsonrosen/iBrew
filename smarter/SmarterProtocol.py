@@ -117,6 +117,7 @@ class SmarterProtocol:
     CommandWifiLeave          = 0x0f
     CommandWifiFirmware       = 0x6a
 
+    
     # coffee
     CommandBrew               = 0x33
     CommandCoffeeStop         = 0x34
@@ -131,8 +132,8 @@ class SmarterProtocol:
     CommandHotplateOff        = 0x4a
     CommandCarafe             = 0x4c
     CommandSetCarafe          = 0x4b
-    CommandMode      = 0x4f
-    CommandSetMode   = 0x4e
+    CommandMode                 = 0x4f
+    CommandSetMode              = 0x4e
     CommandStoreTimer         = 0x40
     CommandTimers             = 0x41
     CommandDisableTimer       = 0x43
@@ -168,7 +169,7 @@ class SmarterProtocol:
     ResponseTimers            = 0x42
     ResponseCoffeeHistory     = 0x47
     ResponseCarafe            = 0x4d
-    ResponseMode     = 0x50
+    ResponseMode              = 0x50
     
     # kettle
     ResponseKettleStatus      = 0x14
@@ -372,6 +373,110 @@ class SmarterProtocol:
             return self.CommandMessages[id][1]
         if self.message_is_response(id) or self.message_is_status(id):
             return self.ResponseMessages[id][1]
+
+
+    # Fire wall rules and tags...
+    GroupWifi           = 1
+    CommandsWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks]
+    GroupCalibrate      = 2
+    CommandsCalibrate   = [CommandCalibrate,CommandBase,CommandStoreBase,ResponseBase]
+    GroupUnknown        = 3
+    CommandsUnknown     = [Command20,Command22,Command23,Command30,Command69]
+    GroupTimers         = 4
+    CommandsTimers      = [CommandStoreTimer,CommandTimers,CommandDisableTimer,ResponseTimers]
+    GroupHistory        = 5
+    CommandsHistory     = [CommandKettleHistory,CommandCoffeeHistory,ResponseKettleHistory,ResponseCoffeeHistory]
+    GroupTime           = 6
+    CommandsTime        = [CommandDeviceTime]
+    GroupGetSettings    = 7
+    CommandsGetSettings = [CommandKettleSettings,CommandCoffeeSettings,ResponseKettleSettings,ResponseCoffeeSettings]
+    GroupStoreSettings  = 8
+    CommandsStoreSettings = [CommandKettleStoreSettings,CommandCoffeeStoreSettings,CommandResetSettings]
+    GroupSettings       = 9
+    CommandsSettings    = CommandsStoreSettings + CommandsGetSettings
+    GroupKettle         = 10
+    CommandsKettle      = [CommandHeat,CommandHeatFormula,CommandHeatDefault,CommandKettleStop, ResponseKettleStatus]
+    GroupUpdate         = 11
+    CommandsUpdate      = [CommandUpdate]
+    GroupDevice         = 12
+    CommandsDevice      = [CommandDeviceInfo, ResponseCommandStatus]
+    GroupCoffee         = 13
+    CommandsCoffee      = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff, ResponseCoffeeStatus]
+    GroupModes          = 14
+    CommandsModes       = [CommandMode,CommandSetMode,CommandCarafe,CommandSetCarafe,ResponseMode,ResponseCarafe]
+    GroupDebug          = 15
+    CommandsDebug       = CommandsUnknown + CommandsTime + CommandsTimers + CommandsHistory + CommandsUpdate
+    GroupSetup          = 16
+    CommandsSetup       = CommandsWifi + CommandsCalibrate + CommandsStoreSettings + CommandsModes
+    GroupNormal         = 17
+    CommandsNormal      = CommandsCoffee + CommandsKettle + CommandsGetSettings + CommandsDevice
+    GroupUser           = 18
+    CommandsUser        = CommandsNormal
+    GroupAdmin          = 19
+    CommandsAdmin       = CommandsSetup + CommandsNormal
+    GroupGod            = 20
+    CommandsGod         = CommandsAdmin + CommandsDebug
+    
+    Groups = {
+        GroupWifi        : ("Wifi",CommandsWifi),
+        GroupCalibrate   : ("Calibration",CommandsCalibrate),
+        GroupModes       : ("Modes",CommandsModes),
+        GroupCoffee      : ("Coffee",CommandsCoffee),
+        GroupUnknown     : ("Unknown",CommandsUnknown),
+        GroupKettle      : ("Kettle",CommandsKettle),
+        GroupTime        : ("Time",CommandsTime),
+        GroupUpdate      : ("Update",CommandsUpdate),
+        GroupTimers      : ("Timers",CommandsTimers),
+        GroupHistory     : ("History",CommandsHistory),
+        GroupDevice      : ("Device",CommandsDevice),
+        GroupStoreSettings : ("Write Settings",CommandsStoreSettings),
+        GroupGetSettings   : ("Settings",CommandsGetSettings),
+        GroupSettings    : ("Settings",CommandsSettings),
+        GroupDebug       : ("Debug",CommandsDebug),
+        GroupNormal      : ("Control",CommandsNormal),
+        GroupSetup       : ("Setup",CommandsSetup),
+        GroupUser        : ("User",CommandsUser),
+        GroupAdmin       : ("Admin",CommandsAdmin),
+        GroupGod         : ("God",CommandsGod)
+    }
+    
+    def groupsCommand(self,id):
+        l = []
+        for g in self.Groups:
+            if id in self.Groups[g][1]:
+                l += [g]
+        return l
+    
+    def groupsL(self,ids):
+        l = []
+        for g in self.Groups:
+            found = True
+            for i in g[1]:
+                if i not in ids:
+                    found = False
+                    break
+            if found:
+                l += [g]
+        for g in l:
+            found = True
+            for h in self.Groups:
+                if g == h: continue
+                if (set(g[1]) - set(h[1])) == {}:
+                    found = False
+                    break
+            if found:
+                m += [g]
+        return m
+
+    def groupsString(self,groups):
+        s = []
+        for g in groups:
+            s += [self.Groups[g][0]]
+        return " ".join(sorted(s))
+        
+
+        
+
 
 
     #------------------------------------------------------
@@ -1113,6 +1218,9 @@ class SmarterProtocol:
     # kinda a real, mess ;-)
     #------------------------------------------------------
 
+
+
+    
     # merge and payload not finished...
 
     ArgCups       = 1000
