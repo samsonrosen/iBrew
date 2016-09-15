@@ -96,25 +96,31 @@ See the console section for the commands
 
   iBrew Web Server
 
-  Usage: ibrew (dump) (fahrenheid) web (port) (host)
+  Usage: ibrew (energy) (dump) (fahrenheid) web (port) (rules) (modifiers) (host)
 
+    energy                 energy saver (stats not possible)
+    dump                   dump message enabled
+    fahrenheid             use fahrenheid
     web                    start web interface & rest api
     port                   optional port number, default 2082
-    dump                   dump message enabled
+    rules                  blocking rules
+    modifiers              patches
+    host                   host address of device (format: ip4, ip6, fqdn)
 
 
   iBrew Command Line
 
-  Usage: ibrew (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)
+  Usage: ibrew (energy) (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)
 
     dump                   dump message enabled
+    energy                 energy saver (stats not possible)
     shout                  sends commands and quits not waiting for a reply
     slow                   fully inits everything before action
     coffee                 assumes coffee machine
     kettle                 assumes kettle
-    command                action to take!
     fahrenheid             use fahrenheid
-    host                   host address (format: ip4, ip6, fqdn)
+    command                action to take!
+    host                   host address of device (format: ip4, ip6, fqdn)
 
   If you do not supply a host, it will try to connect to the first detected device
   Thus if you have more then one device supply a host (if its not in direct mode)
@@ -131,14 +137,12 @@ you can also use them on the command line as arguments:
   iKettle 2.0 & Smarter Coffee  Commands
     default                set default settings
     info                   device info
-    history                action history
     list                   list detected devices
     reset                  reset device to default
     start                  start the device
     status                 show status
     settings               show user settings
     stop                   stop the appliance
-    time [time]            set the device time
 
   iKettle 2.0 Commands
     base                   show watersensor base value
@@ -160,15 +164,14 @@ you can also use them on the command line as arguments:
     carafe [state]         set carafe is required [on or off]
     cups [number]          set number of cups [1..12]
     descaling              descale coffee machine
-    filter                 use filter for coffee
+    filter                 use pregrind beans in filter for coffee
     hotplate off           turn hotplate off
     hotplate on (minutes)  turn hotplate on (time in minutes)
-    singlecup              return single coffee cup mode
-    singlecup [state]      set single coffee cup mode [on or off]
+    mode                   return which mode: cup or carafe mode
+    mode [mode]            set mode: [cup] or [carafe] mode
+    pregrind               use pregrind beans in filter for coffee
     (strength) [strength]  set strength coffee [weak, medium or strong]
     settings [cups] [hotplate] [grind] [strength] store user settings
-    timer [time]           add timer
-    timers                 show timers
 
   Wireless Network Commands
     direct                 enable direct mode access
@@ -176,25 +179,78 @@ you can also use them on the command line as arguments:
     rejoin                 rejoins current wireless network [not in direct mode]
     scan                   scan wireless networks
 
+  Smarter Network Commands [console only]
+    connect (host) (rules&modifiers) connect to device
+    block [rules]          block messages with groups or ids
+    disconnect             disconnect connected device
+    unblock [rules]        unblock messages groups or ids
+    relay (port)           start relay device
+    relay stop             stop relay device
+    rules (full)           show blocking rules
+    stats                  show traffic statistics
+
+  Block Rules
+    Consists of rules, > is for outgoing connection to the device, < is for incomming connection from relay client.
+
+    [>|<]rule(,[>|<]rule)*
+
+    rule:
+      message id
+      group name
+
   Debug Commands
+    time [time]            set the device time
+    firmware               show firmware Wifi
+    history                action history
     [hexdata]              send raw data to device (e.g. '64 7e')
     dump                   toggle 'dump raw messages'
-    console                start console [command line only]
-    connect [host]         connect to device [console only]
-    firmware               show firmware Wifi
     monitor                monitor incomming traffic
-    protocol               show all protocol information available
-    stats                  show traffic statistics
+    modify (modifiers)     patch or unpatch messages
     sweep (id)             [developer only] try (all or start with id) unknown command codes
 
-  Debug Protocol Help Commands
+  Modifiers Rules
+    [>|<]var=(value)(,[>|<]var=(value))*
+
+    VAR           VALUE
+    version       [00..FF]               override device firmware version
+    heater        disable                coffee machine or kettle heater disabled
+
+    base          [00..4000]             override default calibration base
+    formula       [0..100]               override default formula temperature
+    temperature   [0..100]               override default temperature
+    keepwarm      off or [5..?]          override default keepwarm time
+    formula       disable/enabled        override formula mode
+
+    carafe        optional or required   override carafe detection
+    cups          [1..12]                override default number of cups
+    grind         beans or filter        override default grind
+    hotplate      off or [5..?]          override default hotplate time
+    mode          carafe or cup          override mode
+    strength      weak, medium or strong override default strength
+    water                                correct cups according to water level
+    limit         [1..12]                limit the number of cups to be selected
+    grinder       disable                force use of filter
+    hotplate      disable                coffee machine hotplate disabled
+    child         lock                   kettle can not heat above 45 degrees
+
+    if no value it clears the patch
+
+  Debug Coffee Timer
+    timer [index] (erase|[time]) set/erase timer
+    timers                 show timers
+
+  Help Commands
     examples               show examples of commands
+    groups                 show all groups
+    group                  show messages in group
     messages               show all known protocol messages
     message [id]           show protocol message detail of message [id]
     notes                  show developer notes on the devices
+    protocol               show all protocol information available
     structure              show protocol structure information
 
   iBrew Commands
+    console (rules) (modifiers) start console [command line only]
     joke                   show joke
     license                show license
     license disagree       stop using license [command line only]
@@ -208,17 +264,20 @@ you can also use them on the command line as arguments:
 ```
 
   Example:
-    off            Stop heating/brewing
-    messages       Show all protocol messages
-    message 3e     Show protocol message 3a, turn hotplate on
-    167E           Send kettle raw stop
-    21 30 05 7e    Send kettle raw heat
-    weak           Set coffee strength to weak
-    cups 3         Set number of cups to brew
-    brew 4 10 beans strong  Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes
-    join MyWifi p@ssw0rd    Joins MyWifi wireless network using p@ssw0rd as credential
-    singlecup on   Set single cup mode
-    settings 100 20 True 75   Set default user settings for the kettle to...
+    off                      Stop heating/brewing
+    messages                 Show all protocol messages
+    message 3e               Show protocol message 3a, turn hotplate on
+    167E                     Send kettle raw stop
+    21 30 05 7e              Send kettle raw heat
+    weak                     Set coffee strength to weak
+    strength weak            Set coffee strength to weak but do not toggle filter/beans
+    cups 3                   Set number of cups to brew
+    mode cup                 Set cup mode
+    block >wifi,>02          Block wifi and [Set device time] command to device
+    patch relay <version=12] Patches [Device info] Argument version to clients
+    brew 4 10 beans strong   Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes
+    join MyWifi p@ssw0rd     Joins MyWifi wireless network using p@ssw0rd as credential
+    settings 100 20 True 75  Set default user settings for the kettle to...
 
 
 ```
