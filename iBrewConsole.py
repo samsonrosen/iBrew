@@ -11,7 +11,7 @@ import codecs
 
 import logging.handlers
 
-from smarter.SmarterClient import *
+from smarter.SmarterInterface import *
 from smarter.SmarterProtocol import *
 
 from iBrewWeb import *
@@ -452,7 +452,8 @@ class iBrewConsole:
             if command == "monitor":
                 self.client.fast = False
 
-            if (not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "groups" and command != "group" and command != "examples" and command != "messages":
+            if (command == "relay" and not self.console) or ((not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "groups" and command != "group" and command != "examples" and command != "messages"):
+
 
                 if not self.haveHost and command != "relay":
                     devices = self.client.find_devices()
@@ -465,7 +466,6 @@ class iBrewConsole:
             
                 if command == "console" or command == "connect" or command == "relay":
                     self.client.dump_status = False
-                    self.console = True
                     self.client.fast = False
                     self.client.shout = False
 
@@ -474,15 +474,19 @@ class iBrewConsole:
                         print
                         print "  Starting please wait..."
                         print
-                    if command != "relay":
+                    if not (self.console and command == "relay"):
                         self.client.connect()
                     
                 except Exception, e:
                     logging.debug(e)
                     logging.info("iBrew: Could not connect to [" + self.client.host + "]")
                     return
+                
+                if command == "console" or command == "connect" or command == "relay":
+                    self.console = True
 
-            if command == "connect" or command == "console" or ((command == "sweep" or command == "monitor") and not self.console):
+
+            if command == "connect" or command == "console" or ((command == "relay" or command == "sweep" or command == "monitor") and not self.console):
  
                 try:
                     self.client.device_all_settings()
@@ -494,8 +498,10 @@ class iBrewConsole:
                 self.client.print_connect_status()
                 self.client.print_status()
                 
-            if command == "console" or command == "connect":
+            if command == "console" or command == "connect" or (command == "relay" and not self.console):
                 self.intro()
+            
+            if command == "console" or command == "connect":
                 return
 
 
@@ -518,6 +524,7 @@ class iBrewConsole:
                                                 else:
                                                     print "iBrew: If you spin something around and around real fast, it looks like its standing still..."
                                             self.client.relay_start()
+                                            return
             
             elif command == "commands":     self.commands()
             elif command == "protocol":     print Smarter.protocol()

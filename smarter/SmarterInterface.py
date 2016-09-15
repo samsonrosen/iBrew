@@ -221,8 +221,8 @@ class SmarterClient:
         self.shout                      = False
         
         self.device                     = "None"
-        self.deviceId                   = 2
-        self.version                    = 22
+        self.deviceId                   = 0
+        self.version                    = 0
         self.sessionCount               = 0
 
         
@@ -245,9 +245,9 @@ class SmarterClient:
         self.__init()
         self.settingsPath                 = ""
     
-        self.__rules                      = Smarter.MessagesDebug
-        self.__rules_relay                = Smarter.MessagesDebug + Smarter.MessagesWifi
-
+        # firewall or message blocking rules
+        self.__rules                      = Smarter.MessagesDebug + Smarter.MessagesRest
+        self.__rules_relay                = Smarter.MessagesDebug + Smarter.MessagesWifi + Smarter.MessagesRest + Smarter.MessagesDeviceInfo + Smarter.MessagesCalibrateOnly # use only after setup so speed up ... + Smarter.MessagesGet + Smarter.MessagesModesGet
 
     def __del__(self):
         self.disconnect()
@@ -403,7 +403,6 @@ class SmarterClient:
 
 
     def __broadcast_device(self):
-        command = Smarter.number_to_raw(Smarter.ResponseDeviceInfo) + Smarter.number_to_raw(self.deviceId) + Smarter.number_to_raw(self.version) + Smarter.number_to_raw(Smarter.MessageTail)
         self.__utp_ResponseDeviceInfo = True
         while self.__utp_ResponseDeviceInfo:
             try:
@@ -412,6 +411,8 @@ class SmarterClient:
                 continue
             # so what happens....
             logging.info("Received UDP " + address[0] + ":" + str(address[1]))
+            command = Smarter.number_to_raw(Smarter.ResponseDeviceInfo) + Smarter.number_to_raw(self.deviceId) + Smarter.number_to_raw(self.version) + Smarter.number_to_raw(Smarter.MessageTail)
+   
             if message[0] == Smarter.number_to_raw(Smarter.CommandDeviceInfo) and message[1] == Smarter.number_to_raw(Smarter.MessageTail):
                 self.udp.sendto(command, address)
 
@@ -440,30 +441,8 @@ class SmarterClient:
 
 
     #------------------------------------------------------
-    # SERVER CONNECTION
+    # BLOCKING CONNECTION (FIREWALL)
     #------------------------------------------------------
-
-
-    def __serverMonitor(self,clientsock,addr):
-            while self.__server_run:
-                time.sleep(1)
-                if  not self.__clients[(clientsock, addr)].locked():
-                    self.__clients[(clientsock, addr)].acquire()
-                    
-                    
-                    if self.onBase:
-                        t = Smarter.temperature_to_raw(self.temperature)
-                    else:
-                        t = Smarter.number_to_raw(Smarter.MessageOffBase)
-                    
-                    r = Smarter.number_to_raw(Smarter.ResponseKettleStatus)
-                    
-                    r = r +  Smarter.number_to_raw(self.kettleStatus) + t + Smarter.watersensor_to_raw(self.waterSensor) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)
-                    logging.info(addr[0] + ":" + str(addr[1]) + " Status " + Smarter.message_to_codes(r))
-                    clientsock.send(r)
-                    self.__clients[(clientsock, addr)].release()
-
-
 
 
     def __splitrules(self,string):
@@ -525,7 +504,7 @@ class SmarterClient:
         if did != []:
             logging.info("Blocked: " + " ".join(d))
         if rid != []:
-            logging.info("Blocked relay: " + " ".join(e))
+            logging.info("Blocked relay: " + " ".join(r))
     
         
 
@@ -542,12 +521,31 @@ class SmarterClient:
         if did != []:
             logging.info("Unblocked: " + " ".join(d))
         if rid != []:
-            logging.info("Unblocked relay: " + " ".join(e))
+            logging.info("Unblocked relay: " + " ".join(r))
     
+
+    #------------------------------------------------------
+    # SERVER CONNECTION
+    #------------------------------------------------------
+
+
+    def __serverMonitor(self,clientsock,addr):
+            while self.__server_run:
+                time.sleep(1)
+                if  not self.__clients[(clientsock, addr)].locked():
+                    self.__clients[(clientsock, addr)].acquire()
+                    
+                    # BLOCKING HERE FIX
+                    if self.isKettle:
+                        r = self.__encode_KettleStatus(self.kettleStatus,self.temperature,self.waterSensor, self.onbase, self.unknown)[0]
+                    elif self.isCoffee:
+                        r = self.__encode_CoffeeStatus(self.cups,self.strength,self.cupsBrew,self.waterLevel,self.waterEnough,self.carafe, self.grind, self.ready, self.grinderOn, self.heaterOn, self.hotPlateOn,self.working,self.timerEvent)[0]
+                    clientsock.send(r)
+                    self.__clients[(clientsock, addr)].release()
+                    logging.info(addr[0] + ":" + str(addr[1]) + " Status " + Smarter.message_to_codes(r))
 
 
     def __handler(self,clientsock,addr):
-        self.__SetFireWallDefault()
 
         logging.info(addr[0] + ":" + str(addr[1]) + " Client connected")
         clientsock.setblocking(1)
@@ -560,22 +558,22 @@ class SmarterClient:
 
             command = Smarter.raw_to_number(data[0])
 
-
-            if True: #command in self.Firewall:
-            
-                logging.info(addr[0] + ":" + str(addr[1]) + " Command message received [" + Smarter.number_to_code(command) +"] ["+ Smarter.message_description(command) + "] [" + Smarter.message_to_codes(data) + "]")
-                
+            logging.info(addr[0] + ":" + str(addr[1]) + " Command message received relay [" + Smarter.number_to_code(command) +"] ["+ Smarter.message_description(command) + "] [" + Smarter.message_to_codes(data) + "]")
+  
+            if command in self.__rules_relay:
+                logging.debug("Blocked relay command: " + Smarter.number_to_code(command))
                 response = self.__encode(command)
             else:
-                response = self.__send()
+                # relay
+                response = self.__send(data)
             self.mode = not self.mode
 
             if command == Smarter.CommandWifiJoin or command == Smarter.CommandWifiLeave:
                 break
  
-            clientsock.send(response)
+            clientsock.send("".join(response))
             self.__clients[(clientsock, addr)].release()
-            logging.info(addr[0] + ":" + str(addr[1]) + " relay send " + Smarter.message_to_codes(response))
+            logging.info(addr[0] + ":" + str(addr[1]) + " relay send " + Smarter.message_to_codes("".join(response)))
     
         logging.info(addr[0] + ":" + str(addr[1]) + " client disconnected")
         clientsock.close()
@@ -784,6 +782,7 @@ class SmarterClient:
         raise SmarterError(0,"Disconnected")
 
     def __decode(self,message):
+        
         id = Smarter.raw_to_number(message[0])
             
         if Smarter.message_kettle(id) and not Smarter.message_coffee(id):
@@ -843,7 +842,7 @@ class SmarterClient:
             
             try:
                 self.__decode(message)
-            except:
+            except SmarterError, e:
                 logging.debug(str(e))
                 logging.debug(traceback.format_exc())
                 raise SmarterError(0,"Could not read message (convert failure)")
@@ -857,14 +856,6 @@ class SmarterClient:
                 logging.debug("")
                 logging.debug(Smarter.number_to_code(self.unknown) + "-" + str(self.unknown))
             
-            if self.dump:
-                if self.dump_status:
-                    self.print_message_read(message)
-                else:
-                    #fix
-                    if id != Smarter.ResponseCoffeeStatus and id != Smarter.ResponseKettleStatus:
-                        self.print_message_read(message)
-        
             self.__readLock.release()
             return message
         else:
@@ -916,10 +907,10 @@ class SmarterClient:
         if command in self.__rules:
             logging.debug("Blocked command: " + Smarter.number_to_code(command))
             responses = self.__encode(command)
-            print responses
             for message in responses:
                 self.__decode(message)
             return responses
+        
         
         if not self.connected:
             raise SmarterError(0,"Could not write message not connected")
@@ -956,7 +947,7 @@ class SmarterClient:
                     message_read = self.__read()
                     data = Smarter.raw_to_number(message_read[0])
                 except SmarterError, e:
-                    self.disconnect(e)
+                    self.disconnect()
                     logging.debug(str(e))
                     logging.debug(traceback.format_exc())
                     raise SmarterError(0,"Could not write message (no response)")
@@ -1184,24 +1175,27 @@ class SmarterClient:
         elif message == Smarter.ResponseDeviceInfo:     response = self.__encode_DeviceInfo(self.deviceId,self.version)
         elif message == Smarter.ResponseWifiFirmware:   response = self.__encode_WifiFirmware()
         elif message == Smarter.ResponseCoffeeSettings: response = self.__encode_CoffeeSettings()
-        elif message == Smarter.ResponseCoffeeStatus:   response = self.__encode_KettleStatus()
+        elif message == Smarter.ResponseCoffeeStatus:   response = self.__encode_KettleStatus(self.kettleStatus,self.temperature,self.waterSensor, self.onbase, self.unknown)
         elif message == Smarter.ResponseTimers:         response = self.__encode_Timers()
         elif message == Smarter.ResponseCoffeeHistory:  response = self.__encode_CoffeeHistory()
         elif message == Smarter.ResponseCarafe:         response = self.__encode_Carafe()
-        elif message == Smarter.ResponseKettleStatus:   response = self.__encode_CoffeeStatus()
+        elif message == Smarter.ResponseKettleStatus:   response = self.__encode_CoffeeStatus(self.cups,self.strength,self.cupsBrew,self.waterLevel,self.waterEnough,self.carafe, self.grind, self.ready, self.grinderOn, self.heaterOn, self.hotPlateOn,self.working,self.timerEvent, self.unknown)
         elif message == Smarter.ResponseKettleSettings: response = self.__encode_KettleSettings(self.defaultTemperature,self.defaultKeepWarmTime,self.defaultFormulaTemperature)
         elif message == Smarter.ResponseMode:           response = self.__encode_Mode()
         elif message == Smarter.ResponseBase:           response = self.__encode_Base(self.waterSensorBase)
         else:                                           response = self.__encode_messageStatus(Smarter.StatusInvalid)
         return response
 
-    def __encode_KettleStatus():
-        # FIX
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-    
-    def __encode_CoffeeStatus():
-        # FIX
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
+    def __encode_KettleStatus(self,status,temperature,watersensor,onbase,unknown=0):
+        return [Smarter.number_to_raw(Smarter.ResponseKettleStatus) + Smarter.number_to_raw(status) + Smarter.temperaturemerged_to_raw(temperature,onbase) + Smarter.watersensor_to_raw(watersensor) + Smarter.number_to_raw(unknown) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+    def __encode_CoffeeStatus(self,cups,strenght,cupsbrew,waterlevel,waterenough,carafe,grind,ready,grinder,heater,hotplate,working,timer,unknown=0):
+        coffeestatus = Smarter.coffeeStatus_to_raw(carafe,grind,ready,grinder,heater,hotplate,working,timer)
+        cupsmerged   = Smarter.cupsmerged_to_raw(cups,cupsbrew)
+        watermerged  = Smarter.waterlevel_to_raw(waterlevel,waterenough)
+        print type(watermerged)
+        x =  [Smarter.number_to_raw(Smarter.ResponseCoffeeStatus) + coffeestatus + watermerged + Smarter.number_to_raw(unknown) + Smarter.strength_to_raw(strenght) + cupsmerged + Smarter.number_to_raw(Smarter.MessageTail)]
+        return x
     
     def __encode_DeviceTime(self):
         return self.__encode_CommandStatus(Smarter.StatusSucces)
@@ -1373,7 +1367,7 @@ class SmarterClient:
 
 
     def __encode_BaseCommand(self,waterbase):
-        return self.__encode_Base + self.__encode_CommandStatus(Smarter.StatusSucces)
+        return self.__encode_Base(waterbase) + self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
     def __encode_Base(self,waterbase):
@@ -1439,20 +1433,24 @@ class SmarterClient:
 
     def __switch_kettle_device(self):
         if not self.isKettle:
-            self.isKettle = True
-            self.isCoffee = False
             self.__write_stats()
-            self.deviceId = Smarter.DeviceKettle
-            self.device = Smarter.device_to_string(Smarter.DeviceKettle)
+        if self.version == 0 or self.isCoffee:
+            self.version = 18
+        self.isKettle = True
+        self.isCoffee = False
+        self.deviceId = Smarter.DeviceKettle
+        self.device = Smarter.device_to_string(Smarter.DeviceKettle)
 
 
     def __switch_coffee_device(self):
         if not self.isCoffee:
-            self.isKettle = False
-            self.isCoffee = True
             self.__write_stats()
-            self.deviceId = Smarter.DeviceCoffee
-            self.device = Smarter.device_to_string(Smarter.DeviceCoffee)
+        if self.version == 0 or self.isKettle:
+            self.version = 19
+        self.isKettle = False
+        self.isCoffee = True
+        self.deviceId = Smarter.DeviceCoffee
+        self.device = Smarter.device_to_string(Smarter.DeviceCoffee)
 
     def __decode_KettleStatus(self,message):
         self.kettleStatus        = Smarter.raw_to_number(message[1])

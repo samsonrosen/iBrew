@@ -10,7 +10,7 @@ import time
 import threading
 
 import os
-from smarter.SmarterClient import *
+from smarter.SmarterInterface import *
 
 from iBrewBonjour import *
 from iBrewJokes import *

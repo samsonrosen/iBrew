@@ -384,8 +384,10 @@ class SmarterProtocol:
 
     GroupWifi           = 1
     MessagesWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks]
+    GroupCalibrateOnly  = 39
+    MessagesCalibrateOnly   = [CommandBase,CommandStoreBase,ResponseBase]
     GroupCalibrate      = 2
-    MessagesCalibrate   = [CommandCalibrate,CommandBase,CommandStoreBase,ResponseBase]
+    MessagesCalibrate   = MessagesCalibrateOnly + [CommandCalibrate]
     GroupUnknown        = 3
     GroupUnknownKettle  = 26
     MessagesUnknownKettle = [Command20,Command22,Command23,Command30]
@@ -423,8 +425,8 @@ class SmarterProtocol:
     MessagesKettleControl      = __MessagesKettle + [ResponseKettleStatus]
     GroupMaintenance         = 11
     MessagesMaintenance      = [CommandUpdate] + [CommandResetSettings]
-    GroupDevice         = 12
-    MessagesDevice      = [CommandDeviceInfo, ResponseCommandStatus]
+    GroupDeviceInfo         = 12
+    MessagesDeviceInfo      = [CommandDeviceInfo, ResponseDeviceInfo]
     GroupCoffeeControl         = 13
     __MessagesCoffee    = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff]
     MessagesCoffeeControl      = __MessagesCoffee + [ResponseCoffeeStatus]
@@ -440,7 +442,7 @@ class SmarterProtocol:
     GroupSetup          = 16
     MessagesSetup       = MessagesWifi + MessagesCalibrate + MessagesStore + MessagesModes
     GroupNormal         = 17
-    MessagesNormal      = MessagesCoffeeControl + MessagesKettleControl + MessagesGet + MessagesDevice
+    MessagesNormal      = MessagesCoffeeControl + MessagesKettleControl + MessagesGet + MessagesDeviceInfo + [ResponseCommandStatus]
     GroupUser           = 18
     MessagesUser        = MessagesNormal
     GroupAdmin          = 19
@@ -448,29 +450,53 @@ class SmarterProtocol:
     GroupGod            = 20
     MessagesGod         = MessagesAdmin + MessagesDebug
     GroupReadOnly       = 21
-    MessagesReadOnly    = MessagesDebug + MessagesSetup +  __MessagesCoffee + __MessagesKettle + MessagesGet + [CommandDeviceInfo]
+    MessagesReadOnly    = MessagesDebug + MessagesSetup +  __MessagesCoffee + __MessagesKettle + MessagesGet + MessagesDeviceInfo
     
     GroupModeGet        = 22
     GroupModeStore      = 23
   
     GroupKettle         = 24
-    
+    GroupRest         = 37
     GroupShared       = 35
-    MessagesShared    = MessagesWifi + MessagesTime + [Command69] + MessagesDevice + MessagesMaintenance
+    MessagesShared    = MessagesWifi + MessagesTime + [Command69] + MessagesDeviceInfo + MessagesMaintenance + [ResponseCommandStatus]
 
     MessagesKettle      = MessagesKettleControl + MessagesCalibrate + MessagesShared + MessagesKettleHistory + MessagesUnknownKettle + MessagesKettleStore + MessagesKettleGet
     GroupCoffee         = 25
     MessagesCoffee      = MessagesCoffeeControl + MessagesTimers + MessagesModes + MessagesShared + MessagesCoffeeStore + MessagesCoffeeGet +  MessagesCoffeeHistory
+    
+    GroupStatus  = 38
+    MessagesStatus = [ResponseCommandStatus] + [ResponseCoffeeStatus] + [ResponseKettleStatus]
+    
+    def __init__(self):
+        l = []
+        c = []
+        r = []
+        for i in range(0,255):
+            l += [i]
+        for i in self.CommandMessages:
+            c += [i]
+        for i in self.ResponseMessages:
+            r += [i]
+        
+        self.MessagesRest = list(set(l).difference(set(c).union(set(r))))
+        self.MessagesReadOnly += self.MessagesRest
+        self.MessagesGod += self.MessagesRest
+        self.Groups[self.GroupRest] = ("Rest",list(set(l).difference(set(c).union(set(r)))))
 
+            
+    
     Groups = {
+        GroupStatus      : ("Status",MessagesStatus),
         GroupWifi        : ("Wifi",MessagesWifi),
         GroupCalibrate   : ("Calibration",MessagesCalibrate),
+        GroupCalibrateOnly   : ("CalibrationBase",MessagesCalibrateOnly),
         GroupModes       : ("Modes",MessagesModes),
         GroupUnknown     : ("Unknown",MessagesUnknown),
         GroupKettleControl : ("KettleControls",MessagesKettleControl),
         GroupCoffeeControl : ("CoffeeControls",MessagesCoffeeControl),
         GroupControl    : ("Controls",MessagesControl),
         GroupUnknownKettle : ("UnknownKettle",MessagesUnknownKettle),
+        GroupMaintenance : ("Maintenance",MessagesMaintenance),
 
         # Kinda duplicate... of the other protocol table with commands... (o well :)
         GroupKettle : ("Kettle",MessagesKettle),
@@ -481,7 +507,7 @@ class SmarterProtocol:
         GroupHistory     : ("History",MessagesHistory),
         GroupKettleHistory     : ("KettleHistory",MessagesKettleHistory),
         GroupCoffeeHistory     : ("CoffeeHistory",MessagesCoffeeHistory),
-        GroupDevice      : ("Device",MessagesDevice),
+        GroupDeviceInfo      : ("DeviceInfo",MessagesDeviceInfo),
         GroupStore       : ("SettingsStore",MessagesStore),
         GroupGet         : ("SettingsGet",MessagesGet),
         GroupAll         : ("Settings",MessagesAll),
@@ -905,6 +931,13 @@ class SmarterProtocol:
         return self.number_to_raw(self.check_temperature_celsius(temperature))
 
 
+    def temperaturemerged_to_raw(self,temperature,onbase):
+        if onbase:
+            return Smarter.temperature_to_raw(temperature)
+        else:
+            return Smarter.number_to_raw(Smarter.MessageOffBase)
+  
+  
     def temperature_to_string(self,temperature):
         if self.Fahrenheid:
             return str(temperature)+" ºF"
@@ -1085,6 +1118,11 @@ class SmarterProtocol:
 
     def cups_to_raw(self,cups):
         return self.number_to_raw(self.check_cups(cups))
+
+    def cupsmerged_to_raw(self,cups,cupsbrew):
+        self.check_cups(cups)
+        self.check_cups_brew(cupsbrew)
+        return self.number_to_raw(cups + (cupsbrew << 4))
     
 
     def string_to_cups(self,string):
@@ -1139,6 +1177,9 @@ class SmarterProtocol:
 
     def raw_to_waterlevel_bit(self,raw):
         return self.raw_to_number(raw) / 16
+    
+    def waterlevel_to_raw(self,waterlevel,waterenough):
+        return self.number_to_raw(waterlevel + (waterenough << 4))
 
    
     #------------------------------------------------------
@@ -1235,6 +1276,9 @@ class SmarterProtocol:
     CoffeeBeans  = True
     CoffeeFilter = False
 
+
+    def coffeeStatus_to_raw(self,carafe,grind,ready,grinder,heater,hotplate,working,timer):
+        return Smarter.number_to_raw((carafe << 0) + (grind << 1) + (ready << 2) + (grinder << 3) + (heater << 4) + (hotplate << 5) + (working << 6) + (timer << 7))
 
     def grind_to_string(self,grind):
         s = self.CoffeeStringFilter
@@ -1676,7 +1720,6 @@ class SmarterProtocol:
             if y > 1:
                 range = "bits " + str(x) + ".." + str(x+y-1)
             s += ("    " + range).ljust(13, ' ') + " “" + self.ArgType[z][1].upper() + "”\n"
-            # herer
         for (x,y,z) in argument[2]:
             s += self.string_argument(z,True)
         return s + ""
