@@ -204,7 +204,7 @@ class SmarterProtocol:
         CommandStrength         : (False,True,[ResponseCommandStatus],"Set strength of the coffee to brew"),
         CommandCups             : (False,True,[ResponseCommandStatus],"Set number of cups to brew"),
         CommandBrewDefault      : (False,True,[ResponseCommandStatus],"Start coffee brewing using machine settings"),
-        CommandCoffeeStoreSettings : (False,True,[],"Set coffee machine default user settings"),
+        CommandCoffeeStoreSettings : (False,True,[ResponseCommandStatus],"Set coffee machine default user settings"),
         CommandGrinder          : (False,True,[ResponseCommandStatus],"Toggle grinder"),
         CommandHotplateOn       : (False,True,[ResponseCommandStatus],"Turn on hotplate"),
         CommandCarafe           : (False,True,[ResponseCarafe,ResponseCommandStatus],"Get coffee carafe required"),
@@ -375,7 +375,13 @@ class SmarterProtocol:
             return self.ResponseMessages[id][1]
 
 
-    # Fire wall rules and tags...
+    #------------------------------------------------------
+    # MESSAGE GROUPS INFO
+    #------------------------------------------------------
+    #
+    # Fire wall blocking rules and online help tags will use this
+    #
+
     GroupWifi           = 1
     MessagesWifi        = [CommandWifiJoin,CommandWifiLeave,CommandWifiNetwork,CommandWifiPassword,CommandWifiFirmware,CommandWifiScan,ResponseWifiFirmware,ResponseWirelessNetworks]
     GroupCalibrate      = 2
@@ -423,8 +429,8 @@ class SmarterProtocol:
     __MessagesCoffee    = [CommandBrew,CommandBrewDefault,CommandCoffeeStop,CommandCups,CommandStrength,CommandGrinder,CommandHotplateOn,CommandHotplateOff]
     MessagesCoffeeControl      = __MessagesCoffee + [ResponseCoffeeStatus]
     
-    MessagesControl    = MessagesCoffeeControl + MessagesKettleControl
-    GroupControl       = 36
+    MessagesControl     = MessagesCoffeeControl + MessagesKettleControl
+    GroupControl        = 36
     GroupModes          = 14
     MessagesModesStore  = [CommandSetMode,CommandSetCarafe]
     MessagesModesGet    = [CommandMode,CommandCarafe,ResponseMode,ResponseCarafe]
@@ -463,7 +469,7 @@ class SmarterProtocol:
         GroupUnknown     : ("Unknown",MessagesUnknown),
         GroupKettleControl : ("KettleControls",MessagesKettleControl),
         GroupCoffeeControl : ("CoffeeControls",MessagesCoffeeControl),
-        GroupControl    : ("Controls",MessagesKettleControl),
+        GroupControl    : ("Controls",MessagesControl),
         GroupUnknownKettle : ("UnknownKettle",MessagesUnknownKettle),
 
         # Kinda duplicate... of the other protocol table with commands... (o well :)
@@ -503,43 +509,118 @@ class SmarterProtocol:
     }
     
     def groupsCommand(self,id):
+        """
+        Return a list of groups in which the message id is present
+        """
         l = []
         for g in self.Groups:
             if id in self.Groups[g][1]:
                 l += [g]
         return l
-    
-    def groupsL(self,ids):
-        l = []
-        for g in self.Groups:
-            found = True
-            for i in g[1]:
-                if i not in ids:
-                    found = False
-                    break
-            if found:
-                l += [g]
-        for g in l:
-            found = True
-            for h in self.Groups:
-                if g == h: continue
-                if (set(g[1]) - set(h[1])) == {}:
-                    found = False
-                    break
-            if found:
-                m += [g]
-        return m
 
-    def groupsString(self,groups):
+    def hasGroup(self,group):
+        """
+        Check if groupid actually exists
+        """
+        return self.Groups.has_key(group)
+    
+    
+    def isGroup(self,string):
+        """
+        Check if string is a group
+        """
+        try:
+            self.string_to_group(string)
+        except SmarterError:
+            return False
+        return True
+        
+
+    def groupsList(self,groups):
+        """
+        Return group names as a list
+        """
         s = []
         for g in groups:
             s += [self.Groups[g][0]]
-        return " ".join(sorted(s))
+        return sorted(s)
+
+    def groupsString(self,groups):
+        """
+        Return group names as a string seperated with spaces
+        """
+        return " ".join(self.groupsList(groups))
+    
         
+    def string_to_group(self,string):
+        """
+        string name to group id
+        """
+        for g in self.Groups:
+            if self.Groups[g][0].lower() == string.lower().strip():
+                return g
+        raise SmarterError(0,"Group not available")
+    
+    def group_to_string(self,group):
+        """
+        group id to string name
+        """
+        if self.hasGroup(group):
+            return self.Groups[group][0]
+        else:
+            raise SmarterError(0,"Group not available")
 
-        
 
+    def idsMin(self,ids):
+        return list(set(ids))
 
+    def idsRemove(self,ids,removeids):
+        x = set(ids)
+        return list(set(ids).difference(set(removeids)))
+
+    def idsAdd(self,ids,addids):
+        return self.idsMin(ids + addids)
+
+    def ids_to_string(self,ids):
+        return " ".join(ids)
+
+    def groupsStringDecode(self,string):
+        return self.groupsListDecode(string.lower().split(","))
+
+    def groupsListDecode(self,list):
+
+        """
+        Return a list of message ID's from a list of string
+        The list can contain either message ID or Group names sperated with a comma:
+        """
+        ids = []
+        for i in list:
+            if i in [j.lower() for j in self.groupsList(self.Groups.keys())]:
+                ids += self.Groups[self.string_to_group(i)][1]
+            else:
+                try:
+                    message = self.code_to_number(i)
+                except SmarterError:
+                    raise SmarterError(0,"Could not decode group or message id")
+                else:
+                    ids += [message]
+        return self.idsMin(ids)
+
+    def idsListEncode(self,ids):
+        """
+        Neat function that procuces a tupple of a list of groups and a list of ids not in those groups
+        """
+        idsleft = set(ids)
+        l = []
+        for g in self.Groups:
+            found = True
+            for i in self.Groups[g][1]:
+                messages = set(self.Groups[g][1])
+                if not messages.difference(set(ids)):
+                    l += [g]
+                    idsleft = idsleft.difference(messages)
+                    break
+        return (l,list(idsleft))
 
     #------------------------------------------------------
     # RAW <-> BASIC TYPE
@@ -1699,19 +1780,7 @@ class SmarterProtocol:
         s += "\n"
         return s
 
-    def string_to_group(self,s):
-        for g in self.Groups:
-            if self.Groups[g][0].lower() == s.lower().strip():
-                return g
-        raise SmarterError(0,"Group not available")
-    
-    def group_to_string(self,group):
-        if self.Groups.has_key(group):
-            return self.Groups[group][0]
-        else:
-            raise SmarterError(0,"Group not available")
 
-    
     def group(self,group):
         
         s = "\n"

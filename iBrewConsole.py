@@ -486,8 +486,9 @@ class iBrewConsole:
  
                 try:
                     self.client.device_all_settings()
-                except Exception:
-                    #print(traceback.format_exc())
+                except Exception, e:
+                    logging.debug(str(e))
+                    logging.debug(traceback.format_exc())
                     print "iBrew: Could not init values"
                     return
                 self.client.print_connect_status()
@@ -503,7 +504,21 @@ class iBrewConsole:
                                             self.usage()
                                             self.commands()
             elif command == "usage":        self.usage()
-            elif command == "relay":        self.client.relay_start()
+            elif command == "rules":
+                                            if numarg >= 1:
+                                                self.client.print_rules()
+                                            else:
+                                                self.client.print_rules_short()
+            elif command == "unblock":      self.client.unblock(arguments[0])
+            elif command == "block":        self.client.block(arguments[0])
+            elif command == "relay":
+                                            if numarg >= 1:
+                                                if self.console:
+                                                    self.client.relay_stop()
+                                                else:
+                                                    print "iBrew: If you spin something around and around real fast, it looks like its standing still..."
+                                            self.client.relay_start()
+            
             elif command == "commands":     self.commands()
             elif command == "protocol":     print Smarter.protocol()
             elif command == "structure":    print Smarter.structure()
@@ -794,6 +809,7 @@ class iBrewConsole:
         sh.setFormatter(formatter)
         logger.addHandler(sh)
 
+
         sh.setLevel(logging.DEBUG)
         
         self.console = False
@@ -821,8 +837,8 @@ class iBrewConsole:
                 logging.debug(traceback.format_exc())
                 logging.debug(str(e))
         self.client.disconnect()
-
-        
+     
+                     
 #------------------------------------------------------
 # iBrew Console PRINT
 #------------------------------------------------------
@@ -936,22 +952,23 @@ class iBrewConsole:
         print "    scan                   scan wireless networks"
         print
         print "  Smarter Network Commands [console only]"
-        print "    connect (host) (rules) (modifiers) connect to device"
-        #print "    block (relay) [rules]  block messages with group or id"
+        print "    connect (host) (rules&modifiers) connect to device"
+        print "    block [rules]          block messages with groups or ids"
         print "    disconnect             disconnect connected device"
-        #print "    unblock (relay) [rules]  unblock messages group or id"
+        print "    unblock [rules]        unblock messages groups or ids"
         print "    relay (port)           start relay device"
-        #print "    relay stop             stop relay device"
-        #print "    rules                  show blocking rules"
+        print "    relay stop             stop relay device"
+        print "    rules (full)           show blocking rules"
         print "    stats                  show traffic statistics"
         print
         print "  Block Rules"
-        print "    Consists of rules, first part is for (un)blocking device messages, second part is for (un)blocking relay messages"
-        print "    [(rule(,rule)*))(:rule(,rule)*)]"
+        print "    Consists of rules, > is for outgoing connection to the device, < is for incomming connection from relay client."
         print
-        print "    RULE"
+        print "    [>|<]rule(,[>|<]rule)*"
+        print
+        print "    rule:"
         print "      message id"
-        print "      group"
+        print "      group name"
         print
         print "  Debug Commands"
         print "    time [time]            set the device time"
@@ -960,12 +977,11 @@ class iBrewConsole:
         print "    [hexdata]              send raw data to device (e.g. \'64 7e\')"
         print "    dump                   toggle \'dump raw messages\'"
         print "    monitor                monitor incomming traffic"
-#        print "    patch [modifiers]      patch message"
+        print "    modify (modifiers)     patch or unpatch messages"
         print "    sweep (id)             [developer only] try (all or start with id) unknown command codes"
         print
-        """
-        print "  Modifiers"
-        print "   [(var(=value)(,var(=value)))*(:var(=value)(,var(=value))*)]"
+        print "  Modifiers Rules"
+        print "    [>|<]var=(value)(,[>|<]var=(value))*"
         print
         print "    VAR           VALUE"
         print "    version       [00..FF]               override device firmware version"
@@ -988,14 +1004,12 @@ class iBrewConsole:
         print "    grinder       disable                force use of filter"
         print "    hotplate      disable                coffee machine hotplate disabled"
         print "    child         lock                   kettle can not heat above 45 degrees"
-        print "    "
         print
         print "    if no value it clears the patch"
         print
         print "  Debug Coffee Timer"
         print "    timer [index] (erase|[time]) set/erase timer"
         print "    timers                 show timers"
-        """
         print
         print "  Help Commands"
         print "    examples               show examples of commands"
@@ -1028,8 +1042,8 @@ class iBrewConsole:
         print "    strength weak            Set coffee strength to weak but do not toggle filter/beans"
         print "    cups 3                   Set number of cups to brew"
         print "    mode cup                 Set cup mode"
-        print "    block [wifi,02]          Block wifi and [" + Smarter.message_description(02) + "] command to device"
-        print "    patch relay [:version=12] Patches [" + Smarter.message_description(Smarter.ResponseDeviceInfo) + "] Argument version to clients"
+        print "    block >wifi,>02          Block wifi and [" + Smarter.message_description(02) + "] command to device"
+        print "    patch relay <version=12] Patches [" + Smarter.message_description(Smarter.ResponseDeviceInfo) + "] Argument version to clients"
         print "    brew 4 10 beans strong   Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes"
         print "    join MyWifi p@ssw0rd     Joins MyWifi wireless network using p@ssw0rd as credential"
         print "    settings 100 20 True 75  Set default user settings for the kettle to..."
