@@ -780,6 +780,17 @@ class SmarterProtocol:
 
     KettleFirmwareVerified    = [19]
     CoffeeFirmwareVerified    = [20,22]
+ 
+    WifiStringKettleUpdate    = DeviceStringKettle + " Update"
+    WifiStringCoffeeUpdate    = DeviceStringCoffee + " Update"
+    WifiStringKettleDirect    = DeviceStringKettle + ":c0"
+    WifiStringCoffeeDirect    = DeviceStringCoffee + ":c1"
+    
+    
+    FirmWareReleaseNotes = {
+        22 : "Increases keep warm time up to 40 minutes as default."
+        19 : "Reduces kettle overboiling. Improved temperature accuracy."
+    }
     
     
     def is_kettle(self,device):

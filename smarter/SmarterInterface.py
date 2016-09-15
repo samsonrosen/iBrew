@@ -537,7 +537,7 @@ class SmarterClient:
                     
                     # BLOCKING HERE FIX
                     if self.isKettle:
-                        r = self.__encode_KettleStatus(self.kettleStatus,self.temperature,self.waterSensor, self.onbase, self.unknown)[0]
+                        r = self.__encode_KettleStatus(self.kettleStatus,self.temperature,self.waterSensor, self.onBase, self.unknown)[0]
                     elif self.isCoffee:
                         r = self.__encode_CoffeeStatus(self.cups,self.strength,self.cupsBrew,self.waterLevel,self.waterEnough,self.carafe, self.grind, self.ready, self.grinderOn, self.heaterOn, self.hotPlateOn,self.working,self.timerEvent)[0]
                     clientsock.send(r)
@@ -927,7 +927,6 @@ class SmarterClient:
                 self.__monitorLock.release()
                 logging.debug("Blocked command: " + Smarter.number_to_code(command))
                 response = self.__encode(command)
-                print response
                 for message in response:
                     self.__decode(message)
                 return responses
@@ -1183,7 +1182,7 @@ class SmarterClient:
         elif message == Smarter.ResponseKettleSettings: response = self.__encode_KettleSettings(self.defaultTemperature,self.defaultKeepWarmTime,self.defaultFormulaTemperature)
         elif message == Smarter.ResponseMode:           response = self.__encode_Mode()
         elif message == Smarter.ResponseBase:           response = self.__encode_Base(self.waterSensorBase)
-        else:                                           response = self.__encode_messageStatus(Smarter.StatusInvalid)
+        else:                                           response = self.__encode_CommandStatus(Smarter.StatusInvalid)
         return response
 
     def __encode_KettleStatus(self,status,temperature,watersensor,onbase,unknown=0):
@@ -1193,7 +1192,6 @@ class SmarterClient:
         coffeestatus = Smarter.coffeeStatus_to_raw(carafe,grind,ready,grinder,heater,hotplate,working,timer)
         cupsmerged   = Smarter.cupsmerged_to_raw(cups,cupsbrew)
         watermerged  = Smarter.waterlevel_to_raw(waterlevel,waterenough)
-        print type(watermerged)
         x =  [Smarter.number_to_raw(Smarter.ResponseCoffeeStatus) + coffeestatus + watermerged + Smarter.number_to_raw(unknown) + Smarter.strength_to_raw(strenght) + cupsmerged + Smarter.number_to_raw(Smarter.MessageTail)]
         return x
     
@@ -1493,7 +1491,19 @@ class SmarterClient:
             return x & 2**n != 0
         
         coffeeStatus = Smarter.raw_to_number(message[1])
-        
+  
+        self.ready               = is_set(coffeeStatus,2)
+        self.grind               = is_set(coffeeStatus,1)
+        self.working             = is_set(coffeeStatus,5)
+        self.timerEvent          = is_set(coffeeStatus,7)
+        self.waterLevel          = Smarter.raw_to_waterlevel(message[2])
+        self.waterEnough         = Smarter.raw_to_waterlevel_bit(message[2])
+        self.strength            = Smarter.raw_to_strength(message[4])
+        self.cups                = Smarter.raw_to_cups(message[5])
+        self.cupsBrew            = Smarter.raw_to_cups_brew(message[5])
+        self.unknown             = Smarter.raw_to_number(message[3])
+
+  
         if self.carafe != is_set(coffeeStatus,0):
             if not self.carafe:
                  self.countCarafeRemoved += 1
@@ -1504,7 +1514,7 @@ class SmarterClient:
                 self.countHeater += 1
             else:
                 # what happens when it fails?? or stopped
-                self.countCupsBrew += cupsBrew
+                self.countCupsBrew += self.cupsBrew
             self.heaterOn = is_set(coffeeStatus,4)
 
         if self.hotPlateOn != is_set(coffeeStatus,6):
@@ -1519,16 +1529,6 @@ class SmarterClient:
             
         
     
-        self.ready               = is_set(coffeeStatus,2)
-        self.grind               = is_set(coffeeStatus,1)
-        self.working             = is_set(coffeeStatus,5)
-        self.timerEvent          = is_set(coffeeStatus,7)
-        self.waterLevel          = Smarter.raw_to_waterlevel(message[2])
-        self.waterEnough         = Smarter.raw_to_waterlevel_bit(message[2])
-        self.strength            = Smarter.raw_to_strength(message[4])
-        self.cups                = Smarter.raw_to_cups(message[5])
-        self.cupsBrew            = Smarter.raw_to_cups_brew(message[5])
-        self.unknown             = Smarter.raw_to_number(message[3])
 
 
     def __decode_DeviceInfo(self,message):
