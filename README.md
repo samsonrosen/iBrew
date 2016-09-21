@@ -17,14 +17,9 @@ Since the console it nearly done, protocol almost fully mapped out. It is time t
 
 #### Update
 
-I decided to quit... I have no coffee machine to test it on, and I am not doing test sessions to remote coffee machines again. And I learned enough python. I think its a terrible language, I never had an app crash and not quit on me, or calling sys.exit() and it does NOTHING even in the main thread. utf-8 vs ascii.... wtf... and after the windows debacle I was really done with it. Then the webpage designs. css wtf... how dificult is it so have the correct font size with different screen sizes. Or stay on the same posision. 
+I tested the code and I can simulate a coffee machine (so I can write the web stuff without a coffee machine), still I do not have time till december to finish the web interface (ju4ia tolds me the coffee part is partly working). The command line is fully functional!!! Patches are also not working, and the replay mode does not quit properly... Anyway speeded up the network code and added a message blocking system (firewall)... can take a while for the web interface to be fully functional.
 
-It's not my cup of tea. 
-
-So have phun! You can make the web functional yourself (almost all is there to do so and its almost functionally, you can say I quit before the finish line) or just use the command line. Check out the webserver anyway if you want protocol information, every argument and message is clickable, and shows information (well almost all, except wat was left to convert, still in iBrewHelp.py)!  
-
-Well it have been fun. Signed 09/11/2016.
-
+Anyway, as always donate: codes, your own code mods, bugs or other stuff...
 
 #### Contact
 [Bugs or issues](https://github.com/Tristan79/iBrew/issues). Donations & other questions <tristan@monkeycat.nl>
@@ -58,7 +53,7 @@ Start iBrewUI with python to get a taskbar icon.
 I failed to create a package, I gave up after 8 hours, I just can not get it to work. And windows is fighting me
 every step of the way, with its disaster of an user interface (who designs this? Even getting the theme to a bright color took 30 minutes of my time with some hack, are the persons responsible for choosing the color depressed? And then the jumping windows in the taskbar. I give it a try if I find an old windows xp iso. But not going to touch Win7/8/10/... ever again. I get annoyed when software is working against me. But it is almost never the os usually a stand alone app. But in windows 10 its windows itself fighting me on every step. wtf. It doubles the amount of time spend not coding. After 7 years without it, lets make the rest of my life.
 
- 
+
 #### Versions
  * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
  * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
@@ -301,7 +296,10 @@ You can find information on the rest api under:
 http://ip:port/info/api
 ```
  
-     
+### Python Interface
+
+Use pydoc or any other python doc app to see the help on Smarter.py
+
 ### LICENSE
 
 The author has no contact with or support from Smarter, and is not affiliated in any way with the company that produces the appliances.
