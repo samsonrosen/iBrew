@@ -33,7 +33,7 @@ Still no coffee machine (so no web for that)! I could like to thank Ju4ia for le
 
  
 #### Downloads & Setup
-  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) 
+  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) (note that the web interface is NOT finished, only the rest api is)
   * [Windows](https://github.com/Tristan79/iBrew/blob/master/release/iBrew.zip) (unavailable use source, see note)
 
 Other systems running python see download from source section.
