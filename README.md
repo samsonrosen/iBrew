@@ -63,8 +63,8 @@ every step of the way, with its disaster of an user interface (who designs this?
  * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
  * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
  * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
- * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
- * PHASE 6: [PRERELEASE]    v0.5 Dumb Dump Limited Collector Edition (numbered, signed by author)
+ * PHASE 5: [WEB]           v0.4 Brewing on the 7th day (rest api is working!!!)
+ * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
  * PHASE 7: [FINALCUT]      v1.0 Out of order!
  
 #### Upcoming for the last 3 versions  
@@ -206,37 +206,6 @@ you can also use them on the command line as arguments:
     monitor                monitor incomming traffic
     modify (modifiers)     patch or unpatch messages
     sweep (id)             [developer only] try (all or start with id) unknown command codes
-
-  Modifiers Rules
-    [>|<]var=(value)(,[>|<]var=(value))*
-
-    VAR           VALUE
-    version       [00..FF]               override device firmware version
-    heater        disable                coffee machine or kettle heater disabled
-
-    base          [00..4000]             override default calibration base
-    formula       [0..100]               override default formula temperature
-    temperature   [0..100]               override default temperature
-    keepwarm      off or [5..?]          override default keepwarm time
-    formula       disable/enabled        override formula mode
-
-    carafe        optional or required   override carafe detection
-    cups          [1..12]                override default number of cups
-    grind         beans or filter        override default grind
-    hotplate      off or [5..?]          override default hotplate time
-    mode          carafe or cup          override mode
-    strength      weak, medium or strong override default strength
-    water                                correct cups according to water level
-    limit         [1..12]                limit the number of cups to be selected
-    grinder       disable                force use of filter
-    hotplate      disable                coffee machine hotplate disabled
-    child         lock                   kettle can not heat above 45 degrees
-
-    if no value it clears the patch
-
-  Debug Coffee Timer
-    timer [index] (erase|[time]) set/erase timer
-    timers                 show timers
 
   Help Commands
     examples               show examples of commands
