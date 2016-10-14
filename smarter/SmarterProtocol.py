@@ -788,7 +788,7 @@ class SmarterProtocol:
     
     
     FirmWareReleaseNotes = {
-        22 : "Increases keep warm time up to 40 minutes as default."
+        22 : "Increases keep warm time up to 40 minutes as default.",
         19 : "Reduces kettle overboiling. Improved temperature accuracy."
     }
     
