@@ -772,7 +772,7 @@ class iBrewConsole:
             elif command == "reset":        self.client.device_reset()
             elif command == "info":
                                             self.client.device_info()
-                                            if not self.client.dump: self.client.print_info()
+                                            if not self.client.dump: self.client.print_info_device()
             elif command == "history":
                                             self.client.device_history()
                                             if not self.client.dump: self.client.print_history()
