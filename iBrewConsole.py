@@ -384,7 +384,7 @@ class iBrewConsole:
 
             if command == "slow":
                 if self.console or numarg == 0:
-                    print "iBrew: As you command, but it can take a whileâ€¦"
+                    print "iBrew: As you command, but it can take a while!"
                     return
                 if numarg > 0:
                     command = arguments[0].lower()
@@ -399,7 +399,7 @@ class iBrewConsole:
 
             if command == "fahrenheid":
                 if numarg == 0 and not self.console:
-                    print "iBrew: Kelvinâ€¦ stop that!"
+                    print "iBrew: Kelvin, stop that!"
                     return
                 else:
                     Smarter.fahrenheid = True
@@ -414,7 +414,7 @@ class iBrewConsole:
 
             if command == "celsius":
                 if numarg == 0 and not self.console:
-                    print "iBrew: But i'm freezingâ€¦ and so confused. Please turn me on!"
+                    print "iBrew: But i'm freezing and so confused. Please turn me on!"
                     return
                 else:
                     Smarter.fahrenheid = False
@@ -612,6 +612,7 @@ class iBrewConsole:
             elif command == "base":
                                             if numarg == 0:
                                                 self.client.kettle_calibrate_base()
+                                                if not self.client.dump: self.client.print_watersensor_base()
                                             if numarg >= 1:
                                                 self.client.kettle_calibrate_store_base(Smarter.string_to_watersensor(arguments[0]))
                                                 if not self.client.dump: self.client.print_watersensor_base()
