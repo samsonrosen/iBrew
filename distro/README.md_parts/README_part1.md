@@ -2,6 +2,12 @@
 
 [iKettle 2.0](http://smarter.am/ikettle) and [Smarter Coffee](http://smarter.am/coffee) Interface
 
+## News
+[The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
+
+### 4-11-20
+  * Fixed status not working (definitly need a short status for homebridge :-)
+
 
 ## Introduction
 iBrew is a (python) interface to iKettle 2.0 and Smarter Coffee devices. It includes a console, monitor, command line interface, web interface and rest api. You can also use it in your own code. iKettle 2.0 v19 and SmarterCoffee v20 tested at the moment. Please share any other discoveries you made! 
@@ -15,17 +21,6 @@ This means your machine is free! You can connect it yourself and do whatever you
 Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
 
 
-#### Update
-
-I decided to quit... I have no coffee machine to test it on, and I am not doing test sessions to remote coffee machines again. And I learned enough python. I think its a terrible language, I never had an app crash and not quit on me, or calling sys.exit() and it does NOTHING even in the main thread. utf-8 vs ascii.... wtf... and after the windows debacle I was really done with it. Then the webpage designs. css wtf... how dificult is it so have the correct font size with different screen sizes. Or stay on the same posision. 
-
-It's not my cup of tea. 
-
-So have phun! You can make the web functional yourself (almost all is there to do so and its almost functionally, you can say I quit before the finish line) or just use the command line. Check out the webserver anyway if you want protocol information, every argument and message is clickable, and shows information (well almost all, except wat was left to convert, still in iBrewHelp.py)!  
-
-Well it have been fun. Signed 09/11/2016.
-
-
 #### Contact
 [Bugs or issues](https://github.com/Tristan79/iBrew/issues). Donations & other questions <tristan@monkeycat.nl>
 If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, please post in the issues.
@@ -34,8 +29,7 @@ Still no coffee machine (so no web for that)! I could like to thank Ju4ia for le
 
  
 #### Downloads & Setup
-  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) 
-  * [Windows](https://github.com/Tristan79/iBrew/blob/master/release/iBrew.zip) (unavailable use source, see note)
+  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) (note that the web interface is NOT finished, only the rest api is, I hope :-)
 
 Other systems running python see download from source section.
 
@@ -65,7 +59,7 @@ every step of the way, with its disaster of an user interface (who designs this?
  * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
  * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
  * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
- * PHASE 6: [PRERELEASE]    v0.5 Dumb Dump Limited Collector Edition (numbered, signed by author)
+ * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
  * PHASE 7: [FINALCUT]      v1.0 Out of order!
  
 #### Upcoming for the last 3 versions  
@@ -84,6 +78,8 @@ every step of the way, with its disaster of an user interface (who designs this?
  * filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * strip zero from ip
+ * short status for homebridge
+ * descaling data bit? (the smarter app has it...)
 
 
 ## Usage

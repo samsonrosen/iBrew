@@ -2,9 +2,11 @@
 
 [iKettle 2.0](http://smarter.am/ikettle) and [Smarter Coffee](http://smarter.am/coffee) Interface
 
-## News 
-
+## News
 [The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
+
+### 4-11-20
+  * Fixed status not working (definitly need a short status for homebridge :-)
 
 
 ## Introduction
@@ -19,12 +21,6 @@ This means your machine is free! You can connect it yourself and do whatever you
 Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
 
 
-#### Update
-
-I tested the code and I can simulate a coffee machine (so I can write the web stuff without a coffee machine), still I do not have time till december to finish the web interface (ju4ia tolds me the coffee part is partly working). The command line is fully functional!!! Patches are also not working, and the replay mode does not quit properly... Anyway speeded up the network code and added a message blocking system (firewall)... can take a while for the web interface to be fully functional.
-
-Anyway, as always donate: codes, your own code mods, bugs or other stuff...
-
 #### Contact
 [Bugs or issues](https://github.com/Tristan79/iBrew/issues). Donations & other questions <tristan@monkeycat.nl>
 If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, please post in the issues.
@@ -33,8 +29,7 @@ Still no coffee machine (so no web for that)! I could like to thank Ju4ia for le
 
  
 #### Downloads & Setup
-  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) (note that the web interface is NOT finished, only the rest api is)
-  * [Windows](https://github.com/Tristan79/iBrew/blob/master/release/iBrew.zip) (unavailable use source, see note)
+  * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) (note that the web interface is NOT finished, only the rest api is, I hope :-)
 
 Other systems running python see download from source section.
 
@@ -57,13 +52,13 @@ Start iBrewUI with python to get a taskbar icon.
 I failed to create a package, I gave up after 8 hours, I just can not get it to work. And windows is fighting me
 every step of the way, with its disaster of an user interface (who designs this? Even getting the theme to a bright color took 30 minutes of my time with some hack, are the persons responsible for choosing the color depressed? And then the jumping windows in the taskbar. I give it a try if I find an old windows xp iso. But not going to touch Win7/8/10/... ever again. I get annoyed when software is working against me. But it is almost never the os usually a stand alone app. But in windows 10 its windows itself fighting me on every step. wtf. It doubles the amount of time spend not coding. After 7 years without it, lets make the rest of my life.
 
-
+ 
 #### Versions
  * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
  * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
  * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
  * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
- * PHASE 5: [WEB]           v0.4 Brewing on the 7th day (rest api is working!!!)
+ * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
  * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
  * PHASE 7: [FINALCUT]      v1.0 Out of order!
  
@@ -83,6 +78,8 @@ every step of the way, with its disaster of an user interface (who designs this?
  * filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * strip zero from ip
+ * short status for homebridge
+ * descaling data bit? (the smarter app has it...)
 
 
 ## Usage
@@ -269,9 +266,11 @@ You can find information on the rest api under:
 http://ip:port/info/api
 ```
  
+   
 ### Python Interface
 
-Use pydoc or any other python doc app to see the help on Smarter.py
+Use pydoc or any other python doc app to see the help on Smarter*.py
+
 
 ### LICENSE
 

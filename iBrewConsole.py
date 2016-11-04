@@ -1001,6 +1001,8 @@ class iBrewConsole:
         print "    modify (modifiers)     patch or unpatch messages"
         print "    sweep (id)             [developer only] try (all or start with id) unknown command codes"
         print
+        
+        """
         print "  Modifiers Rules"
         print "    [>|<]var=(value)(,[>|<]var=(value))*"
         print
@@ -1032,6 +1034,7 @@ class iBrewConsole:
         print "    timer [index] (erase|[time]) set/erase timer"
         print "    timers                 show timers"
         print
+        """
         print "  Help Commands"
         print "    examples               show examples of commands"
         print "    groups                 show all groups"
