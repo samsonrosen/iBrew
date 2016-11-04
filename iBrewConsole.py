@@ -210,6 +210,7 @@ class iBrewConsole:
             print
             print
             print "WARNING YOU COULD BRICK YOUR DEVICE, USE AT YOUR OWN RISK"
+            print "NOTE: THIS IS OFFLINE! NO INFORMATION WILL BE SHARED WITH ANYONE!"
             print
             print
             print "LICENSING AGREEMENT"
@@ -484,6 +485,18 @@ class iBrewConsole:
                 
                 if command == "console" or command == "connect" or command == "relay":
                     self.console = True
+
+
+            if command == "status":
+                self.client.fast = False
+                try:
+                    self.client.device_all_settings()
+                except Exception, e:
+                    logging.debug(str(e))
+                    logging.debug(traceback.format_exc())
+                    print "iBrew: Could not init values"
+                    return
+
 
 
             if command == "connect" or command == "console" or ((command == "relay" or command == "sweep" or command == "monitor") and not self.console):

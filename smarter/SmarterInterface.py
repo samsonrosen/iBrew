@@ -646,19 +646,16 @@ class SmarterClient:
                     self.__sendLock.acquire()
                     self.__monitorLock.acquire()
                 except threading.ThreadError, e:
+                    if not self.run:
+                        break
                     s = traceback.format_exc()
                     logging.debug(s)
                     logging.debug(e)
                     logging.error("[" + self.host + "] ERROR")
                     self.disconnect()
-                    #print(traceback.format_exc())
- 
                     break
                     raise SmarterError(0,"Monitor Error")
                 try:
-                    if not self.connected:
-                        #print(traceback.format_exc())
-                        break
                     response = self.__read()
                     monitorCount += 1
                     if previousResponse != response:
@@ -667,6 +664,9 @@ class SmarterClient:
                         # ...else got one! yeah! print it!
   
                 except SmarterError, e:
+                    if not self.run:
+                        break
+                    
                     s = traceback.format_exc()
                     logging.debug(s)
                     logging.debug(e)
@@ -679,9 +679,11 @@ class SmarterClient:
                     self.disconnect()
                     break
                     raise SmarterError(0,"Monitor Error")
-                
-                self.__monitorLock.release()
-                self.__sendLock.release()
+    
+                if self.__monitorLock.locked():
+                    self.__monitorLock.release()
+                if self.__sendLock.locked():
+                    self.__sendLock.release()
                 
                 dump = self.dump
                 
@@ -715,12 +717,15 @@ class SmarterClient:
                             pass #self.device_history()
                             
                     except SmarterError, e:
+                        if not self.run:
+                            break
                         s = traceback.format_exc()
                         logging.debug(s)
                         logging.debug(e)
                         logging.error("[" + self.host + "] ERROR")
                         self.disconnect()
                         self.dump = dump
+                        
                         break
                         raise SmarterError(0,"Monitor Error")
 
@@ -761,7 +766,9 @@ class SmarterClient:
                 i = 1
                 while raw != Smarter.number_to_raw(Smarter.MessageTail) or (minlength > 0 and raw == Smarter.number_to_raw(Smarter.MessageTail) and i < minlength):
                     message += raw
+
                     raw = self.__socket.recv(1)
+                    
                     # debug
                     #print "[" + Smarter.raw_to_code(raw) + "]",
                     i += 1
@@ -839,6 +846,10 @@ class SmarterClient:
                 message = self.__encode(id)[0]
     
             # patches here....
+            
+            if not self.connected:
+                # added such that the monitor thread will quit without errors
+                return
             
             try:
                 self.__decode(message)
@@ -1086,6 +1097,7 @@ class SmarterClient:
                 print "[" + self.host +  ":" + '{:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()) + "] Disconnecting " + x
         
             self.connected = False
+            
             try:
                 if self.monitor:
                     if self.__monitorLock.locked():
