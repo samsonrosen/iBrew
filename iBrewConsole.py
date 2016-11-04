@@ -522,6 +522,7 @@ class iBrewConsole:
             if command == "help" or command == "?":
                                             self.usage()
                                             self.commands()
+            elif command == "shortstatus":  self.client.print_short_status()
             elif command == "usage":        self.usage()
             elif command == "rules":
                                             if numarg >= 1:
@@ -930,8 +931,9 @@ class iBrewConsole:
         print "    info                   device info"
         print "    list                   list detected devices"
         print "    reset                  reset device to default"
+        print "    shortstatus            show status"
         print "    start                  start the device"
-        print "    status                 show status"
+        print "    status                 show full status"
         print "    settings               show user settings"
         print "    stop                   stop the appliance"
         print

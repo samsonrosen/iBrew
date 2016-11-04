@@ -2624,6 +2624,7 @@ class SmarterClient:
 
 
     def print_short_status(self):
+        self.__read()
         if self.isKettle:
             self.print_short_kettle_status()
         elif self.isCoffee:
