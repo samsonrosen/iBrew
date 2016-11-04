@@ -253,8 +253,8 @@ you can also use them on the command line as arguments:
 
 Use the following software to bridge iBrew with HomeKit
 
-[Homebridge](https://github.com/nfarina/homebridge)
-[cmdSwitch2](https://github.com/luisiam/homebridge-cmdswitch2)
+ * [Homebridge](https://github.com/nfarina/homebridge)
+ * [cmdSwitch2](https://github.com/luisiam/homebridge-cmdswitch2)
 
 Example homebridge config file for iKettle 2.0 (Smarter Coffee coming soon)
 
