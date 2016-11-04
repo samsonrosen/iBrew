@@ -7,6 +7,7 @@
 
 ### 4-11-20
   * Fixed status not working (definitly need a short status for homebridge :-)
+  * Example Homebridge config file!
 
 
 ## Introduction
