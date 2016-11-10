@@ -124,7 +124,7 @@ Cuz my code sucks... :-)
 You can find information on the rest api in the web interface under:
 
 ```
-http://ip:port/info/rest
+http://ip:port/info/api
 ```
 
 The default port is 2080
