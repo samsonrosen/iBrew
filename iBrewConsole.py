@@ -348,7 +348,7 @@ class iBrewConsole:
                     arguments = arguments[1:]
                     numarg -= 1
                 #if not self.console:
-                self.client.isCoffee   = True
+                self.client.switch_coffee_device()
                 #else:
                 #    print "iBrew: \'coffee\' not available in the console"
 
@@ -379,7 +379,7 @@ class iBrewConsole:
                     arguments = arguments[1:]
                     numarg -= 1
                 #if not self.console:
-                self.client.isKettle   = True
+                self.client.switch_kettle_device()
                 #else:
                 #    print "iBrew: \'kettle\' not available in the console"
 
