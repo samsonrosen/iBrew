@@ -378,10 +378,10 @@ class iBrewConsole:
                     command = arguments[0].lower()
                     arguments = arguments[1:]
                     numarg -= 1
-                if not self.console:
-                    self.client.isKettle   = True
-                else:
-                    print "iBrew: \'kettle\' not available in the console"
+                #if not self.console:
+                self.client.isKettle   = True
+                #else:
+                #    print "iBrew: \'kettle\' not available in the console"
 
 
             if command == "slow":
@@ -991,7 +991,7 @@ class iBrewConsole:
         print "    stats                  show traffic statistics"
         print
         print "  Block Rules"
-        print "    Consists of rules, -> is for outgoing connection to the device, <- is for incomming connection from relay client."
+        print "    Consists of rules, in: is for outgoing connection to the device, out: is for incomming connection from relay client."
         print
         print "    [in:|out:]rule(,[in:|out:]rule)*"
         print
