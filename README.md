@@ -12,15 +12,18 @@ It features!
 
 For smarthome fans! 
  * Support unlimited iKettle 2.0 or Smarter Coffee appliances! As many as you like!
- * Usage statistics
+ * Usage statistics!
+ * No tracking!
+ * Stand alone or bridge mode!
  
-iBrew Bridges 
+iBrew Interfaces & Bridges 
  * Command Line 
  * Web (almost finished, help appreciated!)
- * JSON Rest 
- * [Javascript iBrew interface](https://github.com/Tristan79/iBrew/blob/master/resources/ibrew.js) (almost finished :-)
- * [Python Smarter] (https://github.com/Tristan79/iBrew/tree/master/smarter) 
-
+ * JSON REST 
+ * [Javascript](https://github.com/Tristan79/iBrew/blob/master/resources/ibrew.js) (almost finished :-)
+ * [Python] (https://github.com/Tristan79/iBrew/tree/master/smarter) 
+ * Message relay (works with Smarter app!)
+ 
 Connection Guides
  * __HomeKit__ (using HomeBridge)
  * [Domoticz](http://www.domoticz.com/) (coming soon!)
@@ -28,12 +31,11 @@ Connection Guides
 
 _No tracking of you or your appliances usage!_
  
-For the domotics interface experts!
+For the Smarthome and Domotics Interface experts!
  * Kettle and coffee machine simulation (works with Smarter app!)
  * Console for Smarter protocol debugging
  * Monitor
  * Message blocking and patching
- * Message relay (works with Smarter app!)
  * Smarter protocol description (start web interface for a clickable web version :-)
 
 Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22. 
@@ -363,7 +365,7 @@ Yeah I know the start and stop icons look terrible... and it is partly functiona
 
 For bridging smarthome controllers or use it to integrate your appliance in your own website!
 
-![rest](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/rest.png)
+![rest](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/api.png)
 
 #### Setup
 
@@ -385,9 +387,9 @@ Cuz my code sucks... :-)
 ![protocol](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/protocol.png)
 
 
-### REST API
+### JSON REST API
 
-You can find information on the rest api in the web interface under:
+You can find information on the iBrew JSON REST API in the Web Interface under:
 
 ```
 http://ip:port/info/api
@@ -395,19 +397,25 @@ http://ip:port/info/api
 
 The default port is 2080
 
-##### Example JSON return
+#### Example JSON return
 
 http://localhost:2080/api/10.0.0.99/status
 
 ```
 {"device": {"directmode": false, "connected": true, "host": "10.0.0.99", "firmware": {"version": 19, "certified": "iBrew certified firmware"}, "type": {"desciption": "iKettle 2.0", "id": 1}}, "default": {"formula": {"use": false, "temperature": {"fahrenheid": 32, "celsius": 0}}, "keepwarm": 0, "temperature": {"fahrenheid": 212, "celsius": 100, "prefered": "celsius"}}, "sensors": {"status": "ready", "base": "On", "temperature": {"raw": {"fahrenheid": 68, "celsius": 20}, "stable": {"fahrenheid": 68, "celsius": 20}}, "waterlevel": {"raw": 2005, "base": 920, "stable": 2004}}}
 ```
+
+### JavaScript Interface
+
+Work in progress! Help would be nice!
+
+JavaScript for use with iBrew JSON REST API [Javascript iBrew interface](https://github.com/Tristan79/iBrew/blob/master/resources/ibrew.js) 
  
 ### Python Interface
 
-The Smarter interface to the iKettle 2.0 and the Smarter Coffee is located in the Smarter folder. Use pydoc or any other python doc app to see the help on SmarterInterface.py and SmarterProtocol.py.
+The [Python Smarter Interface](https://github.com/Tristan79/iBrew/blob/master/smarter/) to the iKettle 2.0 and the Smarter Coffee is located in the Smarter folder. Use __pydoc__ or any other python doc app to see the help on [SmarterInterface.py](https://github.com/Tristan79/iBrew/blob/master/smarter/SmarterInterface.py) and [SmarterProtocol.py](https://github.com/Tristan79/iBrew/blob/master/smarter/SmarterProtocol.py). There are a lot of options and functions you can use!
 
-Example
+#### Basic Example
 
 ```
 from smarter.SmarterInterface import *
@@ -436,7 +444,7 @@ And start up the monitor with a command like ```ibrew dump monitor 10.0.0.99``` 
 
 #### Domoticz
 
-Links to old [domoticz alpha python interface](https://github.com/Tristan79/iBrew/tree/6014cbf0a8cd551e74cbc8bfcf3f0f97389359c2/domoticz). This linke contains old example [code](https://github.com/Tristan79/iBrew/blob/927c43e347b7c8aa1c2d897936ac51c34fa80e7e/iBrewTerminal.py) for a monitor (look for domoticz) which can be reused
+Link to old [domoticz alpha python interface](https://github.com/Tristan79/iBrew/tree/6014cbf0a8cd551e74cbc8bfcf3f0f97389359c2/domoticz). This link contains old example [code](https://github.com/Tristan79/iBrew/blob/927c43e347b7c8aa1c2d897936ac51c34fa80e7e/iBrewTerminal.py) for a monitor (look for domoticz) which can be reused
 
 
 ## Guides

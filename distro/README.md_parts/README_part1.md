@@ -12,15 +12,18 @@ It features!
 
 For smarthome fans! 
  * Support unlimited iKettle 2.0 or Smarter Coffee appliances! As many as you like!
- * Usage statistics
+ * Usage statistics!
+ * No tracking!
+ * Stand alone or bridge mode!
  
-iBrew Bridges 
+iBrew Interfaces & Bridges 
  * Command Line 
  * Web (almost finished, help appreciated!)
- * JSON Rest 
- * [Javascript iBrew interface](https://github.com/Tristan79/iBrew/blob/master/resources/ibrew.js) (almost finished :-)
- * [Python Smarter] (https://github.com/Tristan79/iBrew/tree/master/smarter) 
-
+ * JSON REST 
+ * [Javascript](https://github.com/Tristan79/iBrew/blob/master/resources/ibrew.js) (almost finished :-)
+ * [Python] (https://github.com/Tristan79/iBrew/tree/master/smarter) 
+ * Message relay (works with Smarter app!)
+ 
 Connection Guides
  * __HomeKit__ (using HomeBridge)
  * [Domoticz](http://www.domoticz.com/) (coming soon!)
@@ -28,12 +31,11 @@ Connection Guides
 
 _No tracking of you or your appliances usage!_
  
-For the domotics interface experts!
+For the Smarthome and Domotics Interface experts!
  * Kettle and coffee machine simulation (works with Smarter app!)
  * Console for Smarter protocol debugging
  * Monitor
  * Message blocking and patching
- * Message relay (works with Smarter app!)
  * Smarter protocol description (start web interface for a clickable web version :-)
 
 Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22. 
