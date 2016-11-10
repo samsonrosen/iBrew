@@ -87,23 +87,34 @@ Start the web interface and surf to:
 http://ip:port/
 ```
 
-Replacement for the Smarter app
+#### Replacement for the Smarter app
+
+Yeah I know the start and stop icons look terrible... and it is partly functional but you get no visual indicator it worked. Work in progress!
 
 ![devices](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/devices.png)
 
-Build in json rest api
+#### Build in JSON Rest API
+
+For bridging smarthome controllers or use it to integrate your appliance in your own website!
 
 ![rest](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/rest.png)
 
-You can setup your appliance without the Smarter app
+#### Setup
+
+You can setup your appliance without the Smarter app. Default settings, calibration, descaling or wifi setup... it does it all! No internet required. This means you can use and setup the kettle and the smarter coffee even if smarters servers disappears (chance of no smarter servers in 5 years 97%, I seen it before :-/)
 
 ![settings](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/settings.png)
 
-It keeps stats for you and you only! (and does not send them to me or smarter like the Smarter app does)
+#### Statistics
+
+It keeps stats for you, and you only! It does NOT send them (or anything else) to Smarter like the Smarter app does and definitly not to me...
+Keep your appliance usage to yourself, will you!
 
 ![stats](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/stats.png)
 
-Protocol description is fully interactive!
+#### Protocol description is fully interactive!
+
+Cuz my code sucks... :-) 
 
 ![protocol](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/protocol.png)
 
@@ -116,7 +127,9 @@ You can find information on the rest api in the web interface under:
 http://ip:port/info/rest
 ```
 
-##### Eaxmple json return
+The default port is 2080
+
+##### Example JSON return
 
 http://localhost:2080/api/10.0.0.99/status
 
