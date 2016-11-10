@@ -97,10 +97,10 @@ class InfoPageHandler(BaseHandler):
         self.render("info/info.html")
 
 
-class WifiPageHandler(BaseHandler):
+class WirelessPageHandler(BaseHandler):
     #@tornado.web.authenticated
     def get(self,ip):
-        self.render("device/wifi.html",client = self.application.clients[ip])
+        self.render("device/wireless.html",client = self.application.clients[ip])
 
 
 class APIPageHandler(BaseHandler):
@@ -110,7 +110,7 @@ class APIPageHandler(BaseHandler):
         for ip in self.application.clients:
             client = self.application.clients[ip]
             d.update({client.host : Smarter.device_to_string(client.deviceId)})
-        self.render("info/rest.html",devices = d,joke = iBrewJokes().joke())
+        self.render("info/api.html",devices = d,joke = iBrewJokes().joke())
 
 
 class ProtocolPageHandler(BaseHandler):
@@ -395,7 +395,7 @@ class WifiJoinHandler(GenericAPIHandler):
         self.write(response)
 
 
-class CupWifiDirectHandler(GenericAPIHandler):
+class WifiDirectHandler(GenericAPIHandler):
     def get(self,ip):
         if ip in self.application.clients:
             self.application.clients[ip].wifi_direct()
@@ -945,7 +945,7 @@ class iBrewWeb(tornado.web.Application):
                 
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/scan/?",WifiScanHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/join/(.+)/(.*)/?",WifiJoinHandler),
-                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/direct/?",CupWifiDirectHandler),
+                (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/direct/?",WifiDirectHandler),
                 
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/start/?",StartHandler),
                 (self.webroot + r"/api/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/stop/?",StopHandler),
@@ -964,11 +964,11 @@ class iBrewWeb(tornado.web.Application):
                 
                 # WEB PAGES
                 (r"/",MainPageHandler),
-                (r"/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/wifi/?", WifiPageHandler),
+                (r"/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/wireless/?", WirelessPageHandler),
                 (r"/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/statistics/?", StatsPageHandler),
                 (r"/([0-9]+.[0-9]+.[0-9]+.[0-9]+)/settings/?", SettingsPageHandler),
                 (r"/statistics/?",ServerPageHandler),
-                (r"/info/rest/?",APIPageHandler),
+                (r"/info/api/?",APIPageHandler),
                 (r"/info/license/?",LicensePageHandler),
                 (r"/info/protocol/?",ProtocolPageHandler),
                 (r"/info/messages/?",MessagesPageHandler),

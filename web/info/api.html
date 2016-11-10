@@ -1,20 +1,13 @@
-{% set title = "REST Interface" %} {% include ../wrapper/head.html %}
+{% set title = "iBrew API" %} {% include ../wrapper/head.html %}
 
 
 <center>
 
-<div class="TitleApi">REST</div>
+<div class="TitleApi"></div>
+<div class="TitleApi"><img class="IconMessages" src="{{ static_url('icons/info/api.png') }}"><div class="TitleMessageSubSubSub">JSON REST Interface</div>iBrew API</div>
 
-<img class="IconInfo" src="{{ static_url('icons/info/rest.png') }}">
+<br>
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
 
 <div class="tTable">
     <div class="tRow">
@@ -44,7 +37,7 @@
 {% for ip in devices %}
 <div class="tTable">
 
-    {% if "SmarterCoffee" == devices[ip] %}
+    {% if "Smarter Coffee" == devices[ip] %}
     <div class="tRow">
         <div class="CellApiDesc"><img class="IconApi" src="{{ static_url('icons/coffee/coffee.png')}}"></a></div>
         <div class="CellApi"></div>
@@ -57,11 +50,11 @@
     {% end %}
     
     <div class="tRow">
-        <div class="CellApiDesc">Status</div>
+        <div class="CellApiDesc">Status {{ devices[ip] }}</div>
         <div class="CellApi"><a href="/api/{{ escape(ip) }}/status">/status</a></div>
     </div>
 
-    {% if "SmarterCoffee" == devices[ip] %}
+    {% if "Smarter Coffee" == devices[ip] %}
     <div class="tRow">
         <div class="CellApiDesc">Start brewing</div>
         <div class="CellApi"><a href="/api/{{ escape(ip) }}/start">/start</a></div>
