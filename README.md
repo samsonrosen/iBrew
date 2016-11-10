@@ -79,7 +79,7 @@ Start iBrewUI with python to get a taskbar icon. I failed to create a working pa
  * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
  * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
  * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
-                            v0.4.4 Intermezzo! <-- We are here!
+ *                          v0.4.4 Intermezzo! <-- We are here!
  * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
  * PHASE 7: [FINALCUT]      v1.0 Out of order!
 
@@ -396,12 +396,31 @@ Start the web interface and surf to:
 http://ip:port/
 ```
 
-#### REST API
+![devices](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/devices.png)
+
+![rest](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/rest.png)
+
+![settings](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/settings.png)
+
+![stats](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/stats.png)
+
+![protocol](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/protocol.png)
+
+
+### REST API
 
 You can find information on the rest api in the web interface under:
 
 ```
-http://ip:port/info/api
+http://ip:port/info/rest
+```
+
+##### Eaxmple json return
+
+http://localhost:2080/api/10.0.0.99/status
+
+```
+{"device": {"directmode": false, "connected": true, "host": "10.0.0.99", "firmware": {"version": 19, "certified": "iBrew certified firmware"}, "type": {"desciption": "iKettle 2.0", "id": 1}}, "default": {"formula": {"use": false, "temperature": {"fahrenheid": 32, "celsius": 0}}, "keepwarm": 0, "temperature": {"fahrenheid": 212, "celsius": 100, "prefered": "celsius"}}, "sensors": {"status": "ready", "base": "On", "temperature": {"raw": {"fahrenheid": 68, "celsius": 20}, "stable": {"fahrenheid": 68, "celsius": 20}}, "waterlevel": {"raw": 2005, "base": 920, "stable": 2004}}}
 ```
  
 ### Python Interface
@@ -409,7 +428,7 @@ http://ip:port/info/api
 The Smarter interface to the iKettle 2.0 and the Smarter Coffee is located in the Smarter folder. Use pydoc or any other python doc app to see the help on SmarterInterface.py and SmarterProtocol.py.
 
 
-### LICENSE
+## LICENSE
 
 The author has no contact with or support from Smarter, and is not affiliated in any way with the company that produces the appliances.
 

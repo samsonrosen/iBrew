@@ -79,7 +79,7 @@ Start iBrewUI with python to get a taskbar icon. I failed to create a working pa
  * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
  * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
  * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
-                            v0.4.4 Intermezzo! <-- We are here!
+ *                          v0.4.4 Intermezzo! <-- We are here!
  * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
  * PHASE 7: [FINALCUT]      v1.0 Out of order!
 
