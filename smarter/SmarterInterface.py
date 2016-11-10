@@ -90,8 +90,7 @@ class SmarterClient:
         # unknown status byte
         self.unknown                    = 0
     
-        self.isKettle                   = False
-        self.isCoffee                   = False
+
  
         # kettle
         self.waterSensorBase            = 974
@@ -193,6 +192,9 @@ class SmarterClient:
         """
         Initializing SmarterClient
         """
+
+        self.isKettle                   = False
+        self.isCoffee                   = False
         
         # total for device
         self.totalSendCount             = 0
@@ -450,10 +452,10 @@ class SmarterClient:
         d = []
         r = []
         for i in s:
-            if i[0] == "<":
-                r += [i[1:]]
-            if i[0] == ">":
-                d += [i[1:]]
+            if i[0:3] == "in:":
+                r += [i[3:]]
+            if i[0:4] == "out:":
+                d += [i[4:]]
         return (d,r)
 
 
@@ -546,7 +548,6 @@ class SmarterClient:
 
 
     def __handler(self,clientsock,addr):
-
         logging.info(addr[0] + ":" + str(addr[1]) + " Client connected")
         clientsock.setblocking(1)
         while self.__server_run:
@@ -1129,9 +1130,10 @@ class SmarterClient:
         """
         Returns list of reply messages
         """
-    
+        
         if message == Smarter.CommandDeviceInfo:        response = self.__encode_DeviceInfo(self.deviceId,self.version)
-        elif message == Smarter.CommandKettleSettings:  response = self.__encode_KettleSettings(self.defaultTemperature,self.defaultKeepWarmTime,self.defaultFormulaTemperature)
+        elif message == Smarter.CommandKettleSettings:  response = self.__encode_KettleSettings()
+        elif message == Smarter.CommandCoffeeSettings:  response = self.__encode_CoffeeSettings()
         elif message == Smarter.CommandBase:            response = self.__encode_BaseCommand(self.waterSensorBase)
         elif message == Smarter.CommandCalibrate:       response = self.__encode_KettleCalibrate(self.waterSensorBase)
         elif message == Smarter.CommandWifiFirmware:    response = self.__encode_WifiFirmware()
@@ -1153,8 +1155,9 @@ class SmarterClient:
         elif message == Smarter.CommandCoffeeStop:      response = self.__encode_CoffeeStop()
         elif message == Smarter.CommandStrength:        response = self.__encode_Strength()
         elif message == Smarter.CommandCups:            response = self.__encode_Cups()
-        elif message == Smarter.CommandBrewDefault:     response = self.__encode_BrewDefault()
-        elif message == Smarter.CommandCoffeeSettings:  response = self.__encode_CoffeeSettingsCommand()
+        
+        # ???? CHECK THIS
+        elif message == Smarter.CommandBrewDefault:     response = self.__encode_CoffeeSettingsCommand()
 
         elif message == Smarter.CommandCoffeeStoreSettings: response = self.__encode_CoffeeStoreSettings()
         elif message == Smarter.CommandGrinder:         response = self.__encode_Grinder()
@@ -1191,7 +1194,7 @@ class SmarterClient:
         elif message == Smarter.ResponseCoffeeHistory:  response = self.__encode_CoffeeHistory()
         elif message == Smarter.ResponseCarafe:         response = self.__encode_Carafe()
         elif message == Smarter.ResponseKettleStatus:   response = self.__encode_CoffeeStatus(self.cups,self.strength,self.cupsBrew,self.waterLevel,self.waterEnough,self.carafe, self.grind, self.ready, self.grinderOn, self.heaterOn, self.hotPlateOn,self.working,self.timerEvent, self.unknown)
-        elif message == Smarter.ResponseKettleSettings: response = self.__encode_KettleSettings(self.defaultTemperature,self.defaultKeepWarmTime,self.defaultFormulaTemperature)
+        elif message == Smarter.ResponseKettleSettings: response = self.__encode_KettleSettings()
         elif message == Smarter.ResponseMode:           response = self.__encode_Mode()
         elif message == Smarter.ResponseBase:           response = self.__encode_Base(self.waterSensorBase)
         else:                                           response = self.__encode_CommandStatus(Smarter.StatusInvalid)
@@ -1244,10 +1247,10 @@ class SmarterClient:
 
 
     def __encode_CoffeeSettings(self):
-        return __encode_CoffeeSettingsCommand + self.__encode_CommandStatus(Smarter.StatusSucces)
+        return self.__encode_CoffeeSettingsCommand() + self.__encode_CommandStatus(Smarter.StatusSucces)
 
     def __encode_CoffeeSettingsCommand(self):
-        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.strength_to_raw(self.defaultStrength) + Smarter.cups_to_raw(defaultCups) + Smarter.bool_to_raw(self.defaultGrind) + Smarter.hotplate_to_raw(self.defaultHotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
+        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.strength_to_raw(self.defaultStrength) + Smarter.cups_to_raw(self.defaultCups) + Smarter.bool_to_raw(self.defaultGrind) + Smarter.hotplate_to_raw(self.defaultHotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
     def __encode_CoffeeStoreSettings(self):
@@ -1413,12 +1416,12 @@ class SmarterClient:
         return [Smarter.codes_to_message("6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e")]
 
 
-    def __encode_KettleSettingsCommand(self,temperature,keepwarm,formulatemperature):
-        return self.__encode_KettleSettings(temperature,keepwarm,formulatemperature) + self.__encode_CommandStatus(Smarter.StatusSucces)
+    def __encode_KettleSettingsCommand(self):
+        return self.__encode_KettleSettings() + self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
     def __encode_KettleSettings(self,temperature,keepwarm,formulatemperature):
-        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(temperature) + Smarter.keepwarm_to_raw(keepwarm) + Smarter.temperature_to_raw(formulatemperature) + Smarter.number_to_raw(Smarter.MessageTail)
+        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(self.defaultTemperature) + Smarter.keepwarm_to_raw(self.defaultKeepWarmTime) + Smarter.temperature_to_raw(self.defaultFormulaTemperature) + Smarter.number_to_raw(Smarter.MessageTail)
         # emulate bug in v22 (we really should ifx this
         response += Smarter.number_to_raw(0)
         return [response] + self.__encode_CommandStatus(Smarter.StatusSucces)
@@ -1544,6 +1547,7 @@ class SmarterClient:
 
 
     def __decode_DeviceInfo(self,message):
+        
         self.isCoffee = False
         self.isKettle = False
         
@@ -2304,7 +2308,7 @@ class SmarterClient:
         """
         Turns the hotplate off
         """
-        if self.fast or self.isCoffee == True:
+        if self.fast or self.isCoffee:
             self.__send_command(Smarter.CommandHotplateOff)
             set.hotPlate = 0
         else:
@@ -2321,7 +2325,7 @@ class SmarterClient:
         if hotplate == -1:  hp = self.defaultHotPlate
         else:               hp = hotplate
        
-        if self.fast or self.isCoffee == True:
+        if self.fast or self.isCoffee:
             if timer == 0:
                 self.__send_command(Smarter.CommandHotplateOff)
             else:

@@ -30,7 +30,7 @@ import traceback
 #
 # https://github.com/Tristan79/iBrew
 #
-# Copyright Â© 2016 Tristan (@monkeycat.nl)
+# Copyright © 2016 Tristan (@monkeycat.nl)
 #
 # Kettle Rattle (rev 6)
 #------------------------------------------------------
@@ -43,7 +43,7 @@ import traceback
 
 
 iBrewApp          = "iBrew: iKettle 2.0 & Smarter Coffee Interface"
-iBrewInfo         = "iBrew: Brewing on the 7th day Â© 2016 Tristan (@monkeycat.nl)"
+iBrewInfo         = "iBrew: Brewing on the 7th day © 2016 Tristan (@monkeycat.nl)"
 iBrewContribute   = "Please contribute any discoveries on https://github.com/Tristan79/iBrew/issues"
 
 class iBrewConsole:
@@ -209,7 +209,8 @@ class iBrewConsole:
             print Smarter.license()
             print
             print
-            print "WARNING YOU COULD BRICK YOUR DEVICE, USE AT YOUR OWN RISK"
+            print "WARNING: YOU COULD BRICK YOUR DEVICE, USE AT YOUR OWN RISK"
+            print
             print "NOTE: THIS IS OFFLINE! NO INFORMATION WILL BE SHARED WITH ANYONE!"
             print
             print
@@ -324,7 +325,7 @@ class iBrewConsole:
 
             if command == "shout":
                 if self.console or numarg == 0:
-                    print "iBrew: Can't hear you. Drinking tea at a dinner on the other side of the universeâ€¦"
+                    print "iBrew: Can't hear you. Drinking tea at a dinner on the other side of the universe!"
                     return
                 if numarg > 0:
                     command = arguments[0].lower()
@@ -339,21 +340,21 @@ class iBrewConsole:
 
 
             if command == "coffee":
-                if self.console or numarg == 0:
-                    print "iBrew: Nah, I want hot chocoladeâ€¦"
+                if numarg == 0:
+                    print "iBrew: Nah, I want hot chocolade!"
                     return
                 if numarg > 0:
                     command = arguments[0].lower()
                     arguments = arguments[1:]
                     numarg -= 1
-                if not self.console:
-                    self.client.isCoffee   = True
-                else:
-                    print "iBrew: \'coffee\' not available in the console"
+                #if not self.console:
+                self.client.isCoffee   = True
+                #else:
+                #    print "iBrew: \'coffee\' not available in the console"
 
 
             if command == "kettle":
-                if self.console or numarg == 0:
+                if numarg == 0:
                 
                     sim = ""
                     blubtext = "*blub*"
@@ -370,7 +371,7 @@ class iBrewConsole:
                                 sim += " ".rjust(random.randint(0,4)," ") + borreltext.upper()
                             else:
                                 sim += " ".rjust(random.randint(0,4)," ") + borreltext
-                    print "iBrew: Starting simulation of boiling waterâ€¦\n\n" + sim
+                    print "iBrew: Starting simulation of boiling water!\n\n" + sim
                     return
                 
                 if numarg > 0:
@@ -463,12 +464,12 @@ class iBrewConsole:
             
                     if len(devices) == 1:
                         self.client.host = devices[0][0]
-            
-            
+
                 if command == "console" or command == "connect" or command == "relay":
                     self.client.dump_status = False
                     self.client.fast = False
                     self.client.shout = False
+                
 
                 try:
                     if not self.client.dump:
@@ -478,15 +479,20 @@ class iBrewConsole:
                     if not (self.console and command == "relay"):
                         self.client.connect()
                     
+                    
                 except Exception, e:
                     logging.debug(e)
                     logging.info("iBrew: Could not connect to [" + self.client.host + "]")
-                    return
+                    if command != "console" and command != "connect" and command != "relay":
+                        return
                 
                 if command == "console" or command == "connect" or command == "relay":
                     self.console = True
-
-
+                    if numarg == 1:
+                        self.client.block(arguments[0])
+                    if self.client.dump:
+                        self.client.print_rules()
+                
             if command == "status":
                 self.client.fast = False
                 try:
@@ -985,9 +991,9 @@ class iBrewConsole:
         print "    stats                  show traffic statistics"
         print
         print "  Block Rules"
-        print "    Consists of rules, > is for outgoing connection to the device, < is for incomming connection from relay client."
+        print "    Consists of rules, -> is for outgoing connection to the device, <- is for incomming connection from relay client."
         print
-        print "    [>|<]rule(,[>|<]rule)*"
+        print "    [in:|out:]rule(,[in:|out:]rule)*"
         print
         print "    rule:"
         print "      message id"
@@ -1006,7 +1012,7 @@ class iBrewConsole:
         
         """
         print "  Modifiers Rules"
-        print "    [>|<]var=(value)(,[>|<]var=(value))*"
+        print "    [in:|out:]var=(value)(,[in:|out:]var=(value))*"
         print
         print "    VAR           VALUE"
         print "    version       [00..FF]               override device firmware version"
@@ -1068,8 +1074,8 @@ class iBrewConsole:
         print "    strength weak            Set coffee strength to weak but do not toggle filter/beans"
         print "    cups 3                   Set number of cups to brew"
         print "    mode cup                 Set cup mode"
-        print "    block >wifi,>02          Block wifi and [" + Smarter.message_description(02) + "] command to device"
-        print "    patch relay <version=12] Patches [" + Smarter.message_description(Smarter.ResponseDeviceInfo) + "] Argument version to clients"
+        print "    block in:wifi,in:02          Block wifi and [" + Smarter.message_description(02) + "] command to device"
+        print "    patch relay out:version=12] Patches [" + Smarter.message_description(Smarter.ResponseDeviceInfo) + "] Argument version to clients"
         print "    brew 4 10 beans strong   Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes"
         print "    join MyWifi p@ssw0rd     Joins MyWifi wireless network using p@ssw0rd as credential"
         print "    settings 100 20 True 75  Set default user settings for the kettle to..."
