@@ -61,10 +61,16 @@ If you have jokes on coffee, tea, hot chocolade, coffee machines or kettles, ple
 
  
 ## Downloads & Setup
+
+Other systems than MacOS running python see download from source section.
+  
+### MacOS
   * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) (note that the web interface is NOT finished, only the rest api is, I hope :-)
 
-Other systems running python see download from source section.
+Once start the app from the MacOS package (drag it to your application folder) it will auto link iBrew in your terminal.
+Open a terminal and type ```ibrew``` and you're off!
 
+_soft symlink to /usr/local/bin/ibrew_
 
 ### Download from source
 

@@ -15,14 +15,14 @@ class MacGui(rumps.App):
         self.apiServer = apiServer
         self.menu = [
             'Interface',
-            None,
-            'Tea',
+  #          None,
+  #          'Tea',
             None
         ]         
 
-    @rumps.clicked("Tea")
-    def tea(self, sender):
-        self.apiServer.clients['10.0.0.99'].kettle_oelong_tea()
+  #  @rumps.clicked("Tea")
+  #  def tea(self, sender):
+  #      self.apiServer.clients['10.0.0.99'].kettle_oelong_tea()
 
 
     @rumps.clicked("Interface")
