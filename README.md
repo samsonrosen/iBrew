@@ -30,7 +30,7 @@ Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22.
 
 Written enterly lying down... (sick in bed for months and months :-/) 
 
-__Any donations welcome! Tea, jokes, apple cakes... or new stuff to play with!__
+__Any donations welcome! Tea, jokes, apple cakes, indian food, hugs... or new stuff to play with!__
 
 Stand alone, you do not need internet or the smarter app to setup or use the devices.
 
