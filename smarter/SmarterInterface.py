@@ -1319,7 +1319,7 @@ class SmarterClient:
 
 
     def __encode_CarafeCommand(self):
-        return  self.__encode_Carafe + self.__encode_CommandStatus(Smarter.StatusSucces)
+        return  self.__encode_Carafe() + self.__encode_CommandStatus(Smarter.StatusSucces)
   
   
   
