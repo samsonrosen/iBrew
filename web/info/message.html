@@ -1,4 +1,4 @@
-{% set title = "Message" %} {% include ../wrapper/head.html %}
+{% set title = "Message" %} {% include ../wrapper/headinfo.html %}
 {% from smarter.SmarterProtocol import * %}
 
 <br>
@@ -20,7 +20,7 @@
 {% end %}
 <br><br>
 
-<div class="TitleMessageSubSub">Groups</div>
+<div class="TitleMessageSubSub"><a href="/info/groups">Groups</a></div>
 
 {% for i in enumerate(Smarter.groupsList(Smarter.groupsCommand(id))) %}
 <a href="/info/groups#{{ i[1] }}">{{ i[1] }}</a>
@@ -39,7 +39,7 @@
 {% if Smarter.message_arguments(id) != [] %}
 
 
-<div class="TitleMessageSubSub">Arguments</div>
+<div class="TitleMessageSubSub"><a href="/info/arguments">Arguments</a></div>
 {% for x in Smarter.message_arguments(id) %}
 <a href="/info/arguments#{{ x[0]  }}">&lt;{{ x[1] }}&gt;</a>
 {% end %}
@@ -86,7 +86,7 @@
 {% end %}
 </div>
 
-<div class="CellMessagesID"><a href="/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.number_to_code(iid)}}</a></div>
+<div class="CellMessagesID"><a href="/info/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.number_to_code(iid)}}</a></div>
 <div class="CellMessagesDesc"><a href="/info/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.message_description(iid) }}</a></div></div>
 
 {% end %}

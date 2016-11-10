@@ -141,7 +141,7 @@ class ArgumentsPageHandler(BaseHandler):
 class GroupsPageHandler(BaseHandler):
     #@tornado.web.authenticated
     def get(self):
-        self.render("info/arguments.html",status = Smarter.StatusToJSON(),commands = Smarter.CommandToJSON(), responses = Smarter.ResponseToJSON())
+        self.render("info/groups.html",status = Smarter.StatusToJSON(),commands = Smarter.CommandToJSON(), responses = Smarter.ResponseToJSON())
 
 
 class MessagePageHandler(BaseHandler):

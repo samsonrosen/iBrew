@@ -1,14 +1,16 @@
-{% set title = "Messages" %} {% include ../wrapper/head.html %}
+{% set title = "Messages" %} {% include ../wrapper/headinfo.html %}
 {% from smarter.SmarterProtocol import * %}
 <center>
-<div class="Title"><img class="IconMessages" src="{{ static_url('icons/info/messages.png') }}"><div class="TitleMessageSubSubSub"><a href="/info/protocol">Protocol</a></div>Messages</div>
-
+<div class="Title"><img class="IconMessages" src="{{ static_url('icons/info/messages.png') }}"><div class="TitleMessageSubSubSub">Smarter Coffee & iKettle 2.0</div>Messages</div>
+<br>
+<div class="CellMessagesDesc"><a href="#command">Command Messages</a></div><br>
+<div class="CellMessagesDesc"><a href="#response">Response Messages</a></div><br>
+<div class="CellMessagesDesc"><a href="#status">Status Messages</a></div>
 <br>
 <div id="command" > </div>
 <br>
 <br>
 <br>
-
 <div class="TitleMessages">Command Messages</div>
 <br>
 <div class="tTable">
