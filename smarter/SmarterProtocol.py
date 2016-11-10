@@ -500,7 +500,7 @@ class SmarterProtocol:
 
         # Kinda duplicate... of the other protocol table with commands... (o well :)
         GroupKettle : ("Kettle",MessagesKettle),
-        GroupCoffee : ("Coffee",MessagesKettle),
+        GroupCoffee : ("Coffee",MessagesCoffee),
         
         GroupTime        : ("Time",MessagesTime),
         GroupTimers      : ("Timers",MessagesTimers),
