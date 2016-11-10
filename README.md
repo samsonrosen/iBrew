@@ -28,8 +28,9 @@ For the domotics interface experts!
  
 Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22. 
 
-Written enterly lying down... (sick in bed for months and months :-/) Any donations welcome! 
-Sigarettes, tea, jokes, apple cakes... or new toys to play with!
+Written enterly lying down... (sick in bed for months and months :-/) 
+
+__Any donations welcome! Tea, jokes, apple cakes... or new stuff to play with!__
 
 Stand alone, you do not need internet or the smarter app to setup or use the devices.
 
@@ -38,7 +39,7 @@ Please share any discoveries you made!
 ## News
 [The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
 
-Still no coffee machine! I would like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
+__Still no coffee machine!__ I would like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
 
 Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
 
