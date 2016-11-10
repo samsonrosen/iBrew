@@ -72,7 +72,7 @@ class GenericAPIHandler(BaseHandler):
 class GenericPageHandler(BaseHandler):
     #@tornado.web.authenticated
     def get(self,page):
-        if os.path.isfile(os.path.join(os.path.dirname(__file__), webroot)+page+".html"):
+        if os.path.isfile(os.path.join(os.path.dirname(__file__), self.webroot)+page+".html"):
             self.render(page+".html")
         else:
 #            self.render(webroot+"somethingwrong.html")
@@ -133,6 +133,12 @@ class LicensePageHandler(BaseHandler):
 
 
 class ArgumentsPageHandler(BaseHandler):
+    #@tornado.web.authenticated
+    def get(self):
+        self.render("info/arguments.html",status = Smarter.StatusToJSON(),commands = Smarter.CommandToJSON(), responses = Smarter.ResponseToJSON())
+
+
+class GroupsPageHandler(BaseHandler):
     #@tornado.web.authenticated
     def get(self):
         self.render("info/arguments.html",status = Smarter.StatusToJSON(),commands = Smarter.CommandToJSON(), responses = Smarter.ResponseToJSON())
@@ -967,6 +973,7 @@ class iBrewWeb(tornado.web.Application):
                 (r"/info/protocol/?",ProtocolPageHandler),
                 (r"/info/messages/?",MessagesPageHandler),
                 (r"/info/arguments/?",ArgumentsPageHandler),
+                (r"/info/groups/?",GroupsPageHandler),
                 (r"/info/message/([0-9,A-F,a-f][0-9,A-F,a-f])/?",MessagePageHandler),
                 (r"/",MainPageHandler),
                 (r"/info/?",InfoPageHandler),

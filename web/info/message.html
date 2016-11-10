@@ -18,14 +18,25 @@
 {% if Smarter.message_kettle(id) %}
 <img class="IconMessage" src="{{ static_url('icons/kettle/kettle.png')}}">
 {% end %}
+<br><br>
+
+<div class="TitleMessageSubSub">Groups</div>
+
+{% for i in enumerate(Smarter.groupsList(Smarter.groupsCommand(id))) %}
+<a href="/info/groups#{{ i[1] }}">{{ i[1] }}</a>
+{% end %}
 
 <br>
 <br>
 <br>
+{% if Smarter.message_notes(id) != "" %}
+<div class="TitleMessageSubSub">Notes</div>
 {{ Smarter.message_notes(id) }}
+<br>
+<br>
+{% end %}
+
 {% if Smarter.message_arguments(id) != [] %}
-<br>
-<br>
 
 
 <div class="TitleMessageSubSub">Arguments</div>
@@ -37,17 +48,18 @@
 <br><br><span class="TitleMessageSubSub">Argument</span>{% raw Smarter.string_argument(x[0]).replace(' ', '&nbsp').replace("<", "<a href=\"/info/arguments#" + str(x[0]) + "\"> &lt").replace('>', '&gt </a>').replace('”', '”</a>').replace("“", "<a href=\"/info/arguments#" + str(x[0]) + "\">“").replace('\n', '<br>').replace('\r', '<br>')[9:] %}
 {% end %}
 </div>
+<br>
+<br>
 {% end %}
 
-<br>
-<br>
+
 <div class="TitleMessageSubSub">Example</div>
 
 [{{ Smarter.message_example(id) }}]
 
 <br>
 <br>
-
+<br>
 
 <div class="TitleMessageSubSub">
 {% if Smarter.message_connection(id) and Smarter.message_is_response(id) %}
@@ -83,7 +95,9 @@
 {% else %}
 Unknown Message {{ Smarter.number_to_code(id).upper() }}
 {% end %}
-<br><br>
+
+<br><br><br>
+
 <div class="TitleMessageSubSub">Know more info about this message?</div><br>Please contact me!<br><br>
 <a href="mailto:tristan@monkeycat.nl?subject=Smarter Protocol Message {{ id }}"><img class="IconMessage" src="{{ static_url('icons/info/contact.png') }}"></a>
 

@@ -1,0 +1,52 @@
+{% set title = "Arguments" %} {% include ../wrapper/head.html %}
+{% from smarter.SmarterProtocol import * %}
+
+<br>
+
+<center>
+<div class="Title"><img class="IconMessages" src="{{ static_url('icons/info/messages.png') }}"><div class="TitleMessageSubSubSub"><a href="/info/messages">Message</a></div>Groups</div>
+
+<br>
+<br>
+{% for i in Smarter.message_protocol_arguments() %}
+<span class="TitleMessageSubSubSub"><a href="#{{ i }}">&lt{{ Smarter.ArgType[i][1].upper() }}&gt</a></span>
+{% end %}
+
+{% for i in Smarter.message_protocol_arguments() %}
+<div class="Args"  id ="{{ i }}">
+<br>
+<br>
+<br>
+<br>
+<span class="TitleMessageSub">&lt{{ Smarter.ArgType[i][1].upper() }}&gt</span><br>
+<br>
+{% raw Smarter.string_argument(i).replace(' ', '&nbsp').replace("<", "<a href=\"/info/arguments#" + str(i) + "\"> &lt").replace('>', '&gt </a>').replace('”', '”</a>').replace("“", "<a href=\"/info/arguments#" + str(i) + "\">“").replace('\n', '<br>').replace('\r', '<br>')[9:] %}
+
+<br>
+<span class="TitleMessageSubSubSub">In message</span>
+<div class="tTable">
+{% for iid in Smarter.argument_messages(i) %}
+
+<div class="tRow">
+<div class="CellMessagesDevice">
+{% if Smarter.message_coffee(iid) %}
+<a href="/info/message/{{ Smarter.number_to_code(iid) }}"><img class="DeviceIconSmall" src="{{ static_url('icons/coffee/coffee.png')}}"></a>
+{% end %}
+</div><div class="CellMessagesDevice">
+{% if Smarter.message_kettle(iid) %}
+<a href="/info/message/{{ Smarter.number_to_code(iid) }}"><img class="DeviceIconSmall" src="{{ static_url('icons/kettle/kettle.png')}}"></a>
+{% end %}
+</div>
+<div class="CellMessagesID"><a href="/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.number_to_code(iid)}}</a></div>
+<div class="CellMessagesDesc"><a href="/info/message/{{ Smarter.number_to_code(iid) }}">{{ Smarter.message_description(iid) }}</a></div></div>
+
+{% end %}
+</div>
+</div>
+{% end %}
+
+<br>
+<br>
+</center>
+
+{% include ../wrapper/foot.html %}

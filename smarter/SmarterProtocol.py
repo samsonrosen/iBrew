@@ -1523,7 +1523,7 @@ class SmarterProtocol:
         CommandWifiJoin             : ('PROTOCOL',[],"","Sending this command without previous SSID/password commands will reset it to direct mode. Do not wait between sending the network name, the password and the join command, or else it will fail to join the wireless network. The apps actually sends: 0c7e000000000000."),
         CommandWifiScan             : ('PROTOCOL',[],"",""),
         CommandWifiLeave            : ('PROTOCOL',[],"","Leaves wireless network and reset wifi to direct mode. The app also send a firmware update command."),
-        CommandWifiFirmware         : ('PROTOCOL',[],"","The firmware of the wifi module in text with control chars as new line."),
+        CommandWifiFirmware         : ('PROTOCOL',[],"","The firmware of the wifi module is in text, with control chars as new line."),
 
         # coffee
         CommandBrew                 : ('PROTOCOL',[ArgCups,ArgStrength,ArgHotplateCombi,ArgGrind],"04020001",""),
