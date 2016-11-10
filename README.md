@@ -12,38 +12,44 @@ It features!
 
 For smarthome fans! 
  * Support unlimited iKettle 2.0 or Smarter Coffee appliances! As many as you like!
- * Command Line Interface
- * Web Interface (almost finished, help appreciated!)
- * (JSON) Rest API
- * __HomeKit__ setup guide (using HomeBridge)
- * [Domoticz](http://www.domoticz.com/) setup guide (coming soon!)
  * Usage statistics
+ 
+iBrew Bridges 
+ * Command Line 
+ * Web (almost finished, help appreciated!)
+ * JSON Rest 
+ * [Javascript iBrew interface](https://github.com/Tristan79/iBrew/blob/master/resources/ibrew.js) (almost finished :-)
+ * [Python Smarter] (https://github.com/Tristan79/iBrew/tree/master/smarter) 
 
+Connection Guides
+ * __HomeKit__ (using HomeBridge)
+ * [Domoticz](http://www.domoticz.com/) (coming soon!)
+ * Please share your favorite smarthome controller setup!
 
 _No tracking of you or your appliances usage!_
  
 For the domotics interface experts!
  * Kettle and coffee machine simulation (works with Smarter app!)
- * Console
+ * Console for Smarter protocol debugging
  * Monitor
  * Message blocking and patching
  * Message relay (works with Smarter app!)
- * Protocol debugging
- * Protocol description (start web interface for a clickable web version :-)
- * Python interface 
- * Javascript interface (for ibrews rest api, comming soon! :-)
+ * Smarter protocol description (start web interface for a clickable web version :-)
 
 Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22. 
 
 Written enterly lying down... (sick in bed for months and months :-/) 
 
-__Any donations welcome! Tea, jokes, apple cakes, indian food, hugs... or new stuff to play with!__
+__Donations welcome! Tea, jokes, smarthome stuff, apple cakes, indian food, hugs... or new stuff to play with!__
 
 <tristan@monkeycat.nl>
 
-Please share any discoveries you made! 
+Please share any bugs, jokes, problems, discoveries you made! 
 
 ## News
+
+__Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__
+
 [The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
 
 __Still no coffee machine!__ I would like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
@@ -67,10 +73,10 @@ Other systems than MacOS running python see download from source section.
 ### MacOS
   * [MacOS]  (https://github.com/Tristan79/iBrew/blob/master/release/iBrew.dmg) (note that the web interface is NOT finished, only the rest api is, I hope :-)
 
-Once start the app from the MacOS package (drag it to your application folder first) it will auto link iBrew in your terminal.
+Once you start the app from the MacOS package (drag it to your application folder first) it will auto link iBrew in your terminal.
 Open a terminal and run ```ibrew``` and you're all set, good to go!
 
-_soft symlink to /usr/local/bin/ibrew_
+_it creates a soft symlink to /usr/local/bin/ibrew,... :-)_
 
 ### Download from source
 
@@ -103,31 +109,42 @@ Start iBrewUI with python to get a taskbar icon. I failed to create a working pa
  *  4-11-2016 Example Homebridge config file!
  
 ### Upcoming for the last 3 versions  
+
+Protocol
  * Timers protocol
+ * v0.5 Missing Coffee Smarter codes (working bit only?)
+ * descaling data bit? (the smarter app has it...)
  * Time arguments (have not figured that out)
- * Better error handling (sometimes it does not quit :-)
- * it also hangs if you scan wifi too much (luckily it reconnects, can not fix this)
- * Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
- * Web interface & rest api (rest almost finished, uhum, web interface still have to create some pages) and introduce webroot & api key, login, license,...,...
  * History message is not finished
  * Fahrenheid not finished, please to not use.
- * v0.5 Missing Coffee Smarter codes (working bit only?)
- * fix wireless with the same name
  * watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
- * Currently the default values in fast mode are not initalized use slow or give all values
- * filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
  * have not looked at single cup... needs a remote coffee machine session ;-)
- * strip zero from ip
- * descaling data bit? (the smarter app has it...)
- * simulate brew or heating process if not connected.
- * hugs!
+ * modifiers/patches!!! 
+
+Interfaces
+ * RELAY: simulate brew or heating process if not connected.
+ * PYTHON: Better error handling
+ * PYTHON: Strip zero from ip
+ * PYTHON: fix wireless with the same name
+ * PYTHON: filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
+ * CLI: Currently the default values in fast mode are not initalized use slow or give all values
+ * CLI: Sometimes it does not quit :-)
+ * CLI: Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
+ * WEB: it also hangs if you scan wifi too much (luckily it reconnects, can not fix this)
+ * WEB: Web interface 
+ * WEB: Auto relay when in web mode
+ * WEB: API key, login
+ * WEB: Settings iBrew (like blocking, patches, other stuff)
+ * JAVASCRIPT: JSON Rest API
+ * OTHER: Guides to Smarthome controllers
+ * ME: hugs!
 
 
 ## Usage
 
 ### Command Line
 
-See the console section for the commands
+See the console section for the commands.
  
 ```
 
@@ -167,7 +184,7 @@ See the console section for the commands
 
 ### Console
 Start the console with the command `iBrew console`. The following commands are available within the console,
-you can also use them on the command line as arguments:
+you can also use them on the command line as arguments, note that [] are manditory arguments and () are optional arguments.
 
 ```
 
