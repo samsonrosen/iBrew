@@ -100,12 +100,14 @@ Start iBrewUI with python to get a taskbar icon. I failed to create a working pa
  * Fahrenheid not finished, please to not use.
  * v0.5 Missing Coffee Smarter codes (working bit only?)
  * fix wireless with the same name
- * watersensor to something usefull (like the stupid left or right side handle, cuz the can weight balance is off)
+ * watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
  * Currently the default values in fast mode are not initalized use slow or give all values
  * filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * strip zero from ip
  * descaling data bit? (the smarter app has it...)
+ * simulate brew or heating process if not connected.
+ * hugs!
 
 
 ## Usage
