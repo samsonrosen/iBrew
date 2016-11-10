@@ -1184,8 +1184,8 @@ class SmarterClient:
         elif message == Smarter.CommandStrength:        response = self.__encode_Strength()
         elif message == Smarter.CommandCups:            response = self.__encode_Cups()
         
-        # ???? CHECK THIS
-        elif message == Smarter.CommandBrewDefault:     response = self.__encode_CoffeeSettingsCommand()
+        elif message == Smarter.CommandBrewDefault:     response = self.__encode_BrewDefault()
+        elif message == Smarter.CommandCoffeeSettings:  response = self.__encode_CoffeeSettingsCommand()
 
         elif message == Smarter.CommandCoffeeStoreSettings: response = self.__encode_CoffeeStoreSettings()
         elif message == Smarter.CommandGrinder:         response = self.__encode_Grinder()
