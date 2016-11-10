@@ -343,82 +343,6 @@ you can also use them on the command line as arguments, note that [] are mandito
 
 ```
 
-## HomeKit ~ Homebridge 
-
-### Software
-
-Use the following software to bridge iBrew with HomeKit
-
- * [Homebridge](https://github.com/nfarina/homebridge)
- * [cmdSwitch2](https://github.com/luisiam/homebridge-cmdswitch2)
-
-### Config
-
-Part of config file relevant to iKettle 2.0 or Smarter Coffee
-
-#### Homebridge config iKettle 2.0
-  
-```
-	"platforms": [{
-		"platform": "cmdSwitch2",
-		"switches": [{
-			"name": "iKettle 2",
-			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.99",
-			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.99",
-			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.99 | grep 'heating'"
-		}]
-```
-
-#### Homebridge config Smarter Coffee
-
-```
-	"platforms": [{
-		"platform": "cmdSwitch2",
-		"switches": [{
-			"name": "Smarter Coffee",
-			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.89",
-			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.89",
-			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.89 | grep 'grinding\|brewing'"
-		}]
-```
-
-#### Notes 
-
-Fill in your own device host (either IP address or hostname) and location to ibrew, 
-
- * If you use an ip address: PLEASE use a static IP address! (assign in your router)
- * If you are the lucky owner of a router that assigns dynamic IP addresses with hostnames attached (usually in the form of device.local or device.lan) you can use that. If you are lucky, else use a static IP.
- * If you only have ONE device: you can use autodetection (and leave out the ip or hostname) but it adds a 2 seconds time penalty.
-
-#### Example HomeBridge config file
-
-If you do not use any other HomeBridge devices, you can use and alter the following 
-example config file for iKettle 2.0. 
-
-```
-{
-	"bridge": {
-		"name": "Homebridge",
-		"username": "CC:22:3D:E3:CE:30",
-		"port": 51826,
-		"pin": "031-45-154"
-	},
-
-	"description": "Homebridge",
-
-	"platforms": [{
-		"platform": "cmdSwitch2",
-		"switches": [{
-			"name": "iKettle 2",
-			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.99",
-			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.99",
-			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.99 | grep 'heating'"
-		}]
-
-	}]
-}
-```
-
 ### Web Interface
 
 This is a build in progress, please contribute!
@@ -483,6 +407,122 @@ http://localhost:2080/api/10.0.0.99/status
 
 The Smarter interface to the iKettle 2.0 and the Smarter Coffee is located in the Smarter folder. Use pydoc or any other python doc app to see the help on SmarterInterface.py and SmarterProtocol.py.
 
+Example
+
+```
+from smarter.SmarterInterface import *
+from smarter.SmarterProtocol import *
+
+appliance = SmarterClient()
+appliance.host = "10.0.0.99"
+appliance.connect()
+if appliance.isKettle() and not appliance.heaterOn:
+    appliance.kettle_heat_default()
+appliance.disconnect()
+
+```
+
+#### Smarthome controller software
+
+You can always patch or hack in your favorite Smarthome controller (if they have a python interface) into the following functions of SmarterInterface.py. 
+
+```
+def __read(self)
+def __send(self)
+def __monitor_device(self)
+```
+
+And start up the monitor with a command like ```ibrew dump monitor 10.0.0.99```  ;-) 
+
+#### Domoticz
+
+Links to old [domoticz alpha python interface](https://github.com/Tristan79/iBrew/tree/6014cbf0a8cd551e74cbc8bfcf3f0f97389359c2/domoticz). This linke contains old example [code](https://github.com/Tristan79/iBrew/blob/927c43e347b7c8aa1c2d897936ac51c34fa80e7e/iBrewTerminal.py) for a monitor (look for domoticz) which can be reused
+
+
+## Guides
+
+### Domoticz
+
+Coming soon!
+
+### HomeKit ~ HomeBridge 
+
+Yes, you can! Connect your iKettle or Smarter Coffee to HomeKit... just follow the following steps!
+
+#### Software
+
+Install the following software to bridge iBrew with HomeKit
+
+ * [Homebridge](https://github.com/nfarina/homebridge)
+ * [cmdSwitch2](https://github.com/luisiam/homebridge-cmdswitch2)
+
+#### Setup
+
+Part of config file relevant to iKettle 2.0 or Smarter Coffee
+
+Fill in your own device host (either IP address or hostname) and location to iBrew, 
+
+ * If you use an IP address: PLEASE use a static IP address! (assign in your router)
+ * If you are the lucky owner of a router that assigns dynamic IP addresses with hostnames attached (usually in the form of device.local or device.lan) you can use that. If you are lucky, else use a static IP.
+ * If you only have ONE device: you can use autodetection (and leave out the ip or hostname) but it adds a 2 seconds time penalty.
+
+#### HomeBridge example config iKettle 2.0
+  
+```
+	"platforms": [{
+		"platform": "cmdSwitch2",
+		"switches": [{
+			"name": "iKettle 2",
+			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.99",
+			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.99",
+			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.99 | grep 'heating'"
+		}]
+```
+
+#### HomeBridge example config Smarter Coffee
+
+```
+	"platforms": [{
+		"platform": "cmdSwitch2",
+		"switches": [{
+			"name": "Smarter Coffee",
+			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.89",
+			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.89",
+			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.89 | grep 'grinding\|brewing'"
+		}]
+```
+
+#### Example HomeBridge config file
+
+If you do not use any other HomeBridge devices, you can use and alter the following 
+example config file for iKettle 2.0. 
+
+```
+{
+	"bridge": {
+		"name": "Homebridge",
+		"username": "CC:22:3D:E3:CE:30",
+		"port": 51826,
+		"pin": "031-45-154"
+	},
+
+	"description": "Homebridge",
+
+	"platforms": [{
+		"platform": "cmdSwitch2",
+		"switches": [{
+			"name": "iKettle 2",
+			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.99",
+			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.99",
+			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.99 | grep 'heating'"
+		}]
+
+	}]
+}
+```
+### Other
+
+Have any links, info or help on other Smarthome controller software, please post in the issues!
 
 ## LICENSE
 
