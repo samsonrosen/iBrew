@@ -917,12 +917,12 @@ class iBrewConsole:
         print "  Usage: ibrew (energy) (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)"
         print
         print "    dump                   dump message enabled"
-        print "    energy                 energy saver (stats not possible)"
+        print "    energy                 NOT IMPLEMENTED energy saver (stats not possible)"
         print "    shout                  sends commands and quits not waiting for a reply"
         print "    slow                   fully inits everything before action"
         print "    coffee                 assumes coffee machine"
         print "    kettle                 assumes kettle"
-        print "    fahrenheid             use fahrenheid"
+        print "    fahrenheid             PARTLY WORKING use fahrenheid"
         print "    command                action to take!"
         print "    host                   host address of device (format: ip4, ip6, fqdn)"
         print
@@ -1010,8 +1010,8 @@ class iBrewConsole:
         print "    sweep (id)             [developer only] try (all or start with id) unknown command codes"
         print
         
-        """
-        print "  Modifiers Rules"
+        
+        print "  NOT IMPLEMENTED Modifiers Rules"
         print "    [in:|out:]var=(value)(,[in:|out:]var=(value))*"
         print
         print "    VAR           VALUE"
@@ -1038,11 +1038,11 @@ class iBrewConsole:
         print
         print "    if no value it clears the patch"
         print
-        print "  Debug Coffee Timer"
+        print "  NOT IMPLEMENTED Debug Coffee Timer"
         print "    timer [index] (erase|[time]) set/erase timer"
         print "    timers                 show timers"
         print
-        """
+        
         print "  Help Commands"
         print "    examples               show examples of commands"
         print "    groups                 show all groups"
@@ -1064,7 +1064,13 @@ class iBrewConsole:
 
     def examples(self):
         print
-        print "  Example:"
+        print "  Example command line:"
+        print "    ibrew shout 21 30 05 7e  Send kettle raw heat without waiting for reply"
+        print "    ibrew weak 10.0.0.1      Set coffee strength to weak"
+        print "    ibrew strength weak      Set coffee strength to weak but do not toggle filter/beans"
+        print "    ibrew dump coffee relay out:coffee Simulates coffee machine messages"
+        print
+        print "  Example console:"
         print "    off                      Stop heating/brewing"
         print "    messages                 Show all protocol messages"
         print "    message 3e               Show protocol message 3a, turn hotplate on"

@@ -110,12 +110,12 @@ See the console section for the commands
   Usage: ibrew (energy) (dump) (shout|slow) (coffee|kettle) (fahrenheid) [command] (host)
 
     dump                   dump message enabled
-    energy                 energy saver (stats not possible)
+    energy                 NOT IMPLEMENTED energy saver (stats not possible)
     shout                  sends commands and quits not waiting for a reply
     slow                   fully inits everything before action
     coffee                 assumes coffee machine
     kettle                 assumes kettle
-    fahrenheid             use fahrenheid
+    fahrenheid             PARTLY WORKING use fahrenheid
     command                action to take!
     host                   host address of device (format: ip4, ip6, fqdn)
 
@@ -188,9 +188,9 @@ you can also use them on the command line as arguments:
     stats                  show traffic statistics
 
   Block Rules
-    Consists of rules, > is for outgoing connection to the device, < is for incomming connection from relay client.
+    Consists of rules, in: is for outgoing connection to the device, out: is for incomming connection from relay client.
 
-    [>|<]rule(,[>|<]rule)*
+    [in:|out:]rule(,[in:|out:]rule)*
 
     rule:
       message id
@@ -205,6 +205,37 @@ you can also use them on the command line as arguments:
     monitor                monitor incomming traffic
     modify (modifiers)     patch or unpatch messages
     sweep (id)             [developer only] try (all or start with id) unknown command codes
+
+  NOT IMPLEMENTED Modifiers Rules
+    [in:|out:]var=(value)(,[in:|out:]var=(value))*
+
+    VAR           VALUE
+    version       [00..FF]               override device firmware version
+    heater        disable                coffee machine or kettle heater disabled
+
+    base          [00..4000]             override default calibration base
+    formula       [0..100]               override default formula temperature
+    temperature   [0..100]               override default temperature
+    keepwarm      off or [5..?]          override default keepwarm time
+    formula       disable/enabled        override formula mode
+
+    carafe        optional or required   override carafe detection
+    cups          [1..12]                override default number of cups
+    grind         beans or filter        override default grind
+    hotplate      off or [5..?]          override default hotplate time
+    mode          carafe or cup          override mode
+    strength      weak, medium or strong override default strength
+    water                                correct cups according to water level
+    limit         [1..12]                limit the number of cups to be selected
+    grinder       disable                force use of filter
+    hotplate      disable                coffee machine hotplate disabled
+    child         lock                   kettle can not heat above 45 degrees
+
+    if no value it clears the patch
+
+  NOT IMPLEMENTED Debug Coffee Timer
+    timer [index] (erase|[time]) set/erase timer
+    timers                 show timers
 
   Help Commands
     examples               show examples of commands
@@ -230,7 +261,13 @@ you can also use them on the command line as arguments:
 
 ```
 
-  Example:
+  Example command line:
+    ibrew shout 21 30 05 7e  Send kettle raw heat without waiting for reply
+    ibrew weak 10.0.0.1      Set coffee strength to weak
+    ibrew strength weak      Set coffee strength to weak but do not toggle filter/beans
+    ibrew dump coffee relay out:coffee Simulates coffee machine messages
+
+  Example console:
     off                      Stop heating/brewing
     messages                 Show all protocol messages
     message 3e               Show protocol message 3a, turn hotplate on
@@ -240,8 +277,8 @@ you can also use them on the command line as arguments:
     strength weak            Set coffee strength to weak but do not toggle filter/beans
     cups 3                   Set number of cups to brew
     mode cup                 Set cup mode
-    block >wifi,>02          Block wifi and [Set device time] command to device
-    patch relay <version=12] Patches [Device info] Argument version to clients
+    block in:wifi,in:02          Block wifi and [Set device time] command to device
+    patch relay out:version=12] Patches [Device info] Argument version to clients
     brew 4 10 beans strong   Brew 4 cups of strong coffee using the beans keeping the hotplate on for 10 minutes
     join MyWifi p@ssw0rd     Joins MyWifi wireless network using p@ssw0rd as credential
     settings 100 20 True 75  Set default user settings for the kettle to...
