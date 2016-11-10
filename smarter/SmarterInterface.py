@@ -1250,7 +1250,7 @@ class SmarterClient:
         return self.__encode_CoffeeSettingsCommand() + self.__encode_CommandStatus(Smarter.StatusSucces)
 
     def __encode_CoffeeSettingsCommand(self):
-        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.strength_to_raw(self.defaultStrength) + Smarter.cups_to_raw(self.defaultCups) + Smarter.bool_to_raw(self.defaultGrind) + Smarter.hotplate_to_raw(self.defaultHotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
+        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(self.defaultCups) + Smarter.strength_to_raw(self.defaultStrength) + Smarter.bool_to_raw(self.defaultGrind) + Smarter.hotplate_to_raw(self.defaultHotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
     def __encode_CoffeeStoreSettings(self):
