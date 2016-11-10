@@ -1,14 +1,57 @@
 
 ```
 
-### HomeKit ~ Homebridge 
+## HomeKit ~ Homebridge 
+
+### Software
 
 Use the following software to bridge iBrew with HomeKit
 
  * [Homebridge](https://github.com/nfarina/homebridge)
  * [cmdSwitch2](https://github.com/luisiam/homebridge-cmdswitch2)
 
-Example homebridge config file for iKettle 2.0 (Smarter Coffee coming soon)
+### Config
+
+Part of config file relevant to iKettle 2.0 or Smarter Coffee
+
+#### Homebridge config iKettle 2.0
+  
+```
+	"platforms": [{
+		"platform": "cmdSwitch2",
+		"switches": [{
+			"name": "iKettle 2",
+			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.99",
+			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.99",
+			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.99 | grep 'heating'"
+		}]
+```
+
+#### Homebridge config Smarter Coffee
+
+```
+	"platforms": [{
+		"platform": "cmdSwitch2",
+		"switches": [{
+			"name": "Smarter Coffee",
+			"on_cmd": "/Users/Tristan/Coding/iBrew/ibrew start 10.0.0.89",
+			"off_cmd": "/Users/Tristan/Coding/iBrew/ibrew stop 10.0.0.89",
+			"state_cmd": "/Users/Tristan/Coding/iBrew/ibrew shortstatus 10.0.0.89 | grep 'grinding\|brewing'"
+		}]
+```
+
+#### Notes 
+
+Fill in your own device host (either IP address or hostname) and location to ibrew, 
+
+ * If you use an ip address: PLEASE use a static IP address! (assign in your router)
+ * If you are the lucky owner of a router that assigns dynamic IP addresses with hostnames attached (usually in the form of device.local or device.lan) you can use that. If you are lucky, else use a static IP.
+ * If you only have ONE device: you can use autodetection (and leave out the ip or hostname) but it adds a 2 seconds time penalty.
+
+#### Example HomeBridge config file
+
+If you do not use any other HomeBridge devices, you can use and alter the following 
+example config file for iKettle 2.0. 
 
 ```
 {
@@ -46,16 +89,15 @@ http://ip:port/
 
 #### REST API
 
-You can find information on the rest api under:
+You can find information on the rest api in the web interface under:
 
 ```
 http://ip:port/info/api
 ```
  
-   
 ### Python Interface
 
-Use pydoc or any other python doc app to see the help on Smarter*.py
+The Smarter interface to the iKettle 2.0 and the Smarter Coffee is located in the Smarter folder. Use pydoc or any other python doc app to see the help on SmarterInterface.py and SmarterProtocol.py.
 
 
 ### LICENSE

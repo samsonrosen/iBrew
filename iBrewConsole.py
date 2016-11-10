@@ -43,8 +43,8 @@ import traceback
 
 
 iBrewApp          = "iBrew: iKettle 2.0 & Smarter Coffee Interface"
-iBrewInfo         = "iBrew: Brewing on the 7th day © 2016 Tristan (@monkeycat.nl)"
-iBrewContribute   = "Please contribute any discoveries on https://github.com/Tristan79/iBrew/issues"
+iBrewInfo         = "iBrew: Intermezzo © 2016 Tristan (@monkeycat.nl)"
+iBrewContribute   = "Please DONATE! Food, Sigarettes, Jokes and Fun Toys to Play with!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
 
 class iBrewConsole:
 
@@ -1068,7 +1068,7 @@ class iBrewConsole:
         print "    ibrew shout 21 30 05 7e  Send kettle raw heat without waiting for reply"
         print "    ibrew weak 10.0.0.1      Set coffee strength to weak"
         print "    ibrew strength weak      Set coffee strength to weak but do not toggle filter/beans"
-        print "    ibrew dump coffee relay out:coffee Simulates coffee machine messages"
+        print "    ibrew dump coffee relay out:GOD Simulates coffee machine messages"
         print
         print "  Example console:"
         print "    off                      Stop heating/brewing"

@@ -88,7 +88,7 @@ diskimage:
 	
 	##generate raw disk image
 	rm -f iBrew.dmg
-	hdiutil create -srcfolder dmg/iBrew -volname iBrew-0.4.3 -format UDRW -ov raw-iBrew.dmg	
+	hdiutil create -srcfolder dmg/iBrew -volname iBrew-0.4.4 -format UDRW -ov raw-iBrew.dmg	
 
 	#remove working files and folders
 	rm -rf dmg/iBrew
