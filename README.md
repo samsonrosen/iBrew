@@ -38,7 +38,7 @@ Please share any discoveries you made!
 ## News
 [The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
 
-Still no coffee machine! I could like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
+Still no coffee machine! I would like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
 
 Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
 
@@ -396,13 +396,23 @@ Start the web interface and surf to:
 http://ip:port/
 ```
 
+Replacement for the Smarter app
+
 ![devices](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/devices.png)
+
+Build in json rest api
 
 ![rest](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/rest.png)
 
+You can setup your appliance without the Smarter app
+
 ![settings](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/settings.png)
 
+It keeps stats for you and you only! (and does not send them to me or smarter like the Smarter app does)
+
 ![stats](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/stats.png)
+
+Protocol description is fully interactive!
 
 ![protocol](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/protocol.png)
 

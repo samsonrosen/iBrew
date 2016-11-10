@@ -87,13 +87,23 @@ Start the web interface and surf to:
 http://ip:port/
 ```
 
+Replacement for the Smarter app
+
 ![devices](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/devices.png)
+
+Build in json rest api
 
 ![rest](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/rest.png)
 
+You can setup your appliance without the Smarter app
+
 ![settings](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/settings.png)
 
+It keeps stats for you and you only! (and does not send them to me or smarter like the Smarter app does)
+
 ![stats](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/stats.png)
+
+Protocol description is fully interactive!
 
 ![protocol](https://raw.githubusercontent.com/Tristan79/iBrew/master/distro/images/protocol.png)
 
