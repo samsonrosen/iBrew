@@ -11,16 +11,16 @@ _Stand alone, no internet or Smarter app needed!_
 It features!
 
 For smarthome fans! 
- * Support unlimited iKettle 2.0 or Smarter Coffee machines! As many as you like!
+ * Support unlimited iKettle 2.0 or Smarter Coffee appliances! As many as you like!
  * Command Line Interface
- * Web Interface (almost finished, help appriciated!)
+ * Web Interface (almost finished, help appreciated!)
  * (JSON) Rest API
  * __HomeKit__ setup guide (using HomeBridge)
  * [Domoticz](http://www.domoticz.com/) setup guide (coming soon!)
  * Usage statistics
 
 
-_ No tracking of you or your appliances usage!_
+_No tracking of you or your appliances usage!_
  
 For the domotics interface experts!
  * Kettle and coffee machine simulation (works with Smarter app!)
