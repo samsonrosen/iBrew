@@ -6,33 +6,41 @@
 ## Introduction
 iBrew is an interface to the iKettle 2.0 and Smarter Coffee devices. 
 
+_Stand alone, no internet or Smarter app needed!_
+
 It features!
 
 For smarthome fans! 
  * support unlimited iKettle 2.0 or Smarter Coffee machines! (as many as you like)
  * command line interface
  * web interface (almost finished, help appriciated!)
- * (json) rest api
- * homekit ~ homebridge config file
- * domoticz ~ setup guide (coming soon!)
- * relay with usage stats and message blocking and patching (works with Smarter app!)
+ * (JSON) Rest API
+ * HomeKit setup guide
+ * [Domoticz](http://www.domoticz.com/) setup guide (coming soon!)
+ * Usage statistics
+
+
+_ No tracking of you or your appliances usage!_
  
 For the domotics interface experts!
+ * kettle and coffee machine simulation (works with Smarter app!)
  * console
  * monitor
- * python interface 
  * message blocking and patching
+ * message relay (works with Smarter app!)
  * protocol debugging
  * protocol description (start web interface for a clickable web version :-)
- * kettle and coffee machine simulation (works with Smarter app!)
- 
+ * python interface 
+ * javascript interface (for ibrews rest api, comming soon! :-)
+
+   
 Tested on iKettle 2.0 v19 and SmarterCoffee v20 & v22. 
 
 Written enterly lying down... (sick in bed for months and months :-/) 
 
 __Any donations welcome! Tea, jokes, apple cakes, indian food, hugs... or new stuff to play with!__
 
-Stand alone, you do not need internet or the smarter app to setup or use the devices.
+<tristan@monkeycat.nl>
 
 Please share any discoveries you made! 
 
