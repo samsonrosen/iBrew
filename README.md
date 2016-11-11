@@ -86,7 +86,7 @@ Tested on a clean Jessy light image (september 2016).
 
 #### Install 
 
-Write the image to the SD. Boot the Pi. SSH to the Pi! And use:
+SSH to the Pi! And use:
 
 ```
 cd ~
@@ -135,7 +135,7 @@ You can download and unpack the [source](https://github.com/Tristan79/iBrew/arch
 git clone https://github.com/Tristan79/iBrew.git
 ```
 
-Run `make` (or use the requirements file) to configure the python packages.
+Run `sudo make setup` (or use the requirements file) to configure the python packages.
 
 #### Update 
 
@@ -147,6 +147,7 @@ git pull
 ```
 
 ### Windows and source
+For the requirements either use ```pip install requirements.txt``` or install make from somewhere.
 On windows download the additional [win32 package](https://sourceforge.net/projects/pywin32/files/pywin32/).
 Start iBrewUI with python to get a taskbar icon. I failed to create a working package :-)
 
