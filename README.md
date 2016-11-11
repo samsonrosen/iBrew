@@ -85,13 +85,24 @@ _it creates a soft symlink to /usr/local/bin/ibrew,... :-)_
 On tested on a clean Jessy light image (september 2016). Write the image to the SD. Boot the Pi. SSH to the Pi! And use:
 
 ```
+cd ~
 sudo apt-get install git
 sudo apt-get install python-setuptools
 sudo easy_install pip
 git clone https://github.com/Tristan79/iBrew.git
-cd iBrew
+cd ~/iBrew
 sudo make setup
 ```
+
+You can update to the latest version of iBrew with
+
+```
+cd ~/iBrew
+git pull
+```
+
+#### Start web server on pi boot
+Coming soon!
 
 ### Download from source
 
@@ -105,6 +116,14 @@ git clone https://github.com/Tristan79/iBrew.git
 
 Run `make` (or use the requirements file) to configure the python packages.
 
+You can update to the latest version of iBrew with
+
+```
+cd ~/iBrew
+git pull
+```
+
+### Windows and source
 On windows download the additional [win32 package](https://sourceforge.net/projects/pywin32/files/pywin32/).
 Start iBrewUI with python to get a taskbar icon. I failed to create a working package :-)
 
