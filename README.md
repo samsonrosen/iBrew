@@ -80,6 +80,19 @@ Open a terminal and run ```ibrew``` and you're all set, good to go!
 
 _it creates a soft symlink to /usr/local/bin/ibrew,... :-)_
 
+### Raspberry Pi Jessy (light)
+
+On tested on a clean Jessy light image (september 2016). Write the image to the SD. Boot the Pi. SSH to the Pi! And use:
+
+```
+sudo apt-get install git
+sudo apt-get install python-setuptools
+sudo easy_install pip
+git clone https://github.com/Tristan79/iBrew.git
+cd iBrew
+sudo make setup
+```
+
 ### Download from source
 
 You can run iBrew on systems that run python 2.7 
