@@ -82,7 +82,11 @@ _it creates a soft symlink to /usr/local/bin/ibrew,... :-)_
 
 ### Raspberry Pi Jessy (light)
 
-On tested on a clean Jessy light image (september 2016). Write the image to the SD. Boot the Pi. SSH to the Pi! And use:
+Tested on a clean Jessy light image (september 2016). 
+
+#### Install 
+
+Write the image to the SD. Boot the Pi. SSH to the Pi! And use:
 
 ```
 cd ~
@@ -92,7 +96,24 @@ sudo easy_install pip
 git clone https://github.com/Tristan79/iBrew.git
 cd ~/iBrew
 sudo make setup
+sudo ln -s ~/iBrew/ibrew /usr/local/bin/ibrew
 ```
+
+Now you can start ibrew from anywhere :-) Type in your terminal
+
+```
+ibrew
+```
+
+Or if you want to start the web interface type 
+
+```
+ibrew web
+```
+
+And surf to your pi on port 2080!
+
+#### Update 
 
 You can update to the latest version of iBrew with
 
@@ -115,6 +136,8 @@ git clone https://github.com/Tristan79/iBrew.git
 ```
 
 Run `make` (or use the requirements file) to configure the python packages.
+
+#### Update 
 
 You can update to the latest version of iBrew with
 
@@ -381,7 +404,13 @@ you can also use them on the command line as arguments, note that [] are mandito
 
 This is a build in progress, please contribute!
 
-Start the web interface and surf to:
+Start the web interface 
+
+```
+ibrew web
+```
+
+and surf to:
 
 ```
 http://ip:port/

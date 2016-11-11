@@ -5,7 +5,13 @@
 
 This is a build in progress, please contribute!
 
-Start the web interface and surf to:
+Start the web interface 
+
+```
+ibrew web
+```
+
+and surf to:
 
 ```
 http://ip:port/
