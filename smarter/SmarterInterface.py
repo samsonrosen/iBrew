@@ -1331,7 +1331,7 @@ class SmarterClient:
     #------------------------------------------------------
     
     
-   def __simulate_device(self):
+    def __simulate_device(self):
         if self.dump:
             logging.info("Simulation Running")
         self.simulator_run = True
@@ -1555,7 +1555,7 @@ class SmarterClient:
         
         if self.sim_hotPlate == 0:
             self.sim_hotPlateOn = False
-            if not self.sim_heaterOn and not self.sim_grinderOn
+            if not self.sim_heaterOn and not self.sim_grinderOn:
                 self.sim_working = False
         else:
             self.sim_hotPlateOn = True
