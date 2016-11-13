@@ -449,6 +449,7 @@ class SmarterProtocol:
     MessagesAdmin       = MessagesSetup + MessagesNormal
     GroupGod            = 20
     MessagesGod         = MessagesAdmin + MessagesDebug
+    
     GroupReadOnly       = 21
     MessagesReadOnly    = MessagesDebug + MessagesSetup +  __MessagesCoffee + __MessagesKettle + MessagesGet + MessagesDeviceInfo
     
@@ -466,6 +467,7 @@ class SmarterProtocol:
     
     GroupStatus  = 38
     MessagesStatus = [ResponseCommandStatus] + [ResponseCoffeeStatus] + [ResponseKettleStatus]
+    
     
     def __init__(self):
         l = []
@@ -608,13 +610,12 @@ class SmarterProtocol:
         return self.idsMin(ids + addids)
 
     def ids_to_string(self,ids):
-        return " ".join(ids)
+        return " ".join([str(i) for i in ids])
 
     def groupsStringDecode(self,string):
         return self.groupsListDecode(string.lower().split(","))
 
     def groupsListDecode(self,list):
-
         """
         Return a list of message ID's from a list of string
         The list can contain either message ID or Group names sperated with a comma:
@@ -1241,14 +1242,14 @@ class SmarterProtocol:
     KettleHeating             = 0x01
     KettleKeepWarm            = 0x02
     KettleCycleFinished       = 0x03
-    KettleBabyCooling         = 0x04
+    KettleFormulaCooling         = 0x04
 
     StatusKettle = {
         KettleReady             : "ready",
         KettleHeating           : "heating",
         KettleKeepWarm          : "keep warm",
         KettleCycleFinished     : "cycle finished",
-        KettleBabyCooling       : "baby cooling"
+        KettleFormulaCooling       : "baby cooling"
     }
 
 
@@ -1612,7 +1613,7 @@ class SmarterProtocol:
                                 (KettleHeating, StatusKettle[KettleHeating]),
                                 (KettleKeepWarm, StatusKettle[KettleKeepWarm]),
                                 (KettleCycleFinished, StatusKettle[KettleCycleFinished]),
-                                (KettleBabyCooling, StatusKettle[KettleBabyCooling])
+                                (KettleFormulaCooling, StatusKettle[KettleFormulaCooling])
                             ]),
         ArgTemperature        : ('NUMBER',"Temperature",(0,100),"temperature in celcius [0ºC..100ºC]"),
         ArgFormulaTemperature : ('NUMBER',"FormulaTemperature",(0,100),"formula temperature in celcius [0ºC..100ºC]"),
