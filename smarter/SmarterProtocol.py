@@ -13,7 +13,7 @@ from operator import itemgetter
 #
 # Copyright © 2016 Tristan (@monkeycat.nl)
 #
-# Out of order! (rev 7)
+# Intermezzo
 #------------------------------------------------------
 
 # In the end I should have made classes of the types...
@@ -1357,7 +1357,7 @@ class SmarterProtocol:
 
     def string_coffee_bits(self,caraferequired,mode,waterenough,timerevent):
         s = ""
-        if not carafeRequired:
+        if not caraferequired:
             s += ", carafe required"
         if mode:
             s += ", cup mode"
@@ -1986,14 +1986,16 @@ class SmarterProtocol:
     but the differences between levels seem the same. This means that the water level
     detection is probably weight based and that calibration is done at the base,
     which then remembers the weight for \'off base\'. To detect an empty kettle,
-    the connecting device must account for the weight of the kettle.
+    the connecting device must account for the weight of the kettle. Also the weght of
+    the kettle is more to the handle, that why you have to choose between left and right
+    handle use, it gives different results.
     
     (yeah, not! the watersensor becomes higher if the temperature becomes higher...)
 
 
   Wireless Network:
 
-    If the device (coffee?) is configured to access an wifi access point which is not available
+    If the appliance is configured to access a wifi access point which is not available
     It will try to connect to it every so minutes. If it tries to connect it beeps three
     times the wifi access point of the device will remain active but unreachable,
     if it fails to access the access point it beeps once, and it opens up its own default
@@ -2046,7 +2048,7 @@ class SmarterProtocol:
          *  It will heat up empty, making the lights bulbs to flikker.
          *  You can easily knock out it's connection to the wireless network,
             if it fails to connect it creates an default open unencrypted wifi access point 
-            (check!, could be that wifi was not connecting, then this is rubbish ;-).
+            (check!, could be that wifi was not connecting, then this is rubbish ;-) (FIX).
 
             Attack Vectors
             1. Repeat sending heat to 100ºC temperature commands, if we're lucky
@@ -2058,16 +2060,10 @@ class SmarterProtocol:
             4. Repeat scan for wifi commands, it will crash the wifi esp module.
 
 
-  Coffee Brewing:
-
-    Between setting the number of cups, the strength of the coffee and start of brewing
-    atleast 500ms is recommended.
-    
-
   Water Heating:
   
     From smarter website the temperature that can be set is between 20 and 100. We still need to read lower 
-    values for cold water in the kettle
+    values for cold water in the kettle. This should be tested (FIX)
      
  
                """
@@ -2085,7 +2081,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 3. You may not use source, binary forms or derivative work, with or without modification, for commercial purposes. 
 
-4. Written consent of the original author with his/her signature on paper.
+4. Written consent of the iBrew creator Tristan Crispijn with original authentic signature on paper.
 
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. YOU AGREE TO NOT USE THIS SOFTWARE IN ANY WAY. SMARTER EMPLOYEES OR SMARTER AFFILIATED PEOPLE ARE NOT ALLOWED TO USE THIS SOFTWARE OR DERIVATIVE WORK. YOU AGREE THAT THE SOFTWARE CAN MONITOR THE USAGE OF THE SOFTWARE ITSELF AND OR THE DEVICES ATTACHED TO THE SOFTWARE, AND SEND IT BACK TO A MONITOR SERVER FOR BETTER SUPPORT. ENJOY!

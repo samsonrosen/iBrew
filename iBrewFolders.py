@@ -2,6 +2,18 @@ import os
 import sys
 import platform
 
+#------------------------------------------------------
+# iBrew
+#
+# Default folder locations
+#
+# https://github.com/Tristan79/iBrew
+#
+# Copyright © 2016 Tristan (@monkeycat.nl)
+#
+# Intermezzo
+#------------------------------------------------------
+
 appname = 'iBrew'
 
 class AppFolders():

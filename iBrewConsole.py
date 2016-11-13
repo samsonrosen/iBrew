@@ -26,13 +26,13 @@ import traceback
 #------------------------------------------------------
 # iBrew
 #
-# Console Interface to iKettle 2.0 & Smarter Coffee Devices
+# Console interface to iKettle 2.0 & Smarter Coffee Devices
 #
 # https://github.com/Tristan79/iBrew
 #
 # Copyright © 2016 Tristan (@monkeycat.nl)
 #
-# Kettle Rattle (rev 6)
+# Intermezzo
 #------------------------------------------------------
 
 
@@ -44,7 +44,7 @@ import traceback
 
 iBrewApp          = "iBrew: iKettle 2.0 & Smarter Coffee Interface"
 iBrewInfo         = "iBrew: Intermezzo © 2016 Tristan (@monkeycat.nl)"
-iBrewContribute   = "Please DONATE! Food, Sigarettes, Jokes and Fun Toys to Play with!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
+iBrewContribute   = "Please DONATE! Food, jokes, hugs and fun toys!\n\nContribute any discoveries on https://github.com/Tristan79/iBrew/issues"
 
 class iBrewConsole:
 
@@ -622,7 +622,7 @@ class iBrewConsole:
                                             elif numarg == 1:
                                                 self.client.kettle_formula_heat(Smarter.string_to_temperature(arguments[0]),self.client.defaultKeepWarmTime)
                                             else:
-                                                self.client.kettle_formula_heat_default(self.client.defaultFormulaTemperature,self.client.defaultKeepWarmTime)
+                                                self.client.kettle_formula_heat(self.client.defaultFormulaTemperature,self.client.defaultKeepWarmTime)
 
             elif command == "default":      self.client.device_restore_default()
             elif command == "calibrate":
@@ -853,7 +853,7 @@ class iBrewConsole:
     
         if self.console:
             self.quit = False
-            
+        
         while not self.quit:
             try:
                 cursor = self.client.host + ":" + self.client.device + "$"
@@ -864,7 +864,9 @@ class iBrewConsole:
                 self.quit = True
                 logging.debug(traceback.format_exc())
                 logging.debug(str(e))
+
         self.client.disconnect()
+        self.client.stop()
      
                      
 #------------------------------------------------------

@@ -7,6 +7,18 @@ from PyObjCTools import AppHelper
 
 import webbrowser
 
+#------------------------------------------------------
+# iBrew
+#
+# Taskbar Launcher MacOS
+#
+# https://github.com/Tristan79/iBrew
+#
+# Copyright © 2016 Tristan (@monkeycat.nl)
+#
+# Intermezzo
+#------------------------------------------------------
+
 rumps.debug_mode(False)  # turn on command line logging information for development - default is off
 
 class MacGui(rumps.App):

@@ -179,6 +179,7 @@ Protocol
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * modifiers/patches!!! 
  * there is no length check on message... could crash thing :-)
+ * # Bug in ./iBrew slow dump calibrate 10.0.0.3
 
 Interfaces
  * RELAY: simulate brew or heating process if not connected.

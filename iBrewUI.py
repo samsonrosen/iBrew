@@ -14,6 +14,18 @@ import logging.handlers
 from iBrewFolders import AppFolders
 from iBrewWeb import *
 
+#------------------------------------------------------
+# iBrew
+#
+# Taskbar Launcher (MacOS & Windows)
+#
+# https://github.com/Tristan79/iBrew
+#
+# Copyright © 2016 Tristan (@monkeycat.nl)
+#
+# Intermezzo
+#------------------------------------------------------
+
 class Launcher():    
     def signal_handler(self, signal, frame):
         print "Caught Ctrl-C.  exiting."

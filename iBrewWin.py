@@ -14,6 +14,18 @@ except ImportError:
     
 from iBrewFolders import AppFolders
 
+#------------------------------------------------------
+# iBrew
+#
+# Taskbar Launcher Windows
+#
+# https://github.com/Tristan79/iBrew
+#
+# Copyright © 2016 Tristan (@monkeycat.nl)
+#
+# Intermezzo
+#------------------------------------------------------
+
 class WinGui(object):
     '''TODO'''
     QUIT = 'QUIT'

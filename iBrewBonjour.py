@@ -15,7 +15,7 @@ import socket
 #
 # Copyright © 2016 Tristan (@monkeycat.nl)
 #
-# Kettle Rattle (rev 6)
+# Intermezzo
 #------------------------------------------------------
 
 

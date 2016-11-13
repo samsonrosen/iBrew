@@ -33,10 +33,9 @@ from SmarterProtocol import *
 #
 # Copyright © 2016 Tristan (@monkeycat.nl)
 #
-# Out of order! (rev 7)
+# Intermezzo
 #------------------------------------------------------
 
-# Bug in ./iBrew slow dump calibrate 10.0.0.3
 
 def _threadsafe_function(fn):
     """decorator making sure that the decorated function is thread safe"""
@@ -306,7 +305,7 @@ class SmarterClient:
         self.__clients                    = dict()
         
         # monitor run
-        self.monitor_run                          = False
+        self.monitor_run                  = False
         self.simulator_run                = False
         self.__utp_ResponseDeviceInfo     = False
         self.__server_run                 = False
@@ -331,10 +330,10 @@ class SmarterClient:
 
 
 
-    def __del__(self):
+    def stop(self):
         self.simulator_run = False
-        self.simulator = None
         self.disconnect()
+        self.simulator = None
 
 
 
@@ -740,12 +739,10 @@ class SmarterClient:
     #------------------------------------------------------
 
     def __simulate_device(self):
-
         if self.dump:
             logging.info("Simulation Running")
         self.simulator_run = True
         while self.simulator_run:
-            time.sleep(1)
             self.sim_cooling_timeout += 1
             self.sim_onbase_timeout += 1
 
@@ -839,9 +836,11 @@ class SmarterClient:
                 
             elif self.deviceId == Smarter.DeviceCoffee:
                 pass
-                
+            time.sleep(1)
+            
         if self.dump:
             logging.info("Simulation Stopped")
+    
     
     def __monitor_device(self):
         if self.dump:
@@ -1497,7 +1496,7 @@ class SmarterClient:
             self.sim_setTemperature  = Smarter.raw_to_temperature(message[1])
             self.sim_setKeepWarmTime = Smarter.raw_to_keepwarm(message[2])
         except SmarterError:
-            return self.__encode_CommandStatus(StatusFailed)
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
         self.sim_setFormula      = False
         self.sim_heaterOn        = True
         self.sim_kettleStatus    = Smarter.KettleHeating
@@ -1525,9 +1524,9 @@ class SmarterClient:
             self.sim_setFormulaTemperature = Smarter.raw_to_temperature(message[1])
             self.sim_setKeepWarmTime = Smarter.raw_to_keepwarm(message[2])
         except SmarterError:
-            return self.__encode_CommandStatus(StatusFailed)
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
         self.sim_setTemperature = 100
-        self.setFormula = True
+        self.sim_setFormula = True
         self.sim_heaterOn = True
         self.sim_kettleStatus = Smarter.KettleHeating
         return self.__encode_CommandStatus(Smarter.StatusSucces)
@@ -2317,7 +2316,7 @@ class SmarterClient:
         if not self.isKettle:
             self.__write_stats()
         if self.version == 0 or self.isCoffee:
-            self.version = 18
+            self.version = 19
         self.isKettle = True
         self.isCoffee = False
         self.deviceId = Smarter.DeviceKettle

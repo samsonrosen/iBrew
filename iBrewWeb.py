@@ -19,15 +19,15 @@ from iBrewFolders import AppFolders
 import traceback
 
 #------------------------------------------------------
-# SMARTER PROTOCOL INTERFACE REST API
+# iBrew
 #
-# REST API interface to iKettle 2.0 & Smarter Coffee Devices
+# Web & JSON REST interface to iKettle 2.0 & Smarter Coffee Devices
 #
 # https://github.com/Tristan79/iBrew
 #
 # Copyright © 2016 Tristan (@monkeycat.nl)
 #
-# Brewing on the 7th day (rev 6)
+# Intermezzo
 #------------------------------------------------------
 
 
