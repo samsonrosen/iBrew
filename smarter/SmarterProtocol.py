@@ -1226,6 +1226,11 @@ class SmarterProtocol:
     }
 
 
+    def is_status_command(self,status):
+        return self.StatusCommand.has_key(status)
+
+
+
     def status_command(self,status):
         if self.is_status_command(status):
             return self.StatusCommand[status]
@@ -1273,8 +1278,13 @@ class SmarterProtocol:
             message = message + " and keep it warm for " + str(keepwarmtime) + " minutes"
         return message
 
-    def is_status_command(self,status):
-        return self.StatusCommand.has_key(status)
+
+    def string_kettle_status(self,onbase,kettlestatus,temperature,watersensor):
+        if onbase:
+            return self.status_kettle_description(kettlestatus) + " on base: temperature " + self.temperature_to_string(temperature) + ", watersensor " + str(watersensor)
+        else:
+            return self.status_kettle_description(kettlestatus) + " off base"
+
 
 
     #------------------------------------------------------
@@ -1313,6 +1323,7 @@ class SmarterProtocol:
     CoffeeCupMode = True
     CoffeeCarafeMode = False
 
+
     def string_coffee_settings(self, cups, strength, grind, hotplate):
         s = ""
         if hotplate >= 5 and hotplate <= 40:
@@ -1321,6 +1332,7 @@ class SmarterProtocol:
         if grind:
             t = " " + self.strength_to_string(strength) + t
         return "brew " + self.cups_to_string(cups) + " of" + t + s
+
 
 
     def string_coffee_status(self,ready,cups,working,heating,hotPlateOn,carafe,grinderOn):
@@ -1339,6 +1351,22 @@ class SmarterProtocol:
             s+= "carafe on base"
         else:
             s+= "no carafe"
+        return s
+
+
+
+    def string_coffee_bits(self,caraferequired,mode,waterenough,timerevent):
+        s = ""
+        if not carafeRequired:
+            s += ", carafe required"
+        if mode:
+            s += ", cup mode"
+        else:
+            s += ", carafe mode"
+        if not waterenough:
+            s += ", not enough water to brew"
+        if timerevent:
+            s += ", timer triggered"
         return s
 
 

@@ -465,7 +465,7 @@ class iBrewConsole:
                     if len(devices) == 1:
                         self.client.host = devices[0][0]
 
-                if command == "console" or command == "connect" or command == "relay":
+                if command == "console" or command == "connect":
                     self.client.dump_status = False
                     self.client.fast = False
                     self.client.shout = False
