@@ -751,7 +751,7 @@ class SmarterClient:
 
             if self.deviceId == Smarter.DeviceKettle:
                 # take kettle off base
-                if (self.sim_heaterOn and self.sim_onbase_timeout % 50 == 10) and (not self.sim_heaterOn and self.sim_onbase_timeout % 30 == 10) and self.sim_onBase and 1 != random.randint(1,3):
+                if (self.sim_heaterOn and self.sim_onbase_timeout % 50) and (not self.sim_heaterOn and self.sim_onbase_timeout % 30 == 10) and self.sim_onBase and 1 != random.randint(1,3):
                     
                     if self.dump and self.dump_status:
                         logging.debug("Simulation kettle ready and off base")
@@ -763,7 +763,7 @@ class SmarterClient:
                     self.sim_keepwarm_timeout = 0
                 
                 # water lever up when almost empty... or else if heated enough one cup
-                elif self.sim_onbase_timeout % 10 == 5 and not self.sim_onBase:
+                elif self.sim_onbase_timeout % 10 and not self.sim_onBase:
                     self.sim_onBase = True
                     
                     if self.dump and self.dump_status:
@@ -782,8 +782,11 @@ class SmarterClient:
                 # heatin water time
                 elif self.sim_heaterOn:
                     self.sim_temperature += 1
+                    print self.sim_setTemperature
+                    print self.sim_temperature
+                    print
                     if self.sim_setTemperature <= self.sim_temperature or 100 == self.sim_temperature:
-                        if self.setFormula:
+                        if self.sim_setFormula:
                             self.sim_kettleStatus = Smarter.KettleFormulaCooling
                             self.sim_formulaCoolingOn  = True
                             self.sim_keepwarm_timeout = 0
@@ -815,7 +818,7 @@ class SmarterClient:
 
             
                 # cooling down water time
-                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % 10 and self.sim_temperature > 22:
+                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % 20 and self.sim_temperature > 22:
                     self.sim_temperature -= 1
                     
                 # formula cooling down water trigger time
