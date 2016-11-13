@@ -13,5 +13,4 @@ test/*
 
 .ibrew
 *.tmp
-pybonjour-1.1.1.zip
 ibrew.py
