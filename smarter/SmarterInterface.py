@@ -81,21 +81,9 @@ class SmarterClient:
 
         self.sim_heaterOn               = False
         self.sim_unknown                = 0
-
-
-        # internal kettle variable
-        self.sim_setTemperature         = 100
-        self.sim_setKeepWarmTime        = 0
-        self.sim_setFormulaTemperature  = 75
-        self.sim_setFormula             = False
-        self.sim_keepwarm_timeout       = 0
-        self.sim_cooling_timeout        = 0
-        self.sim_onbase_timeout         = 0
-
+        
         self.sim_waterSensorBase        = 974
         self.sim_waterSensor            = 2010
-        self.sim_waterSensorEmpty       = 1975
-        self.sim_waterSensorFull        = 2100
         self.sim_kettleStatus           = Smarter.KettleReady
         self.sim_onBase                 = True
         self.sim_keepWarmOn             = False
@@ -132,6 +120,27 @@ class SmarterClient:
         
         self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
 
+        # internal data kettle variable
+        self.sim_setTemperature         = 100
+        self.sim_setKeepWarmTime        = 0
+        self.sim_setFormulaTemperature  = 75
+        self.sim_setFormula             = False
+        self.sim_keepwarm_timeout       = 0
+        self.sim_cooling_timeout        = 0
+        self.sim_onbase_timeout         = 0
+        self.sim_waterSensorEmpty       = 1975
+        self.sim_waterSensorFull        = 2100
+        
+        # internal data coffee machine variable
+        self.sim_setHotPlate            = False
+        self.sim_hotPlate_timout        = 0
+        self.sim_grinder_timeout        = 5
+        self.sim_heating_timeout        = 25
+        self.sim_working_timeout        = 5
+        self.sim_setCups                = 1
+        self.sim_setStrength            = Smarter.CoffeeMedium
+        self.sim_setGrind               = False
+        self.sim_setHotPlate            = 0
 
     def __init(self):
         self.__init_simulation()
@@ -835,6 +844,8 @@ class SmarterClient:
 
                 
             elif self.deviceId == Smarter.DeviceCoffee:
+            
+            
                 pass
             time.sleep(1)
             
@@ -1438,6 +1449,18 @@ class SmarterClient:
         """
         Simulate response on command Brew
         """
+
+        if self.sim_carafeRequired and not self.sim_carafe:
+            return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        self.sim_setStrength = self.sim_strength
+        self.sim_setHotPlate = self.sim_hotPlate
+        self.sim_setCups = self.sim_cups
+        self.sim_grinderOn = self.sim_grind
+        self.sim_ready = False
+        self.sim_working = True
+        self.sim_heaterOn = True
+        self.sim_hotPlateOn = False
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -1446,6 +1469,20 @@ class SmarterClient:
         """
         Simulate response on command CoffeeStop
         """
+        
+        self.sim_heaterOn = False
+        self.sim_ready                  = True
+        self.sim_hotPlateOn             = False
+        self.sim_grinderOn              = False
+        self.sim_working                = False
+        
+        # remove water from sensor
+        
+        # self.sim_waterEnough            = False
+        # self.sim_waterLevel
+        
+        #self.sim_cupsBrew               = 0
+        
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -1454,9 +1491,67 @@ class SmarterClient:
         """
         Simulate response on command BrewDefault
         """
+        
+        if self.sim_carafeRequired and not self.sim_carafe:
+            return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        self.sim_setStrength = self.sim_defaultStrength
+        self.sim_setHotPlate = self.sim_defaultHotPlate
+        self.sim_setCups = self.sim_defaultCups
+        self.sim_grinderOn = self.sim_defaultGrind
+        self.sim_ready = False
+        self.sim_working = True
+        self.sim_heaterOn = True
+        self.sim_hotPlateOn = False
+        
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
+    
+    def __simulate_HotplateOn(self,message):
+        """
+        Simulate response on command HotplateOn
+        """
+        
+        if self.sim_heaterOn or self.sim_grinderOn:
+            return self.__encode_CommandStatus(Smarter.StatusBusy)
+        
+        # assumption, mother of all f.. ups, hope it works like this...
+        if not self.sim_carafe or self.sim_mode:
+            return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        
+        # if no message then use default.
+        if message[1] == Smarter.MessageTail:
+            self.sim_hotPlate = self.sim_defaultHotPlate
+        else:
+            try:
+                self.sim_hotPlate = Smarter.raw_to_hotplate(message[1])
+            except SmarterError:
+                return self.__encode_CommandStatus(Smarter.StatusFailed)
+        
+        if self.sim_hotPlate == 0:
+            self.sim_hotPlateOn = False
+            if not self.sim_heaterOn and not self.sim_grinderOn
+                self.sim_working = False
+        else:
+            self.sim_hotPlateOn = True
+            self.sim_working = True
+            # Start hotplate timer here FIX
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+    
+    
+    
+    def __simulate_HotplateOff(self):
+        """
+        Simulate response on command HotplateOff
+        """
+        if not self.sim_heaterOn and not self.sim_grinderOn:
+            self.sim_working = False
+        self.sim_hotPlateOn = False
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
 
     def __simulate_StoreTimer(self,message):
         """
@@ -1634,34 +1729,6 @@ class SmarterClient:
         return self.__encode_CommandStatus(Smarter.StatusSucces)
     
     
-    
-    def __simulate_HotplateOn(self,message):
-        """
-        Simulate response on command HotplateOn
-        """
-        
-        # if no message then use default.
-        if message[1] == Smarter.MessageTail:
-            self.sim_hotPlate = self.sim_defaultHotPlate
-        else:
-            try:
-                self.sim_hotPlate = Smarter.raw_to_hotplate(message[1])
-            except SmarterError:
-                return self.__encode_CommandStatus(Smarter.StatusFailed)
-        
-        # Start hotplate timer here FIX
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-    
-    
-    
-    def __simulate_HotplateOff(self):
-        """
-        Simulate response on command HotplateOff
-        """
-        self.sim_hotPlateOn = False
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
 
     def __simulate_Carafe(self):
         """
