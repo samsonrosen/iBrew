@@ -76,8 +76,50 @@ class SmarterClient:
 
     """
     
-    def __init(self):
     
+    def __init_simulation(self):
+        self.sim_heaterOn               = False
+        self.sim_unknown                = 0
+        self.sim_waterSensorBase        = 974
+        self.sim_waterSensor            = 2010
+        self.sim_kettleStatus           = Smarter.KettleReady
+        self.sim_onBase                 = True
+        self.sim_keepWarmOn             = False
+        self.sim_temperature            = 24
+        
+        self.sim_defaultTemperature     = 100
+        self.sim_defaultKeepWarmTime    = 0
+        self.sim_defaultFormula         = False
+        self.sim_defaultFormulaTemperature = 75
+        
+        self.sim_waterLevel             = Smarter.CoffeeWaterFull
+        self.sim_strength               = Smarter.CoffeeMedium
+        self.sim_cups                   = 1
+        self.sim_hotPlate               = 0
+        self.sim_grind                  = False
+        
+        self.sim_defaultCups            = 1
+        self.sim_defaultStrength        = Smarter.CoffeeMedium
+        self.sim_defaultGrind           = False
+        self.sim_defaultHotPlate        = 0
+        
+        self.sim_mode                   = False
+        self.sim_carafeRequired         = False
+        self.sim_cupsBrew               = 0
+        
+        self.sim_waterEnough            = False
+        self.sim_carafe                 = True
+        self.sim_timerEvent             = False
+        self.sim_ready                  = True
+        self.sim_hotPlateOn             = False
+        self.sim_grinderOn              = False
+        self.sim_working                = False
+        
+        self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
+
+
+    def __init(self):
+        self.__init_simulation()
     
         # network
         self.port                       = Smarter.Port
@@ -87,11 +129,15 @@ class SmarterClient:
         
         # device info
         self.heaterOn                   = False
+        
         # unknown status byte
         self.unknown                    = 0
     
         # kettle
         self.waterSensorBase            = 974
+
+
+        
         self.waterSensor                = 2010
         self.waterSensorStable          = 2010
 
@@ -100,6 +146,7 @@ class SmarterClient:
         
         # sensors
         self.onBase                     = True
+        
         self.keepWarmOn                 = False
         self.temperature                = 24
         self.temperatureStable          = 24
@@ -224,6 +271,7 @@ class SmarterClient:
         self.device                     = "None"
         self.deviceId                   = 0
         self.version                    = 0
+        
         self.sessionCount               = 0
 
         
@@ -575,7 +623,7 @@ class SmarterClient:
   
             if command in self.__rules_relay:
                 logging.debug("Blocked relay command: " + Smarter.number_to_code(command))
-                response = self.__encode(command)
+                response = self.__block_command(data)
             else:
                 # relay
                 response = self.__send(data)
@@ -768,7 +816,7 @@ class SmarterClient:
         if self.dump:
             logging.info("[" + self.host + "] Monitor Stopped")
  
-     #------------------------------------------------------
+    #------------------------------------------------------
     # TRANSMISSION
     #------------------------------------------------------
 
@@ -810,42 +858,7 @@ class SmarterClient:
 
 
 
-    def __decode(self,message):
-        
-        id = Smarter.raw_to_number(message[0])
-            
-        if Smarter.message_kettle(id) and not Smarter.message_coffee(id):
-            self.switch_kettle_device()
-        elif Smarter.message_coffee(id) and not Smarter.message_kettle(id):
-            self.switch_coffee_device()
-        
-        try:
-            if   id == Smarter.ResponseKettleStatus:    self.__decode_KettleStatus(message)
-            elif id == Smarter.ResponseCoffeeStatus:    self.__decode_CoffeeStatus(message)
-            elif id == Smarter.ResponseCommandStatus:   self.__decode_CommandStatus(message)
-            elif id == Smarter.ResponseBase:            self.__decode_Base(message)
-            elif id == Smarter.ResponseTimers:          self.__decode_Timers(message)
-            elif id == Smarter.ResponseCarafe:          self.__decode_Carafe(message)
-            elif id == Smarter.ResponseMode:            self.__decode_Mode(message)
-            elif id == Smarter.ResponseKettleHistory:   self.__decode_KettleHistory(message)
-            elif id == Smarter.ResponseCoffeeHistory:   self.__decode_CoffeeHistory(message)
-            elif id == Smarter.ResponseKettleSettings:  self.__decode_KettleSettings(message)
-            elif id == Smarter.ResponseCoffeeSettings:  self.__decode_CoffeeSettings(message)
-            elif id == Smarter.ResponseDeviceInfo:      self.__decode_DeviceInfo(message)
-            elif id == Smarter.ResponseWifiFirmware:    self.__decode_WifiFirmware(message)
-            elif id == Smarter.ResponseWirelessNetworks:self.__decode_WirelessNetworks(message)
-        except SmarterError, e:
-            logging.debug(str(e))
-            logging.debug(traceback.format_exc())
-            raise SmarterError(0,"Could not decode message")
 
-        if self.dump:
-            if self.dump_status:
-                self.print_message_read(message)
-            else:
-                #fix
-                if id != Smarter.ResponseCoffeeStatus and id != Smarter.ResponseKettleStatus:
-                    self.print_message_read(message)
 
     # MESSAGE READ PROTOCOL
     def __read(self):
@@ -865,7 +878,7 @@ class SmarterClient:
             
             if id in self.__rules:
                 logging.debug("Blocked Response: " + Smarter.number_to_code(id))
-                message = self.__encode(id)[0]
+                message = self.__block_response(message)[0]
     
             # patches here....
             
@@ -944,7 +957,7 @@ class SmarterClient:
         command = Smarter.raw_to_number(message[0])
         if command in self.__rules:
             logging.debug("Blocked command: " + Smarter.number_to_code(command))
-            responses = self.__encode(command)
+            responses = self.__block_command(message)
             for message in responses:
                 self.__decode(message)
             return responses
@@ -964,7 +977,7 @@ class SmarterClient:
             if command in self.__rules:
                 self.__monitorLock.release()
                 logging.debug("Blocked command: " + Smarter.number_to_code(command))
-                response = self.__encode(command)
+                response = self.__block_command(message)
                 for message in response:
                     self.__decode(message)
                 return responses
@@ -978,7 +991,8 @@ class SmarterClient:
             
                 if self.shout:
                     self.__monitorLock.release()
-                    return self.__encode(command)
+                    # we do not care about result only speed..
+                    return self.__block_command(message)
 
                 try:
                     message_read = self.__read()
@@ -1149,93 +1163,499 @@ class SmarterClient:
 
 
     #------------------------------------------------------
-    # MESSAGE COMMAND RESPONSERS
+    # MESSAGE COMMAND & RESPONSE
     #------------------------------------------------------
  
- 
- 
-    def __encode(self,message):
+
+    def __block_command(self,message):
         """
-        Returns list of reply messages
+        Returns list of reply messages and preform sim action if needed of bot command and response messages.
         """
         
-        if message == Smarter.CommandDeviceInfo:        response = self.__encode_DeviceInfo(self.deviceId,self.version)
-        elif message == Smarter.CommandKettleSettings:  response = self.__encode_KettleSettings()
-        elif message == Smarter.CommandCoffeeSettings:  response = self.__encode_CoffeeSettings()
-        elif message == Smarter.CommandBase:            response = self.__encode_BaseCommand(self.waterSensorBase)
-        elif message == Smarter.CommandCalibrate:       response = self.__encode_KettleCalibrate(self.waterSensorBase)
-        elif message == Smarter.CommandWifiFirmware:    response = self.__encode_WifiFirmware()
-        elif message == Smarter.CommandStoreBase:       response = self.__encode_StoreBase()
-        elif message == Smarter.CommandKettleHistory:   response = self.__encode_KettleHistory()
-        elif message == Smarter.CommandCoffeeHistory:   response = self.__encode_CoffeeHistory()
-        elif message == Smarter.CommandWifiNetwork:     response = self.__encode_WifiNetwork()
-        elif message == Smarter.CommandWifiPassword:    response = self.__encode_WifiPassword()
-        elif message == Smarter.CommandWifiJoin:        response = self.__encode_WifiJoin()
-        #elif message == Smarter.CommandWifiLeave:      response = self.__encode_WifiLeave()
-        elif message == Smarter.CommandWifiScan:        response = self.__encode_WifiScan()
-
-        elif message == Smarter.CommandDeviceTime:      response = self.__encode_DeviceTime()
-        elif message == Smarter.CommandResetSettings:   response = self.__encode_ResetSettings()
-        elif message == Smarter.CommandUpdate:          response = self.__encode_Update()
-        elif message == Smarter.Command69:              response = self.__encode_69()
-        elif message == Smarter.CommandBrew:            response = self.__encode_Brew()
-
-        elif message == Smarter.CommandCoffeeStop:      response = self.__encode_CoffeeStop()
-        elif message == Smarter.CommandStrength:        response = self.__encode_Strength()
-        elif message == Smarter.CommandCups:            response = self.__encode_Cups()
         
-        elif message == Smarter.CommandBrewDefault:     response = self.__encode_BrewDefault()
-        elif message == Smarter.CommandCoffeeSettings:  response = self.__encode_CoffeeSettingsCommand()
+        id = Smarter.raw_to_number(message[0])
+        if id == Smarter.CommandDeviceInfo:             response = self.__simulate_DeviceInfo()
+        elif id == Smarter.Command20:                   response = self.__simulate_20()
+        elif id == Smarter.Command22:                   response = self.__simulate_22()
+        elif id == Smarter.Command23:                   response = self.__simulate_23()
+        elif id == Smarter.Command30:                   response = self.__simulate_30()
+        elif id == Smarter.CommandUpdate:               response = self.__simulate_Update()
+        elif id == Smarter.Command69:                   response = self.__simulate_69()
+        elif id == Smarter.CommandWifiFirmware:         response = self.__simulate_WifiFirmware()
+        elif id == Smarter.CommandWifiNetwork:          response = self.__simulate_WifiNetwork()
+        elif id == Smarter.CommandWifiPassword:         response = self.__simulate_WifiPassword()
+        elif id == Smarter.CommandWifiJoin:             response = self.__simulate_WifiJoin()
+        #elif id == Smarter.CommandWifiLeave:            response = self.__simulate_WifiLeave()
+        elif id == Smarter.CommandWifiScan:             response = self.__simulate_WifiScan()
+        elif id == Smarter.CommandKettleHistory:        response = self.__simulate_KettleHistory()
+        elif id == Smarter.CommandCoffeeHistory:        response = self.__simulate_CoffeeHistory()
+        elif id == Smarter.CommandSetMode:              response = self.__simulate_SetMode(message)
+        elif id == Smarter.CommandMode:                 response = self.__simulate_Mode()
+        elif id == Smarter.CommandBase:                 response = self.__simulate_Base()
+        elif id == Smarter.CommandCalibrate:            response = self.__simulate_Calibrate()
+        elif id == Smarter.CommandStoreBase:            response = self.__simulate_StoreBase(message)
+        elif id == Smarter.CommandSetCarafe:            response = self.__simulate_SetCarafe(message)
+        elif id == Smarter.CommandCarafe:               response = self.__simulate_Carafe()
+        elif id == Smarter.CommandKettleSettings:       response = self.__simulate_KettleSettings()
+        elif id == Smarter.CommandCoffeeSettings:       response = self.__simulate_CoffeeSettings()
+        elif id == Smarter.CommandKettleStoreSettings:  response = self.__simulate_KettleStoreSettings(message)
+        elif id == Smarter.CommandCoffeeStoreSettings:  response = self.__simulate_CoffeeStoreSettings(message)
+        elif id == Smarter.CommandStrength:             response = self.__simulate_Strength(message)
+        elif id == Smarter.CommandCups:                 response = self.__simulate_Cups(message)
+        elif id == Smarter.CommandGrinder:              response = self.__simulate_Grinder()
+        elif id == Smarter.CommandHotplateOn:           response = self.__simulate_HotplateOn(message)
+        elif id == Smarter.CommandHotplateOff:          response = self.__simulate_HotplateOff()
+        elif id == Smarter.CommandDeviceTime:           response = self.__simulate_DeviceTime(message)
+        elif id == Smarter.CommandResetSettings:        response = self.__simulate_ResetSettings()
+        
+        elif id == Smarter.CommandBrew:                 response = self.__simulate_Brew()
+        elif id == Smarter.CommandCoffeeStop:           response = self.__simulate_CoffeeStop()
+        elif id == Smarter.CommandBrewDefault:          response = self.__simulate_BrewDefault()
+        elif id == Smarter.CommandHeatFormula:          response = self.__simulate_HeatFormula()
+        elif id == Smarter.CommandHeat:                 response = self.__simulate_Heat()
+        elif id == Smarter.CommandHeatDefault:          response = self.__simulate_HeatDefault()
+        elif id == Smarter.CommandKettleStop:           response = self.__simulate_KettleStop()
+        
+        elif id == Smarter.CommandStoreTimer:           response = self.__simulate_StoreTimer(message)
+        elif id == Smarter.CommandTimers:               response = self.__simulate_Timers(message)
+        elif id == Smarter.CommandDisableTimer:         response = self.__simulate_DisableTimer(message)
+        else:                                           response = self.__encode_CommandStatus(Smarter.StatusInvalid)
+        return response
 
-        elif message == Smarter.CommandCoffeeStoreSettings: response = self.__encode_CoffeeStoreSettings()
-        elif message == Smarter.CommandGrinder:         response = self.__encode_Grinder()
-        elif message == Smarter.CommandHotplateOn:      response = self.__encode_HotplateOn()
-        elif message == Smarter.CommandHotplateOff:     response = self.__encode_HotplateOff()
-        elif message == Smarter.CommandSetCarafe:       response = self.__encode_SetCarafe()
 
-        elif message == Smarter.CommandCarafe:          response = self.__encode_CarafeCommand()
-        elif message == Smarter.CommandSetMode:         response = self.__encode_SetMode()
-        elif message == Smarter.CommandMode:            response = self.__encode_ModeCommand()
-        elif message == Smarter.CommandKettleStoreSettings: response = self.__encode_KettleStoreSettings()
-        elif message == Smarter.CommandHeatFormula:     response = self.__encode_HeatFormula()
-
-        elif message == Smarter.CommandStoreTimer:      response = self.__encode_StoreTimer()
-        elif message == Smarter.CommandTimers:          response = self.__encode_TimersCommand()
-        elif message == Smarter.CommandDisableTimer:    response = self.__encode_DisableTimer()
-        elif message == Smarter.CommandHeat:            response = self.__encode_Heat()
-        elif message == Smarter.CommandKettleStop:      response = self.__encode_KettleStop()
-
-        elif message == Smarter.CommandHeatDefault:     response = self.__encode_HeatDefault()
-        elif message == Smarter.Command20:              response = self.__encode_20()
-        elif message == Smarter.Command22:              response = self.__encode_22()
-        elif message == Smarter.Command23:              response = self.__encode_23()
-        elif message == Smarter.Command30:              response = self.__encode_30()
-
-        elif message == Smarter.ResponseCommandStatus:  response = self.__encode_CommandStatus(Smarter.StatusSucces)
-        elif message == Smarter.ResponseWirelessNetworks: response = self.__encode_WifiScan()
-        elif message == Smarter.ResponseKettleHistory:  response = self.__encode_KettleHistory()
-        elif message == Smarter.ResponseDeviceInfo:     response = self.__encode_DeviceInfo(self.deviceId,self.version)
-        elif message == Smarter.ResponseWifiFirmware:   response = self.__encode_WifiFirmware()
-        elif message == Smarter.ResponseCoffeeSettings: response = self.__encode_CoffeeSettings()
-        elif message == Smarter.ResponseKettleStatus:   response = self.__encode_KettleStatus(self.kettleStatus,self.temperature,self.waterSensor, self.onBase, self.unknown)
-        elif message == Smarter.ResponseTimers:         response = self.__encode_Timers()
-        elif message == Smarter.ResponseCoffeeHistory:  response = self.__encode_CoffeeHistory()
-        elif message == Smarter.ResponseCarafe:         response = self.__encode_Carafe()
-        elif message == Smarter.ResponseCoffeeStatus:   response = self.__encode_CoffeeStatus(self.cups,self.strength,self.cupsBrew,self.waterLevel,self.waterEnough,self.carafe, self.grind, self.ready, self.grinderOn, self.heaterOn, self.hotPlateOn,self.working,self.timerEvent, self.unknown)
-        elif message == Smarter.ResponseKettleSettings: response = self.__encode_KettleSettings()
-        elif message == Smarter.ResponseMode:           response = self.__encode_Mode()
-        elif message == Smarter.ResponseBase:           response = self.__encode_Base(self.waterSensorBase)
+    def __block_response(self,message):
+        """
+        Returns list of reply messages and preform sim action if needed of blocked response messages.
+        """
+        id = Smarter.raw_to_number(message[0])
+        # blocking the other way....
+        if id == Smarter.ResponseCommandStatus:         response = self.__encode_CommandStatus(Smarter.StatusSucces)
+        elif id == Smarter.ResponseWirelessNetworks:    response = self.__simulate_WifiScan()
+        elif id == Smarter.ResponseDeviceInfo:          response = self.__simulate_DeviceInfo()
+        elif id == Smarter.ResponseCoffeeSettings:      response = self.__simulate_CoffeeSettings()
+        elif id == Smarter.ResponseKettleSettings:      response = self.__simulate_KettleSettings()
+        elif id == Smarter.ResponseKettleStatus:        response = self.__simulate_KettleStatus()
+        elif id == Smarter.ResponseCoffeeStatus:        response = self.__simulate_CoffeeStatus()
+        elif id == Smarter.ResponseWifiFirmware:        response = self.__encode_WifiFirmware()
+        elif id == Smarter.ResponseKettleHistory:       response = self.__enable_KettleHistory()
+        elif id == Smarter.ResponseCoffeeHistory:       response = self.__encode_CoffeeHistory()
+        elif id == Smarter.ResponseTimers:              response = self.__encode_Timers()
+        elif id == Smarter.ResponseCarafe:              response = self.__encode_Carafe(self.sim_carafeRequired)
+        elif id == Smarter.ResponseMode:                response = self.__encode_Mode(self.sim_mode)
+        elif id == Smarter.ResponseBase:                response = self.__encode_Base(self.sim_waterSensorBase)
         else:                                           response = self.__encode_CommandStatus(Smarter.StatusInvalid)
         return response
 
 
 
+    #------------------------------------------------------
+    # MESSAGE SIMULATE RESPONSES
+    #------------------------------------------------------
+
+
+
+    def __simulate_KettleStatus(self):
+        return self.__encode_KettleStatus(self.sim_kettleStatus,self.sim_temperature, self.sim_waterSensor, self.sim_onBase, self.sim_unknown)
+        
+
+
+    def __simulate_CoffeeStatus(self):
+        return self.__encode_CoffeeStatus(self.sim_cups,self.sim_strenght,self.sim_cupsBrew, self.sim_waterLevel, self.sim_waterEnough, self.sim_carafe, self.sim_grind, self.sim_ready, self.sim_grinderOn, self.sim_heaterOn, self.sim_hotPlateOn, self.sim_working, self.sim_timerEvent, self.sim_unknown)
+    
+
+
+    def __simulate_DeviceTime(self,message):
+        """
+        Simulate response on command DeviceTime
+        FIX not finished...
+        """
+        return self.__encode_DeviceTime(0,0,0,0,0,0,0,0)
+        
+       
+         
+    def __simulate_ResetSettings(self):
+        """
+        Simulate response on command ResetSettings
+        """
+        self.__init_simulation()
+        return self.__encode_ResetSettings()
+        
+       
+       
+    def __simulate_Brew(self):
+        """
+        Simulate response on command Brew
+        """
+        return self.__encode_Brew()
+        
+        
+        
+    def __simulate_CoffeeStop(self):
+        """
+        Simulate response on command CoffeeStop
+        """
+        return self.__encode_CoffeeStop()
+        
+        
+        
+    def __simulate_BrewDefault(self):
+        """
+        Simulate response on command BrewDefault
+        """
+        return self.__encode_BrewDefault()
+        
+        
+
+    def __simulate_StoreTimer(self,message):
+        """
+        Simulate response on command StoreTimer
+        FIX
+        """
+        return self.__encode_StoreTimer(Smarter.raw_to_number(message[1]),0,0,0,0,0,0,0)
+
+
+
+    def __simulate_Timers(self,message):
+        """
+        Simulate response on command GetTimers
+        FIX index 0...  type... aaagh....
+        """
+        if message[1] == Smarter.MessageTail:
+            return self.__encode_GetTimers(0)
+        else:
+            return self.__encode_GetTimers(Smarter.raw_to_number(message[1]))
+
+
+
+    def __simulate_DisableTimer(self,message):
+        """
+        Simulate response on command DisableTimer
+        FIX! raw_to_number -> raw_to_index
+        """
+        return self.__encode_DisableTimer(Smarter.raw_to_number(message[1]))
+
+
+
+    def __simulate_Heat(self):
+        """
+        Simulate response on command Heat
+        """
+        return self.__encode_Heat()
+
+
+
+    def __simulate_KettleStop(self):
+        """
+        Simulate response on command KettleStop
+        """
+        self.sim_heaterOn = False
+        self.sim_keepWarmOn = False
+        self.sim_kettleStatus = Smarter.KettleReady
+        return self.__encode_KettleStop()
+
+
+
+    def __simulate_HeatFormula(self):
+        """
+        Simulate response on command HeatFormula
+        """
+        return self.__encode_HeatFormula()
+
+
+
+    def __simulate_HeatDefault(self):
+        """
+        Simulate response on command HeatDefault
+        """
+        return self.__encode_HeatDefault()
+
+
+
+    def __simulate_DeviceInfo(self):
+        """
+        Simulate response on command DeviceInfo
+        """
+        return self.__encode_DeviceInfo(self.deviceId,self.version)
+
+
+
+    def __simulate_KettleStoreSettings(self,message):
+        """
+        Simulate response on command Kettle Store Settings
+        """
+        
+        self.sim_defaultTemperature         = Smarter.raw_to_temperature(message[2])
+        self.sim_defaultFormula             = Smarter.raw_to_bool(message[3])
+        self.sim_defaultFormulaTemperature  = Smarter.raw_to_temperature(message[4])
+        self.sim_defaultKeepWarmTime        = Smarter.raw_to_keepwarm(message[1])
+        return self.__encode_KettleStoreSettings()
+    
+    
+    
+    def __simulate_KettleSettings(self):
+        """
+        Simulate response on command Kettle Get Settings
+        """
+        return self.__encode_KettleGetSettings(self.sim_defaultTemperature,self.sim_defaultKeepWarmTime,sim_defaultFormulaTemperature)
+    
+    
+    
+    def __simulate_CoffeeSettings(self):
+        """
+        Simulate response on command Coffee Get Settings
+        """
+        return self.__encode_CoffeeGetSettings(self.sim_defaultCups,self.sim_defaultStrength,self.sim_defaultGrind,self.sim_defaultHotPlate)
+    
+    
+    
+    def __simulate_CoffeeStoreSettings(self,message):
+        """
+        Simulate response on command Coffee Store Settings
+        """
+        
+        self.sim_defaultHotPlate    = Smarter.raw_to_hotplate(message[4])
+        self.sim_defaultCups        = Smarter.raw_to_cups(message[2])
+        self.sim_defaultStrength    = Smarter.raw_to_strength(message[1])
+        self.sim_defaultGrind       = Smarter.raw_to_bool(message[3])
+        return self.__encode_CoffeeStoreSettings()
+
+
+
+    def __simulate_Grinder(self):
+        """
+        Simulate response on command Grinder
+        """
+        self.sim_grind = not self.sim_grind
+        return self.__encode_Grinder()
+    
+    
+    
+    def __simulate_Strength(self,message):
+        """
+        Simulate response on command Strength
+        """
+        self.sim_strength = Smarter.raw_to_strength(message[1])
+        return self.__encode_Strength()
+    
+    
+    
+    def __simulate_Cups(self,message):
+        """
+        Simulate response on command Cups
+        """
+        self.sim_cups = Smarter.raw_to_cups(message[1])
+        # if cup mode no more then 3? FIX
+        return self.__encode_Cups()
+    
+    
+    
+    def __simulate_HotplateOn(self,message):
+        """
+        Simulate response on command HotplateOn
+        """
+        
+        # if no message then use default.
+        if message[1] == Smarter.MessageTail:
+            self.sim_hotPlate = self.sim_defaultHotPlate
+        else:
+            self.sim_hotPlate = Smarter.raw_to_hotplate(message[1])
+        
+        # Start hotplate timer here FIX
+        return self.__encode_HotplateOn()
+    
+    
+    
+    def __simulate_HotplateOff(self):
+        """
+        Simulate response on command HotplateOff
+        """
+        # stop hotplate timer here FIX
+        return self.__encode_HotplateOff()
+
+
+
+    def __simulate_Carafe(self):
+        """
+        Simulate response on command Carafe
+        """
+        return self.__encode_GetCarafe(self.sim_carafeRequired)
+    
+
+
+    def __simulate_SetCarafe(self,message):
+        """
+        Simulate response on command SetCarafe
+        """
+        self.sim_carafeRequired = Smarter.raw_to_bool(message[1])
+        return self.__encode_SetCarafe()
+
+
+
+    def __simulate_Mode(self):
+        """
+        Simulate response on command Mode
+        """
+        return self.__encode_GetMode(self.sim_mode)
+    
+
+
+    def __simulate_SetMode(self,message):
+        """
+        Simulate response on command SetMode
+        """
+        self.sim_mode = Smarter.raw_to_bool(message[1])
+        return self.__encode_SetMode()
+
+
+
+    def __simulate_Base(self):
+        """
+        Simulate response on command GetBase
+        """
+        return self.__encode_GetBase(self.sim_waterSensorBase)
+
+
+
+    def __simulate_Calibrate(self):
+        """
+        Simulate response on command Calibrate
+        """
+        self.sim_waterSensorBase = random.randint(975,999)
+        return self.__encode_Calibrate(self.sim_waterSensorBase)
+
+
+
+    def __simulate_StoreBase(self,message):
+        """
+        Simulate response on command StoreBase
+        """
+        self.sim_waterSensorBase = Smarter.raw_to_watersensor(message[1],message[2])
+        return self.__encode_StoreBase(self.sim_waterSensorBase)
+
+
+
+    def __simulate_KettleHistory(self):
+        """
+        Simulate response on commandkettle history, no history
+        """
+        return self.__encode_KettleHistory()
+
+
+
+    def __simulate_CoffeeHistory(self):
+        """
+        Simulate response on commandcoffee history, no history
+        """
+        return self.__encode_CoffeeHistory()
+
+
+
+    def __simulate_WifiFirmware(self):
+        """
+        Simulate response on commandWifiFirmware encode simulated wifi firmware response message (note: changes version number for relay detection)
+        """
+        return self.__encode_WifiFirmware(self.sim_WifiFirmware)
+
+
+
+    def __simulate_WifiScan(self):
+        """
+        Simulate response on commandWifiScan encode simulated one wifi access point with random dBm response message
+        """
+        return self.__encode_WifiScan('iBrew Relay '+self.host+',-'+str(random.randint(70,90))+'}')
+
+
+
+    def __simulate_WifiJoin(self):
+        """
+        Simulate response on commandWifiJoin (probably just should disconnect or send nothing FIX)
+        """
+        return self.__encode_WifiJoin()
+
+
+
+    def __simulate_WifiPassword(self):
+        """
+        Simulate response on commandset wifi password
+        And yes we can snoop here on wifi network names & password... (not implemented. do not care)
+        """
+        return self.__encode_WifiPassword()
+
+
+
+    def __simulate_Network(self):
+        """
+        Simulate response on commandset wireless network name
+        """
+        return self.__encode_Network()
+
+
+
+    def __simulate_Update(self):
+        """
+        Simulate response on command Update
+        """
+        return self.__encode_Update()
+
+
+
+    def __simulate_69(self):
+        """
+        Simulate response on command 69
+        """
+        return self.__encode_69()
+
+
+
+    def __simulate_20(self):
+        """
+        Simulate response on command 20
+        """
+        return self.__encode_20()
+
+
+
+    def __simulate_22(self):
+        """
+        Simulate response on command 22
+        """
+        return self.__encode_22()
+
+
+
+    def __simulate_23(self):
+        """
+        Simulate response on command 23
+        """
+        return self.__encode_23()
+
+
+
+    def __simulate_30(self):
+        """
+        Simulate response on command 30
+        """
+        return self.__encode_30()
+
+
+
+    #------------------------------------------------------
+    # MESSAGE RESPONSE ENCODERS
+    #------------------------------------------------------
+
+
     def __encode_KettleStatus(self,status,temperature,watersensor,onbase,unknown=0):
+        """
+        Encode kettle status response message
+        """
         return [Smarter.number_to_raw(Smarter.ResponseKettleStatus) + Smarter.number_to_raw(status) + Smarter.temperaturemerged_to_raw(temperature,onbase) + Smarter.watersensor_to_raw(watersensor) + Smarter.number_to_raw(unknown) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
 
     def __encode_CoffeeStatus(self,cups,strenght,cupsbrew,waterlevel,waterenough,carafe,grind,ready,grinder,heater,hotplate,working,timer,unknown=0):
+        """
+        Encode coffee machine status response message
+        """
         coffeestatus = Smarter.coffeeStatus_to_raw(carafe,grind,ready,grinder,heater,hotplate,working,timer)
         cupsmerged   = Smarter.cupsmerged_to_raw(cups,cupsbrew)
         watermerged  = Smarter.waterlevel_to_raw(waterlevel,waterenough)
@@ -1243,257 +1663,454 @@ class SmarterClient:
 
 
 
-    def __encode_DeviceTime(self):
+    def __encode_DeviceTime(self,seconds,minutes,hours,unknown,day,month,year,century):
+        """
+        Encode DeviceTime response message
+        FIX not finished...
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_ResetSettings(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_Update(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_Command69(self):
+        """
+        Encode ResetSettings response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_Brew(self):
+        """
+        Encode Brew response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_CoffeeStop(self):
+        """
+        Encode CoffeeStop response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
-
-    def __encode_Strength(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_Cups(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
+  
     def __encode_BrewDefault(self):
+        """
+        Encode BrewDefault response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
-    def __encode_CoffeeSettings(self):
-        return self.__encode_CoffeeSettingsCommand() + self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_CoffeeSettingsCommand(self):
-        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(self.defaultCups) + Smarter.strength_to_raw(self.defaultStrength) + Smarter.bool_to_raw(self.defaultGrind) + Smarter.hotplate_to_raw(self.defaultHotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_CoffeeStoreSettings(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_Grinder(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_HotplateOn(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_HotplateOff(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_CarafeCommand(self):
-        return  self.__encode_Carafe() + self.__encode_CommandStatus(Smarter.StatusSucces)
-  
-  
-  
-    def __encode_Carafe(self):
-        return [Smarter.number_to_raw(Smarter.ResponseCarafe) + Smarter.bool_to_raw(not self.carafeRequired) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_SetCarafe(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_ModeCommand(self):
-        return self.__encode_Mode() + self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_Mode(self):
-        return [Smarter.number_to_raw(Smarter.ResponseMode) + Smarter.bool_to_raw(self.mode) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_SetMode(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_StoreTimer(self):
+    def __encode_StoreTimer(self,index,minutes,hours,unknown,day,month,year,century):
+        """
+        Encode StoreTimer response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_Timers(self):
-        # FIX THIS
+        """
+        Encode Timers response message
+        FIX NOT IMPLEMENTED
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
-    def __encode_TimersCommand(self):
+    def __encode_GetTimers(self,index):
+        """
+        Encode Get Timers response message
+        FIX NOT IMPLEMENTED
+        """
         return self.__encode_Timers() + self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
-    def __encode_DisableTimer(self):
+    def __encode_DisableTimer(self,index):
+        """
+        Encode Disable Timer response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_Heat(self):
+        """
+        Encode Heat response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_KettleStop(self):
+        """
+        Encode Kettle Stop response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_HeatFormula(self):
+        """
+        Encode Heat Formula response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_HeatDefault(self):
+        """
+        Encode Heat Default response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
-    def __encode_20(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
+    def __encode_DeviceInfo(self,type,version):
+        """
+        Encode commandstatus response message
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseDeviceInfo) + Smarter.number_to_raw(type) + Smarter.number_to_raw(version) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
 
-    def __encode_22(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_23(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_30(self):
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
+    def __encode_CommandStatus(self,status):
+        """
+        Encode commandstatus response message
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseCommandStatus) + Smarter.number_to_raw(status) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
 
     def __encode_KettleStoreSettings(self):
+        """
+        Encode Kettle Store Settings response messages
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
+    def __encode_KettleSettings(self,temperature,keepwarm,formulatemperature):
+        """
+        Encode Kettle Settings response message
+        """
+        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(self.defaultTemperature) + Smarter.keepwarm_to_raw(self.defaultKeepWarmTime) + Smarter.temperature_to_raw(self.defaultFormulaTemperature) + Smarter.number_to_raw(Smarter.MessageTail)
+        # emulate bug in v22
+        response += Smarter.number_to_raw(0)
+        return [response]
+
+
+
+    def __encode_KettleGetSettings(self,temperature,keepwarm,formulatemperature):
+        """
+        Encode Kettle Get Settings response messages
+        """
+        return self.__encode_KettleSettings(temperature,keepwarm,formulatemperature) + self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_CoffeeGetSettings(self,cups,strength,grind,hotplate):
+        """
+        Encode coffee machine get settings response messages
+        """
+        return self.__encode_CoffeeSettings(cups,strength,grind,hotplate) + self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_CoffeeSettings(self,cups,strength,grind,hotplate):
+        """
+        Encode coffee machine settings response message
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(self.cups) + Smarter.strength_to_raw(self.strength) + Smarter.bool_to_raw(self.grind) + Smarter.hotplate_to_raw(self.hotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+
+
+    def __encode_CoffeeStoreSettings(self):
+        """
+        Encode coffee machine store settings response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_Grinder(self):
+        """
+        Encode coffee machine Grinder response messages
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+    def __encode_Strength(self):
+        """
+        Encode coffee machine Strength response messages
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_Cups(self):
+        """
+        Encode coffee machine cups response messages
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_HotplateOn(self):
+        """
+        Encode coffee machine HotplateOn response messages
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_HotplateOff(self):
+        """
+        Encode coffee machine HotplateOff response messages
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_GetCarafe(self,carafeRequired):
+        """
+        Encode coffee machine carafe mode response messages
+        """
+        return  self.__encode_Carafe(carafeRequired) + self.__encode_CommandStatus(Smarter.StatusSucces)
+  
+  
+  
+    def __encode_Carafe(self,carafeRequired):
+        """
+        Encode coffee machine mode response message
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseCarafe) + Smarter.bool_to_raw(carafeRequired) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+
+
+    def __encode_SetCarafe(self):
+        """
+        Encode coffee machine set carafe mode response messages
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_GetMode(self,mode):
+        """
+        Encode coffee machine mode response messages
+        """
+        return self.__encode_Mode(mode) + self.__encode_CommandStatus(Smarter.StatusSucces)
+    
+
+
+    def __encode_Mode(self,mode):
+        """
+        Encode coffee machine mode response message
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseMode) + Smarter.bool_to_raw(mode) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+
+
+    def __encode_SetMode(self):
+        """
+        Encode coffee machine set mode response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_Base(self,base):
+        """
+        Encode kettle base response message
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseBase) + Smarter.watersensor_to_raw(base) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+
+
+    def __encode_GetBase(self,base):
+        """
+        Encode base command response messages
+        """
+        return self.__encode_Base(base) + self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+    
+    def __encode_Calibrate(self,base):
+        """
+        Encode kettle calibrate base respons message
+        """
+        
+        return self.__encode_Base(base)
+
+
+
+    def __encode_StoreBase(self):
+        """
+        Encode store kettle calibrate base respons message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_KettleHistory(self,history=""):
+        """
+        Encode no kettle history response message
+        FIX Should be a list of history as input...
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseKettleHistory) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)]
+ 
+ 
+ 
+    def __encode_CoffeeHistory(self,history=""):
+        """
+        Encode no coffee history response message
+        FIX Should be a list of history as input...
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseCoffeeHistory) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+
+
+    def __encode_WifiFirmware(self,wifi="6b41542b474d520d0d0a41542076657273696f6e3a302e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"):
+        """
+        Encode simulated wifi firmware response message
+        """
+        return [Smarter.codes_to_message(wifi)]
+
+
+
+    def __encode_WifiScan(self,list):
+        """
+        Encode wifi access point response message (FIX should take a list of networks))
+        """
+        return [Smarter.number_to_raw(Smarter.ResponseWirelessNetworks) + Smarter.text_to_raw(list) + Smarter.number_to_raw(Smarter.MessageTail)]
+
+
+
     def __encode_WifiJoin(self):
+        """
+        Encode wifi join succesfull response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
     def __encode_WifiPassword(self):
+        """
+        Encode set wifi password is succesfull response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
     
 
 
     def __encode_WifiNetwork(self):
+        """
+        Encode wifi set wireless network name is succesfull response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
-    def __encode_WifiScan(self):
-        return [Smarter.number_to_raw(Smarter.ResponseWirelessNetworks) + Smarter.text_to_raw('iBrew Relay '+self.host+',-60}') + Smarter.number_to_raw(Smarter.MessageTail)] 
-
-
-
-    def __encode_DeviceInfo(self,type,version):
-        return [Smarter.number_to_raw(Smarter.ResponseDeviceInfo) + Smarter.number_to_raw(type) + Smarter.number_to_raw(version) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_BaseCommand(self,waterbase):
-        return self.__encode_Base(waterbase) + self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
-
-    def __encode_Base(self,waterbase):
-        return [Smarter.number_to_raw(Smarter.ResponseBase) + Smarter.watersensor_to_raw(waterbase) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_KettleHistory(self):
-        return [Smarter.number_to_raw(Smarter.ResponseKettleHistory) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_CoffeeHistory(self):
-        return [Smarter.number_to_raw(Smarter.ResponseCoffeeHistory) + Smarter.number_to_raw(0) + Smarter.number_to_raw(Smarter.MessageTail)]
-    
-
-
-    def __encode_CommandStatus(self,status):
-        return [Smarter.number_to_raw(Smarter.ResponseCommandStatus) + Smarter.number_to_raw(status) + Smarter.number_to_raw(Smarter.MessageTail)]
-
-
-
-    def __encode_KettleCalibrate(self,waterbase):
-        return self.__encode_Base(waterbase)
-
-
-
-    def __encode_StoreBase(self):
+    def __encode_Update(self):
+        """
+        Encode succes response message
+        """
         return self.__encode_CommandStatus(Smarter.StatusSucces)
-    
-
-
-    def __encode_WifiFirmware(self,wifi=""):
-        return [Smarter.codes_to_message("6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e")]
 
 
 
-    def __encode_KettleSettingsCommand(self):
-        return self.__encode_KettleSettings() + self.__encode_CommandStatus(Smarter.StatusSucces)
+    def __encode_69(self):
+        """
+        Encode succes response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
 
-    def __encode_KettleSettings(self,temperature,keepwarm,formulatemperature):
-        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(self.defaultTemperature) + Smarter.keepwarm_to_raw(self.defaultKeepWarmTime) + Smarter.temperature_to_raw(self.defaultFormulaTemperature) + Smarter.number_to_raw(Smarter.MessageTail)
-        # emulate bug in v22 (we really should ifx this
-        response += Smarter.number_to_raw(0)
-        return [response] + self.__encode_CommandStatus(Smarter.StatusSucces)
+    def __encode_20(self):
+        """
+        Encode succes response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_22(self):
+        """
+        Encode succes response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_23(self):
+        """
+        Encode succes response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
+
+    def __encode_30(self):
+        """
+        Encode succes response message
+        """
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
 
 
     #------------------------------------------------------
     # MESSAGE RESPONSE DECODERS
     #------------------------------------------------------
+
+
+    def __decode(self,message):
+        """
+        Decode incoming response message
+        """
+        
+        id = Smarter.raw_to_number(message[0])
+        
+        # Switch if needed to the right type of appliance
+        if Smarter.message_kettle(id) and not Smarter.message_coffee(id):
+            self.switch_kettle_device()
+        elif Smarter.message_coffee(id) and not Smarter.message_kettle(id):
+            self.switch_coffee_device()
+        
+        try:
+            if   id == Smarter.ResponseKettleStatus:    self.__decode_KettleStatus(message)
+            elif id == Smarter.ResponseCoffeeStatus:    self.__decode_CoffeeStatus(message)
+            elif id == Smarter.ResponseCommandStatus:   self.__decode_CommandStatus(message)
+            elif id == Smarter.ResponseBase:            self.__decode_Base(message)
+            elif id == Smarter.ResponseTimers:          self.__decode_Timers(message)
+            elif id == Smarter.ResponseCarafe:          self.__decode_Carafe(message)
+            elif id == Smarter.ResponseMode:            self.__decode_Mode(message)
+            elif id == Smarter.ResponseKettleHistory:   self.__decode_KettleHistory(message)
+            elif id == Smarter.ResponseCoffeeHistory:   self.__decode_CoffeeHistory(message)
+            elif id == Smarter.ResponseKettleSettings:  self.__decode_KettleSettings(message)
+            elif id == Smarter.ResponseCoffeeSettings:  self.__decode_CoffeeSettings(message)
+            elif id == Smarter.ResponseDeviceInfo:      self.__decode_DeviceInfo(message)
+            elif id == Smarter.ResponseWifiFirmware:    self.__decode_WifiFirmware(message)
+            elif id == Smarter.ResponseWirelessNetworks:self.__decode_WirelessNetworks(message)
+        
+        except SmarterError, e:
+            # FIX ERROR HANDLING
+            logging.debug(str(e))
+            logging.debug(traceback.format_exc())
+            raise SmarterError(0,"Could not decode message")
+
+        if self.dump:
+            if self.dump_status:
+                self.print_message_read(message)
+            else:
+                #FIX (but what?)
+                if id != Smarter.ResponseCoffeeStatus and id != Smarter.ResponseKettleStatus:
+                    self.print_message_read(message)
+                    
 
 
 
@@ -1680,6 +2297,9 @@ class SmarterClient:
 
 
     def __decode_KettleHistory(self,message):
+        """
+        Decode kettle history response message
+        """
         counter = Smarter.raw_to_number(message[1])
         if counter > 0:
             for i in range(0,counter):

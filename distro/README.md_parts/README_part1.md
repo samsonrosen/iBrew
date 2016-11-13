@@ -178,6 +178,7 @@ Protocol
  * watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * modifiers/patches!!! 
+ * there is no length check on message... could crash thing :-)
 
 Interfaces
  * RELAY: simulate brew or heating process if not connected.

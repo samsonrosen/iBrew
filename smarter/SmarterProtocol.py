@@ -1534,7 +1534,7 @@ class SmarterProtocol:
         CommandCoffeeSettings       : ('PROTOCOL',[ArgCups,ArgStrength,ArgGrind,ArgHotplateCombi],"03010100","Also return 00 message in an unconfigured state.??? CHECK"),
         CommandCoffeeStoreSettings  : ('PROTOCOL',[ArgStrength,ArgCups,ArgGrind,ArgHotplateCombi],"02050010",""),
         CommandGrinder              : ('PROTOCOL',[],"",""),
-        CommandHotplateOn           : ('PROTOCOL',[ArgHotPlate],"05","Sets on the hotplate, you can specify how many minutes before it switch off. If no value it uses the default. "),
+        CommandHotplateOn           : ('PROTOCOL',[ArgHotPlate],"05","Sets on the hotplate, you can specify how many minutes before it switch off. Argument is optional. If no value it uses the stored user default settings. "),
         CommandCoffeeHistory        : ('PROTOCOL',[],"","When called will erase this history."),
         CommandHotplateOff          : ('PROTOCOL',[],"",""),
         CommandCarafe               : ('PROTOCOL',[],"",""),
