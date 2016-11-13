@@ -76,72 +76,6 @@ class SmarterClient:
     """
     
     
-    def __init_simulation(self):
-
-
-        self.sim_heaterOn               = False
-        self.sim_unknown                = 0
-        
-        self.sim_waterSensorBase        = 974
-        self.sim_waterSensor            = 2010
-        self.sim_kettleStatus           = Smarter.KettleReady
-        self.sim_onBase                 = True
-        self.sim_keepWarmOn             = False
-        self.sim_formulaCoolingOn          = False
-        self.sim_temperature            = 24
-        
-        self.sim_defaultTemperature     = 100
-        self.sim_defaultKeepWarmTime    = 0
-        self.sim_defaultFormula         = False
-        self.sim_defaultFormulaTemperature = 75
-        
-        self.sim_waterLevel             = Smarter.CoffeeWaterFull
-        self.sim_strength               = Smarter.CoffeeMedium
-        self.sim_cups                   = 1
-        self.sim_hotPlate               = 0
-        self.sim_grind                  = False
-        
-        self.sim_defaultCups            = 1
-        self.sim_defaultStrength        = Smarter.CoffeeMedium
-        self.sim_defaultGrind           = False
-        self.sim_defaultHotPlate        = 0
-        
-        self.sim_mode                   = False
-        self.sim_carafeRequired         = False
-        self.sim_cupsBrew               = 0
-        
-        self.sim_waterEnough            = False
-        self.sim_carafe                 = True
-        self.sim_timerEvent             = False
-        self.sim_ready                  = True
-        self.sim_hotPlateOn             = False
-        self.sim_grinderOn              = False
-        self.sim_working                = False
-        
-        self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
-
-        # internal data kettle variable
-        self.sim_setTemperature         = 100
-        self.sim_setKeepWarmTime        = 0
-        self.sim_setFormulaTemperature  = 75
-        self.sim_setFormula             = False
-        self.sim_keepwarm_timeout       = 0
-        self.sim_cooling_timeout        = 0
-        self.sim_onbase_timeout         = 0
-        self.sim_waterSensorEmpty       = 1975
-        self.sim_waterSensorFull        = 2100
-        
-        # internal data coffee machine variable
-        self.sim_setHotPlate            = False
-        self.sim_hotPlate_timout        = 0
-        self.sim_grinder_timeout        = 5
-        self.sim_heating_timeout        = 25
-        self.sim_working_timeout        = 5
-        self.sim_setCups                = 1
-        self.sim_setStrength            = Smarter.CoffeeMedium
-        self.sim_setGrind               = False
-        self.sim_setHotPlate            = 0
-
     def __init(self):
         self.__init_simulation()
     
@@ -1329,6 +1263,90 @@ class SmarterClient:
     # v0.1 Black Water Engine
     # v0.2 iSmarter.am Engine
     #------------------------------------------------------
+
+    def __init_simulation(self):
+
+
+        self.sim_heaterOn               = False
+        self.sim_unknown                = 0
+        
+        self.sim_waterSensorBase        = 974
+        self.sim_waterSensor            = 2010
+        self.sim_kettleStatus           = Smarter.KettleReady
+        self.sim_onBase                 = True
+        self.sim_keepWarmOn             = False
+        self.sim_formulaCoolingOn          = False
+        self.sim_temperature            = 24
+        
+        self.sim_defaultTemperature     = 100
+        self.sim_defaultKeepWarmTime    = 0
+        self.sim_defaultFormula         = False
+        self.sim_defaultFormulaTemperature = 75
+        
+        self.sim_waterLevel             = Smarter.CoffeeWaterFull
+        self.sim_strength               = Smarter.CoffeeMedium
+        self.sim_cups                   = 1
+        self.sim_hotPlate               = 0
+        self.sim_grind                  = False
+        
+        self.sim_defaultCups            = 1
+        self.sim_defaultStrength        = Smarter.CoffeeMedium
+        self.sim_defaultGrind           = False
+        self.sim_defaultHotPlate        = 0
+        
+        self.sim_mode                   = False
+        self.sim_carafeRequired         = False
+        self.sim_cupsBrew               = 0
+        
+        self.sim_waterEnough            = False
+        self.sim_carafe                 = True
+        self.sim_timerEvent             = False
+        self.sim_ready                  = True
+        self.sim_hotPlateOn             = False
+        self.sim_grinderOn              = False
+        self.sim_working                = False
+        
+        self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
+
+        # internal data kettle variable
+        self.sim_setTemperature         = 100
+        self.sim_setKeepWarmTime        = 0
+        self.sim_setFormulaTemperature  = 75
+        self.sim_setFormula             = False
+        
+        self.sim_keepwarm_timeout       = 0
+        self.sim_cooling_timeout        = 0
+        self.sim_cooling_timer          = 20
+        self.sim_onbase_timeout         = 0
+        self.sim_onbase_timer1          = 50
+        self.sim_onbase_timer2          = 30
+        self.sim_onbase_timer3          = 10
+        
+        # constants
+        self.sim_rangeTemperature       = 20
+        self.sim_roomTemperature        = 21
+        self.sim_waterSensorEmpty       = 1975
+        self.sim_waterSensorFull        = 2100
+        self.sim_waterSensorCup         = 50
+        self.sim_wiggleSmallWaterSensor       = 5
+        self.sim_wiggleLargeWaterSensor      = 20
+        self.sim_wiggleTemperature      = 5
+        self.sim_coolTemperature        = 11
+        self.sim_lowestTemperature      = 10
+        self.sim_chance                 = 3
+        
+        
+        # internal data coffee machine variable
+        self.sim_setHotPlate            = False
+        self.sim_hotPlate_timout        = 0
+        self.sim_grinder_timeout        = 5
+        self.sim_heating_timeout        = 25
+        self.sim_working_timeout        = 5
+        self.sim_setCups                = 1
+        self.sim_setStrength            = Smarter.CoffeeMedium
+        self.sim_setGrind               = False
+        self.sim_setHotPlate            = 0
+    
     
     
     def __simulate_device(self):
@@ -1336,12 +1354,16 @@ class SmarterClient:
             logging.info("Simulation Running")
         self.simulator_run = True
         while self.simulator_run:
-            self.sim_cooling_timeout += 1
-            self.sim_onbase_timeout += 1
+
+
 
             if self.deviceId == Smarter.DeviceKettle:
+            
+                self.sim_cooling_timeout += 1
+                self.sim_onbase_timeout += 1
+                
                 # take kettle off base
-                if (self.sim_heaterOn and self.sim_onbase_timeout % 50) and (not self.sim_heaterOn and self.sim_onbase_timeout % 30 == 10) and self.sim_onBase and 1 != random.randint(1,3):
+                if (self.sim_heaterOn and self.sim_onbase_timeout % self.sim_onbase_timer1) and (not self.sim_heaterOn and self.sim_onbase_timeout % self.sim_onbase_timer2) and self.sim_onBase and 1 != random.randint(1,self.sim_chance):
                     
                     if self.dump and self.dump_status:
                         logging.debug("Simulation kettle ready and off base")
@@ -1353,21 +1375,21 @@ class SmarterClient:
                     self.sim_keepwarm_timeout = 0
                 
                 # water lever up when almost empty... or else if heated enough one cup
-                elif self.sim_onbase_timeout % 10 and not self.sim_onBase:
+                elif self.sim_onbase_timeout % self.sim_onbase_timer3 and not self.sim_onBase:
                     self.sim_onBase = True
                     
                     if self.dump and self.dump_status:
                         logging.debug("Simulation kettle on base")
-                    if self.sim_heaterOn and self.sim_setTemperature < 15 + self.sim_temperature:
-                        self.sim_waterSensor -= 50 + random.randint(-5,5)
+                    if self.sim_heaterOn and self.sim_setTemperature < self.sim_rangeTemperature + self.sim_temperature:
+                        self.sim_waterSensor -= self.sim_waterSensorCup + random.randint(-self.sim_wiggleSmallWaterSensor,self.sim_wiggleSmallWaterSensor)
                         if self.sim_waterSensorEmpty > self.sim_waterSensor:
-                            self.sim_waterSensor = self.sim_waterSensorEmpty + random.randint(-5,5)
-                    if self.sim_waterSensor < self.sim_waterSensorEmpty + 50 + random.randint(-5,5):
-                        self.sim_waterSensor = self.sim_waterSensorFull - random.randint(0,20)
+                            self.sim_waterSensor = self.sim_waterSensorEmpty + random.randint(-self.sim_wiggleSmallWaterSensor,self.sim_wiggleSmallWaterSensor)
+                    if self.sim_waterSensor < self.sim_waterSensorEmpty + self.sim_waterSensorCup + random.randint(-self.sim_wiggleSmallWaterSensor,self.sim_wiggleSmallWaterSensor):
+                        self.sim_waterSensor = self.sim_waterSensorFull - random.randint(0,self.sim_wiggleLargeWaterSensor)
                     # and water is cooling off base!!!
-                    self.sim_temperature -= random.randint(0,5)
-                    if self.sim_temperature < 10:
-                        self.sim_temperature = 23
+                    self.sim_temperature -= random.randint(0,self.sim_coolTemperature)
+                    if self.sim_temperature < self.sim_lowestTemperature:
+                        self.sim_temperature = self.sim_roomTemperature
         
                 # heatin water time
                 elif self.sim_heaterOn:
@@ -1405,7 +1427,7 @@ class SmarterClient:
 
             
                 # cooling down water time
-                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % 20 and self.sim_temperature > 22:
+                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % self.sim_cooling_timer and self.sim_temperature > self.sim_roomTemperature:
                     self.sim_temperature -= 1
                     
                 # formula cooling down water trigger time
@@ -1426,8 +1448,10 @@ class SmarterClient:
                 
             elif self.deviceId == Smarter.DeviceCoffee:
             
-            
-                pass
+                self.sim_heating_timeout += 1
+                self.sim_grinder_timeout += 1
+                self.sim_working_timeout += 1
+                
             time.sleep(1)
             
         if self.dump:
@@ -1441,7 +1465,7 @@ class SmarterClient:
 
 
     def __simulate_KettleStatus(self):
-        return self.__encode_KettleStatus(self.sim_kettleStatus,self.sim_temperature, self.sim_waterSensor + random.randint(-5,5), self.sim_onBase, self.sim_unknown)
+        return self.__encode_KettleStatus(self.sim_kettleStatus,self.sim_temperature, self.sim_waterSensor + random.randint(-self.sim_wiggleTemperature,self.sim_wiggleTemperature), self.sim_onBase, self.sim_unknown)
         
 
 
