@@ -4,8 +4,17 @@
 ### Relay
 
 Start a relay server on port 2081, it acts as an man in the middle passing messages between the appliance and
-the clients like the Smarter app or another iBrew instances. It can be configured to block and/or modify certain messages. And as there is only one connection needed to the appliances. Good riddense of the annoying beep when the wireless network disconnects due to overload of connections. Also stats are now possible.
+the clients like the Smarter app or another iBrew instances. It can be configured to block and/or modify/patch certain messages. And as there is only one connection needed to the appliances. Good riddense of the annoying beep when the wireless network disconnects due to overload of connections. Also stats are now possible.
 
+
+Advantages
+ * No annoying beep. Only one connection to the appliance needed
+ * Faster!
+ * History and stats possible!
+ * Works with Smarter app!
+ * Works with iBrew as client
+ * Message blocking
+ * Message patching
 
 ```ibrew dump relay 10.0.0.99```
 
