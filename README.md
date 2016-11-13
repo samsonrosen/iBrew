@@ -50,7 +50,12 @@ Please share any bugs, jokes, problems, discoveries you made!
 
 ## News
 
-__Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__
+__Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__, if you are a plugin coder or scripter and you do not have an iKettle or Smarter Coffee, __just simulate one!__
+
+* Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
+* Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
+
+        
 
 [The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
 
@@ -162,6 +167,7 @@ Start iBrewUI with python to get a taskbar icon. I failed to create a working pa
  * PHASE 7: [FINALCUT]      v1.0 Out of order!
 
 ### Fixes 
+ * 13-11-2016 Fixed firewall added coffee machine and kettle simulator
  * 10-11-2016 Fixed relay so you can simulate an smarter coffee or ikettle
  *  4-11-2016 Fixed status not working for homebridge :-)
  *  4-11-2016 Example Homebridge config file!
@@ -178,8 +184,9 @@ Protocol
  * watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
  * have not looked at single cup... needs a remote coffee machine session ;-)
  * modifiers/patches!!! 
+ * script or url events
  * there is no length check on message... could crash thing :-)
- * # Bug in ./iBrew slow dump calibrate 10.0.0.3
+
 
 Interfaces
  * RELAY: simulate brew or heating process if not connected.
@@ -190,6 +197,7 @@ Interfaces
  * CLI: Currently the default values in fast mode are not initalized use slow or give all values
  * CLI: Sometimes it does not quit :-)
  * CLI: Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
+ * CLI: # Bug in ./iBrew slow dump calibrate 10.0.0.3
  * WEB: it also hangs if you scan wifi too much (luckily it reconnects, can not fix this)
  * WEB: Web interface 
  * WEB: Auto relay when in web mode
@@ -382,7 +390,8 @@ you can also use them on the command line as arguments, note that [] are mandito
     ibrew shout 21 30 05 7e  Send kettle raw heat without waiting for reply
     ibrew weak 10.0.0.1      Set coffee strength to weak
     ibrew strength weak      Set coffee strength to weak but do not toggle filter/beans
-    ibrew dump coffee relay out:GOD Simulates coffee machine messages
+    ibrew dump coffee relay out:GOD,in:32 Simulates Smarter Coffee machine
+    ibrew dump kettle relay out:GOD,in:14 Simulates iKettle 2.0
 
   Example console:
     off                      Stop heating/brewing
@@ -402,6 +411,20 @@ you can also use them on the command line as arguments, note that [] are mandito
 
 
 ```
+
+### Relay
+
+Start a relay server on port 2081, it acts as an man in the middle passing messages between the appliance and
+the clients like the Smarter app or another iBrew instances. It can be configured to block and/or modify certain messages. And as there is only one connection needed to the appliances. Good riddense of the annoying beep when the wireless network disconnects due to overload of connections. Also stats are now possible.
+
+
+```ibrew dump relay 10.0.0.99```
+
+
+### Simulation
+
+* Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
+* Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
 
 ### Web
 

@@ -1070,7 +1070,8 @@ class iBrewConsole:
         print "    ibrew shout 21 30 05 7e  Send kettle raw heat without waiting for reply"
         print "    ibrew weak 10.0.0.1      Set coffee strength to weak"
         print "    ibrew strength weak      Set coffee strength to weak but do not toggle filter/beans"
-        print "    ibrew dump coffee relay out:GOD Simulates coffee machine messages"
+        print "    ibrew dump coffee relay out:GOD,in:32 Simulates Smarter Coffee machine"
+        print "    ibrew dump kettle relay out:GOD,in:14 Simulates iKettle 2.0"
         print
         print "  Example console:"
         print "    off                      Stop heating/brewing"
