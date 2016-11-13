@@ -50,7 +50,9 @@ Please share any bugs, jokes, problems, discoveries you made!
 
 
 ## Hot! News
-__Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__, if you are a plugin coder or scripter and you do not have an iKettle or Smarter Coffee, __just simulate one!__
+__Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__.
+
+If you are a plugin coder or scripter and you do not have an iKettle or Smarter Coffee, __just simulate one!__
 
 * Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
 * Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
