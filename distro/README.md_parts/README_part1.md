@@ -48,17 +48,19 @@ __Donations welcome! Tea, jokes, smarthome stuff, apple cakes, indian food, hugs
 
 Please share any bugs, jokes, problems, discoveries you made! 
 
-## News
 
+## Hot! News
 __Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__, if you are a plugin coder or scripter and you do not have an iKettle or Smarter Coffee, __just simulate one!__
 
 * Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
 * Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
 
         
-
+### iBrew in the Media
 [The iKettle, the Eleven-Hour Struggle to Make a Cup of Tea, and Why It Was All About Data, Analytics and Connecting Things Together](https://medium.com/mark-rittman/the-story-behind-the-ikettle-the-eleven-hour-struggle-to-make-a-cup-of-tea-and-why-it-was-all-769144d12d7#.h62foolse) 
 
+
+### Old :-) News
 __Still no coffee machine!__ I would like to thank Ju4ia for letting me access his coffee machine remotely, and get more Smarter Coffee missing protocol bits, and... that I could test the client code. And thanks for jkellerer for supplying coffee codes!
 
 Since the console it nearly done, protocol almost fully mapped out. It is time to focus on the webpage... the framework is working, it auto reconnect, keeps some stats and you can even preform some actions with it.
