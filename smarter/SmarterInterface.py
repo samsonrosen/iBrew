@@ -543,98 +543,6 @@ class SmarterClient:
 
 
     #------------------------------------------------------
-    # BLOCKING CONNECTION (FIREWALL)
-    #------------------------------------------------------
-
-
-    def __splitrules(self,string):
-        s = string.lower().split(",")
-        d = []
-        r = []
-        for i in s:
-            if i[0:3] == "in:":
-                r += [i[3:]]
-            if i[0:4] == "out:":
-                d += [i[4:]]
-        return (d,r)
-
-
-
-    def string_rules(self):
-        groups, ids = Smarter.idsListEncode(self.__rules)
-        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
-
-
-
-    def string_rules_relay(self):
-        groups, ids = Smarter.idsListEncode(self.__rules_relay)
-        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
-
-
-
-    def print_rules_short(self):
-        print "Device blocks: " + self.string_rules()
-        print "Relay blocks:  " + self.string_rules_relay()
- 
- 
- 
-    def print_rules(self):
-        print
-        print "Device blocks: " + self.string_rules()
-        print
-        print "    ID Description"
-        print "    ___________________________________________"
-        print
-        for id in sorted(self.__rules):
-            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
-        print
-        print
-        print "Relay blocks:  " + self.string_rules_relay()
-        print
-        print "    ID Description"
-        print "    ___________________________________________"
-        print
-        for id in sorted(self.__rules_relay):
-            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
-        print
-
-
-    
-    def block(self,string):
-        """
-        Block messages from the list of ids
-        """
-        d, r  = self.__splitrules(string)
-        did = Smarter.groupsListDecode(d)
-
-        rid = Smarter.groupsListDecode(r)
-        
-        self.__rules = Smarter.idsAdd(self.__rules,did)
-        self.__rules_relay = Smarter.idsAdd(self.__rules_relay,rid)
-        if did != []:
-            logging.info("Blocked: " + " ".join(d))
-        if rid != []:
-            logging.info("Blocked relay: " + " ".join(r))
-    
-        
-
-    def unblock(self,string):
-        """
-        Block messages from the list of ids
-        """
-        d, r  = self.__splitrules(string)
-        did = Smarter.groupsListDecode(d)
-        rid = Smarter.groupsListDecode(r)
-        
-        self.__rules = Smarter.idsRemove(self.__rules,did)
-        self.__rules_relay = Smarter.idsRemove(self.__rules_relay,rid)
-        if did != []:
-            logging.info("Unblocked: " + " ".join(d))
-        if rid != []:
-            logging.info("Unblocked relay: " + " ".join(r))
-    
-
-    #------------------------------------------------------
     # SERVER CONNECTION
     #------------------------------------------------------
 
@@ -747,111 +655,7 @@ class SmarterClient:
     # CLIENT CONNECTION
     #------------------------------------------------------
 
-    def __simulate_device(self):
-        if self.dump:
-            logging.info("Simulation Running")
-        self.simulator_run = True
-        while self.simulator_run:
-            self.sim_cooling_timeout += 1
-            self.sim_onbase_timeout += 1
 
-            if self.deviceId == Smarter.DeviceKettle:
-                # take kettle off base
-                if (self.sim_heaterOn and self.sim_onbase_timeout % 50) and (not self.sim_heaterOn and self.sim_onbase_timeout % 30 == 10) and self.sim_onBase and 1 != random.randint(1,3):
-                    
-                    if self.dump and self.dump_status:
-                        logging.debug("Simulation kettle ready and off base")
-                    self.sim_onBase = False
-                    self.sim_heaterOn = False
-                    self.sim_kettleStatus = Smarter.KettleReady
-                    self.sim_keepWarmOn = False
-                    self.sim_formulaCoolingOn = False
-                    self.sim_keepwarm_timeout = 0
-                
-                # water lever up when almost empty... or else if heated enough one cup
-                elif self.sim_onbase_timeout % 10 and not self.sim_onBase:
-                    self.sim_onBase = True
-                    
-                    if self.dump and self.dump_status:
-                        logging.debug("Simulation kettle on base")
-                    if self.sim_heaterOn and self.sim_setTemperature < 15 + self.sim_temperature:
-                        self.sim_waterSensor -= 50 + random.randint(-5,5)
-                        if self.sim_waterSensorEmpty > self.sim_waterSensor:
-                            self.sim_waterSensor = self.sim_waterSensorEmpty + random.randint(-5,5)
-                    if self.sim_waterSensor < self.sim_waterSensorEmpty + 50 + random.randint(-5,5):
-                        self.sim_waterSensor = self.sim_waterSensorFull - random.randint(0,20)
-                    # and water is cooling off base!!!
-                    self.sim_temperature -= random.randint(0,5)
-                    if self.sim_temperature < 10:
-                        self.sim_temperature = 23
-        
-                # heatin water time
-                elif self.sim_heaterOn:
-                    self.sim_temperature += 1
-                    print self.sim_setTemperature
-                    print self.sim_temperature
-                    print
-                    if self.sim_setTemperature <= self.sim_temperature or 100 == self.sim_temperature:
-                        if self.sim_setFormula:
-                            self.sim_kettleStatus = Smarter.KettleFormulaCooling
-                            self.sim_formulaCoolingOn  = True
-                            self.sim_keepwarm_timeout = 0
-                            if self.dump and self.dump_status:
-                                logging.debug("Simulation kettle formula cooling")
-                        elif self.sim_setKeepWarmTime > 0:
-                            if self.dump and self.dump_status:
-                                logging.debug("Simulation kettle keepwarm")
-                            self.sim_keepWarmOn = True
-                            self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
-                            self.sim_kettleStatus = Smarter.KettleKeepWarm
-                        else:
-                            if not self.dump:
-                                logging.debug("Simulation kettle ready")
-                            self.sim_kettleStatus = Smarter.KettleReady
-                            self.sim_keepwarm_timeout = 0
-                        self.sim_heaterOn = False
-
-
-
-                # keepwarm time
-                if (time.time() > self.sim_keepwarm_timeout) and self.sim_keepWarmOn:
-                    if self.dump and self.dump_status:
-                        logging.debug("Simulation kettle ready")
-                    self.sim_keepWarmOn = False
-                    self.sim_kettleStatus = Smarter.KettleReady
-                    self.sim_keepwarm_timeout = 0
-                
-
-            
-                # cooling down water time
-                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % 20 and self.sim_temperature > 22:
-                    self.sim_temperature -= 1
-                    
-                # formula cooling down water trigger time
-                if self.sim_formulaCoolingOn and self.sim_temperature <= self.sim_setFormulaTemperature:
-                    if self.sim_setKeepWarmTime > 0:
-                        if self.dump and self.dump_status:
-                            logging.debug("Simulation kettle keepwarm")
-                        self.sim_keepWarmOn = True
-                        self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
-                        self.sim_kettleStatus = Smarter.KettleKeepWarm
-                    else:
-                        if self.dump and self.dump_status:
-                            logging.debug("Simulation kettle ready")
-                        self.sim_kettleStatus = Smarter.KettleReady
-                        self.sim_keepwarm_timeout = 0
-                    self.sim_formulaCoolingOn = False
-
-                
-            elif self.deviceId == Smarter.DeviceCoffee:
-            
-            
-                pass
-            time.sleep(1)
-            
-        if self.dump:
-            logging.info("Simulation Stopped")
-    
     
     def __monitor_device(self):
         if self.dump:
@@ -1325,10 +1129,116 @@ class SmarterClient:
 
 
 
+
     #------------------------------------------------------
-    # MESSAGE COMMAND & RESPONSE
+    # iBrew: iKettle 2.0 and Smarter Coffee Firewall
     #------------------------------------------------------
+    #
+    # History:
+    # v0.1 Hot Chocolade Engine
+    #------------------------------------------------------
+    
+   
+    def __splitrules(self,string):
+        s = string.lower().split(",")
+        d = []
+        r = []
+        for i in s:
+            if i[0:3] == "in:":
+                r += [i[3:]]
+            if i[0:4] == "out:":
+                d += [i[4:]]
+        return (d,r)
+
+
+
+    def string_rules(self):
+        groups, ids = Smarter.idsListEncode(self.__rules)
+        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
+
+
+
+    def string_rules_relay(self):
+        groups, ids = Smarter.idsListEncode(self.__rules_relay)
+        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
+
+
+    #------------------------------------------------------
+    # Firewall Rules Printers
+    #------------------------------------------------------
+    
+
+    def print_rules_short(self):
+        print "Device blocks: " + self.string_rules()
+        print "Relay blocks:  " + self.string_rules_relay()
  
+ 
+
+    def print_rules(self):
+        print
+        print "Device blocks: " + self.string_rules()
+        print
+        print "    ID Description"
+        print "    ___________________________________________"
+        print
+        for id in sorted(self.__rules):
+            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
+        print
+        print
+        print "Relay blocks:  " + self.string_rules_relay()
+        print
+        print "    ID Description"
+        print "    ___________________________________________"
+        print
+        for id in sorted(self.__rules_relay):
+            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
+        print
+
+
+    #------------------------------------------------------
+    # Firewall Interface
+    #------------------------------------------------------
+    
+    
+    def block(self,string):
+        """
+        Block messages from the list of ids
+        """
+        d, r  = self.__splitrules(string)
+        did = Smarter.groupsListDecode(d)
+
+        rid = Smarter.groupsListDecode(r)
+        
+        self.__rules = Smarter.idsAdd(self.__rules,did)
+        self.__rules_relay = Smarter.idsAdd(self.__rules_relay,rid)
+        if did != []:
+            logging.info("Blocked: " + " ".join(d))
+        if rid != []:
+            logging.info("Blocked relay: " + " ".join(r))
+    
+        
+
+    def unblock(self,string):
+        """
+        Block messages from the list of ids
+        """
+        d, r  = self.__splitrules(string)
+        did = Smarter.groupsListDecode(d)
+        rid = Smarter.groupsListDecode(r)
+        
+        self.__rules = Smarter.idsRemove(self.__rules,did)
+        self.__rules_relay = Smarter.idsRemove(self.__rules_relay,rid)
+        if did != []:
+            logging.info("Unblocked: " + " ".join(d))
+        if rid != []:
+            logging.info("Unblocked relay: " + " ".join(r))
+
+
+
+    #------------------------------------------------------
+    # Firewall Simulate Messages
+    #------------------------------------------------------
+
 
     def __block_command(self,message):
         """
@@ -1409,6 +1319,119 @@ class SmarterClient:
         else:                                           response = self.__encode_CommandStatus(Smarter.StatusInvalid)
         return response
 
+
+
+    #------------------------------------------------------
+    # iBrew: iKettle 2.0 and Smarter Coffee Simulator
+    #------------------------------------------------------
+    #
+    # History:
+    # v0.1 Black Water Engine
+    # v0.2 iSmarter.am Engine
+    #------------------------------------------------------
+    
+    
+   def __simulate_device(self):
+        if self.dump:
+            logging.info("Simulation Running")
+        self.simulator_run = True
+        while self.simulator_run:
+            self.sim_cooling_timeout += 1
+            self.sim_onbase_timeout += 1
+
+            if self.deviceId == Smarter.DeviceKettle:
+                # take kettle off base
+                if (self.sim_heaterOn and self.sim_onbase_timeout % 50) and (not self.sim_heaterOn and self.sim_onbase_timeout % 30 == 10) and self.sim_onBase and 1 != random.randint(1,3):
+                    
+                    if self.dump and self.dump_status:
+                        logging.debug("Simulation kettle ready and off base")
+                    self.sim_onBase = False
+                    self.sim_heaterOn = False
+                    self.sim_kettleStatus = Smarter.KettleReady
+                    self.sim_keepWarmOn = False
+                    self.sim_formulaCoolingOn = False
+                    self.sim_keepwarm_timeout = 0
+                
+                # water lever up when almost empty... or else if heated enough one cup
+                elif self.sim_onbase_timeout % 10 and not self.sim_onBase:
+                    self.sim_onBase = True
+                    
+                    if self.dump and self.dump_status:
+                        logging.debug("Simulation kettle on base")
+                    if self.sim_heaterOn and self.sim_setTemperature < 15 + self.sim_temperature:
+                        self.sim_waterSensor -= 50 + random.randint(-5,5)
+                        if self.sim_waterSensorEmpty > self.sim_waterSensor:
+                            self.sim_waterSensor = self.sim_waterSensorEmpty + random.randint(-5,5)
+                    if self.sim_waterSensor < self.sim_waterSensorEmpty + 50 + random.randint(-5,5):
+                        self.sim_waterSensor = self.sim_waterSensorFull - random.randint(0,20)
+                    # and water is cooling off base!!!
+                    self.sim_temperature -= random.randint(0,5)
+                    if self.sim_temperature < 10:
+                        self.sim_temperature = 23
+        
+                # heatin water time
+                elif self.sim_heaterOn:
+                    self.sim_temperature += 1
+                    if self.sim_setTemperature <= self.sim_temperature or 100 == self.sim_temperature:
+                        if self.sim_setFormula:
+                            self.sim_kettleStatus = Smarter.KettleFormulaCooling
+                            self.sim_formulaCoolingOn  = True
+                            self.sim_keepwarm_timeout = 0
+                            if self.dump and self.dump_status:
+                                logging.debug("Simulation kettle formula cooling")
+                        elif self.sim_setKeepWarmTime > 0:
+                            if self.dump and self.dump_status:
+                                logging.debug("Simulation kettle keepwarm")
+                            self.sim_keepWarmOn = True
+                            self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
+                            self.sim_kettleStatus = Smarter.KettleKeepWarm
+                        else:
+                            if not self.dump:
+                                logging.debug("Simulation kettle ready")
+                            self.sim_kettleStatus = Smarter.KettleReady
+                            self.sim_keepwarm_timeout = 0
+                        self.sim_heaterOn = False
+
+
+
+                # keepwarm time
+                if (time.time() > self.sim_keepwarm_timeout) and self.sim_keepWarmOn:
+                    if self.dump and self.dump_status:
+                        logging.debug("Simulation kettle ready")
+                    self.sim_keepWarmOn = False
+                    self.sim_kettleStatus = Smarter.KettleReady
+                    self.sim_keepwarm_timeout = 0
+                
+
+            
+                # cooling down water time
+                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % 20 and self.sim_temperature > 22:
+                    self.sim_temperature -= 1
+                    
+                # formula cooling down water trigger time
+                if self.sim_formulaCoolingOn and self.sim_temperature <= self.sim_setFormulaTemperature:
+                    if self.sim_setKeepWarmTime > 0:
+                        if self.dump and self.dump_status:
+                            logging.debug("Simulation kettle keepwarm")
+                        self.sim_keepWarmOn = True
+                        self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
+                        self.sim_kettleStatus = Smarter.KettleKeepWarm
+                    else:
+                        if self.dump and self.dump_status:
+                            logging.debug("Simulation kettle ready")
+                        self.sim_kettleStatus = Smarter.KettleReady
+                        self.sim_keepwarm_timeout = 0
+                    self.sim_formulaCoolingOn = False
+
+                
+            elif self.deviceId == Smarter.DeviceCoffee:
+            
+            
+                pass
+            time.sleep(1)
+            
+        if self.dump:
+            logging.info("Simulation Stopped")
 
     
     #------------------------------------------------------
