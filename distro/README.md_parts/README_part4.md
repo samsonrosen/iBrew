@@ -21,8 +21,10 @@ __Advantages__
 
 ### Simulation
 
-* Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
-* Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
+* Simulates iKettle 2.0 ```ibrew coffee simulate```
+* Simulates Smarter Coffee machine ```ibrew kettle simulate```
+
+You can use to dump actionto see more info...
 
 ### Web
 
@@ -216,6 +218,66 @@ example config file for iKettle 2.0.
 ### Other
 
 Have any links, info or help on other Smarthome controller software, please post in the issues!
+
+## Versions
+ * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
+ * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
+ * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
+ * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
+ * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
+ *                          v0.4.4 Intermezzo! <-- We are here!
+ * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
+ * PHASE 7: [FINALCUT]      v1.0 Out of order!
+
+### Fixes 
+ * 13-11-2016 Fixed firewall added coffee machine and kettle simulator
+ * 10-11-2016 Fixed relay so you can simulate an smarter coffee or ikettle
+ *  4-11-2016 Fixed status not working for homebridge :-)
+ *  4-11-2016 Example Homebridge config file!
+ 
+### Upcoming for the last 3 versions  
+
+Protocol
+ * PROTOCOL: History message is not finished
+ * PROTOCOL: Modifiers/patches!!! 
+ * PROCOCOL: Script or url events
+ * PROCOCOL: Time arguments (have not figured that out)
+ * PYTHON: Better error handling
+ * PYTHON: There is no length check on message... could crash thing :-)
+ * IKETTLE20: Fahrenheid not finished, please to not use.
+ * IKETTLE20: Watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
+ * SMARTER COFFEE: Have not looked at single cup... needs a remote coffee machine session ;-)
+ * SMARTER COFFEE: Did I accidently switch carafe required bit?
+ * SMARTER COFFEE: Cups from the status and cups from the display setting is differen 
+ * SMARTER COFFEE: Timers protocol
+ * SMARTER COFFEE: v0.5 Missing Coffee Smarter codes (working bit only?)
+ * SMARTER COFFEE: Descaling data bit? (the smarter app has it...)
+ * HELP: Add the missing pieces
+ * SIMULATOR: Add carafe removal and water filling
+ * SIMULATOR: Fix waterlevel and fix cups?
+
+Interfaces
+ * PYTHON: Better error handling
+ * PYTHON: Make the print stuff more general
+ * PYTHON: Strip zero from ip
+ * PYTHON: fix wireless with the same name
+ * PYTHON: filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
+ * CLI: make on/off true/false universal with string_to_bool
+ * CLI: relay has no port neither has ibrew, we need port numbers...
+ * CLI: Fix Simulation command and relay...
+ * CLI: Currently the default values in fast mode are not initalized use slow or give all values
+ * CLI: Sometimes it does not quit :-)
+ * CLI: Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
+ * CLI: # Bug in ./iBrew slow dump calibrate 10.0.0.3
+ * WEB: it also hangs if you scan wifi too much (luckily it reconnects, can not fix this)
+ * WEB: Web interface 
+ * WEB: Auto relay when in web mode
+ * WEB: API key, login
+ * WEB: Settings iBrew (like blocking, patches, other stuff)
+ * JAVASCRIPT: JSON Rest API
+ * OTHER: Guides to Smarthome controllers
+ * ME: hugs!
+
 
 ## LICENSE
 

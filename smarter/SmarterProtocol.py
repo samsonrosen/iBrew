@@ -577,7 +577,7 @@ class SmarterProtocol:
         """
         Return group names as a string seperated with spaces
         """
-        return " ".join(self.groupsList(groups))
+        return " ".join(self.groupsList(groups)).upper()
     
         
     def string_to_group(self,string):
@@ -594,7 +594,7 @@ class SmarterProtocol:
         group id to string name
         """
         if self.hasGroup(group):
-            return self.Groups[group][0]
+            return self.Groups[group][0].upper()
         else:
             raise SmarterError(0,"Group not available")
 
@@ -613,7 +613,7 @@ class SmarterProtocol:
         return " ".join([str(i) for i in ids])
 
     def groupsStringDecode(self,string):
-        return self.groupsListDecode(string.lower().split(","))
+        return self.groupsListDecode(string.upper().split(","))
 
     def groupsListDecode(self,list):
         """

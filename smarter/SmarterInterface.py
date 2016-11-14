@@ -777,7 +777,8 @@ class SmarterClient:
             id = Smarter.raw_to_number(message[0])
             
             if id in self.__rules:
-                logging.debug("Blocked Response: " + Smarter.number_to_code(id))
+                if self.dump and self.dump_status:
+                    logging.debug("Blocked Response: " + Smarter.number_to_code(id))
                 message = self.__block_response(message)[0]
     
             # patches here....
@@ -856,7 +857,8 @@ class SmarterClient:
         
         command = Smarter.raw_to_number(message[0])
         if command in self.__rules:
-            logging.debug("Blocked command: " + Smarter.number_to_code(command))
+            if self.dump and self.dump_status:
+                logging.debug("Blocked command: " + Smarter.number_to_code(command))
             responses = self.__block_command(message)
             for message in responses:
                 self.__decode(message)
@@ -876,7 +878,8 @@ class SmarterClient:
             command = Smarter.raw_to_number(message[0])
             if command in self.__rules:
                 self.__monitorLock.release()
-                logging.debug("Blocked command: " + Smarter.number_to_code(command))
+                if self.dump and self.dump_status:
+                    logging.debug("Blocked command: " + Smarter.number_to_code(command))
                 response = self.__block_command(message)
                 for message in response:
                     self.__decode(message)
@@ -1146,9 +1149,9 @@ class SmarterClient:
         self.__rules = Smarter.idsAdd(self.__rules,did)
         self.__rules_relay = Smarter.idsAdd(self.__rules_relay,rid)
         if did != []:
-            logging.info("Blocked: " + " ".join(d))
+            logging.info("Blocked: " + " ".join(d).upper())
         if rid != []:
-            logging.info("Blocked relay: " + " ".join(r))
+            logging.info("Blocked relay: " + " ".join(r).upper())
     
         
 
@@ -1156,7 +1159,7 @@ class SmarterClient:
         """
         Block messages from the list of ids
         """
-        d, r  = self.__splitrules(string)
+        d, r  = self.__splitrules(string.upper())
         did = Smarter.groupsListDecode(d)
         rid = Smarter.groupsListDecode(r)
         
