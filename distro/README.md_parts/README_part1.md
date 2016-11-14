@@ -190,6 +190,7 @@ Protocol
  * modifiers/patches!!! 
  * script or url events
  * there is no length check on message... could crash thing :-)
+ * did I accidently switch carafe required bit?
 
 
 Interfaces

@@ -399,8 +399,8 @@ class SmarterClient:
             config.write(f)
 
         
-        if self.dump:
-            self.print_stats()
+        #if self.dump:
+        #    self.print_stats()
 
 
     #------------------------------------------------------
@@ -1348,6 +1348,7 @@ class SmarterClient:
         self.sim_setStrength            = Smarter.CoffeeMedium
         self.sim_setGrind               = False
         self.sim_setHotPlate            = 0
+        self.sim_cupsBrewed             = 0
     
     
     
@@ -1459,14 +1460,18 @@ class SmarterClient:
                     
                 elif self.sim_heaterOn:
                     print "Heating"
-                    self.sim_cupsBrewed = int(self.sim_heating_timer / self.sim_setCups)
-                    self.sim_heating_timer
+                    print str(self.sim_heating_timeout * self.sim_setCups) + " " + str(self.sim_heating_timer)
+                    self.sim_cupsBrewed = (self.sim_setCups * self.sim_heating_timeout) / (self.sim_heating_timer + 1)
+                    print str(self.sim_cupsBrewed)
                     if (self.sim_heating_timeout * self.sim_setCups) <= self.sim_heating_timer:
                         self.sim_heaterOn = False
                         self.sim_heating_timer = 0
                         self.sim_ready = True
                         self.sim_cupsBrew = self.sim_cupsBrewed
                         self.sim_cupsBrewed = 0
+                        
+                        self.sim_waterLevelCups -= self.sim_cupsBrew
+                        self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
                         
                         if self.sim_useHotPlate:
                             self.sim_hotPlateOn = True
@@ -1475,7 +1480,7 @@ class SmarterClient:
                         else:
                             self.sim_working = False
                     else:
-                        self.sim_heating_timeout += 1
+                        self.sim_heating_timer += 1
                     
                 elif self.sim_hotPlateOn:
                      if (time.time() > self.sim_hotPlate_timout):
@@ -1544,7 +1549,10 @@ class SmarterClient:
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
 
-        self.sim_waterEnough = (self.sim_setCups <= self.sim_waterLevelCups)
+        if self.sim_cups > self.sim_waterLevelCups:
+            return self.__encode_CommandStatus(Smarter.StatusNoWater)
+        
+        self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
         
         self.sim_ready = False
         self.sim_working = True
@@ -1567,6 +1575,9 @@ class SmarterClient:
         
         if self.sim_heaterOn:
             self.sim_cupsBrew = self.sim_cupsBrewed
+            self.sim_waterLevelCups -= self.sim_cupsBrew
+            self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
+        
         self.sim_cupsBrewed             = 0
         self.sim_heaterOn               = False
         self.sim_ready                  = True
@@ -1592,6 +1603,8 @@ class SmarterClient:
         if self.sim_heaterOn or self.sim_grinderOn:
             return self.__encode_CommandStatus(Smarter.StatusBusy)
         
+        if self.sim_cups > self.sim_waterLevelCups:
+            return self.__encode_CommandStatus(Smarter.StatusNoWater)
         
         self.sim_setStrength = self.sim_strength
         self.sim_setHotPlate = self.sim_hotPlate
@@ -1788,7 +1801,6 @@ class SmarterClient:
         """
         Simulate response on command Coffee Store Settings
         """
-        
         try:
             self.sim_defaultHotPlate    = Smarter.raw_to_hotplate(message[4])
             self.sim_defaultCups        = Smarter.raw_to_cups(message[2])
@@ -2037,7 +2049,6 @@ class SmarterClient:
         coffeestatus = Smarter.coffeeStatus_to_raw(carafe,grind,ready,grinder,heater,hotplate,working,timer)
         cupsmerged   = Smarter.cupsmerged_to_raw(cups,cupsbrew)
         watermerged  = Smarter.waterlevel_to_raw(waterlevel,waterenough)
-        print Smarter.raw_to_code(watermerged) + "merged" + str(waterlevel) + " " + str(waterenough)
         return [Smarter.number_to_raw(Smarter.ResponseCoffeeStatus) + coffeestatus + watermerged + Smarter.number_to_raw(unknown) + Smarter.strength_to_raw(strenght) + cupsmerged + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
@@ -2079,7 +2090,7 @@ class SmarterClient:
         """
         Encode Kettle Settings response message
         """
-        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(self.defaultTemperature) + Smarter.keepwarm_to_raw(self.defaultKeepWarmTime) + Smarter.temperature_to_raw(self.defaultFormulaTemperature) + Smarter.number_to_raw(Smarter.MessageTail)
+        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(temperature) + Smarter.keepwarm_to_raw(keepwarm) + Smarter.temperature_to_raw(formulatemperature) + Smarter.number_to_raw(Smarter.MessageTail)
         # emulate bug in v22
         response += Smarter.number_to_raw(0)
         return [response]
@@ -2106,7 +2117,7 @@ class SmarterClient:
         """
         Encode coffee machine settings response message
         """
-        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(self.cups) + Smarter.strength_to_raw(self.strength) + Smarter.bool_to_raw(self.grind) + Smarter.hotplate_to_raw(self.hotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
+        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(cups) + Smarter.strength_to_raw(strength) + Smarter.bool_to_raw(grind) + Smarter.hotplate_to_raw(hotplate) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
 
@@ -3188,7 +3199,7 @@ class SmarterClient:
                 self.__send_command(Smarter.CommandHotplateOff)
                 self.hotPlate = self.defaultHotPlate
             else:
-                self.__send_command(Smarter.CommandHotplateOn,Smarter.hotplate_to_raw(hp))
+                self.__send_command(Smarter.CommandHotplateOn,Smarter.hotplate_to_raw(minutes))
                 self.hotPlate = minutes
         else:
             raise SmarterError(Smarter.CoffeeNoMachineHotplateOn,"You need a coffee machine to turn on the hotplate")

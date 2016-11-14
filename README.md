@@ -190,6 +190,7 @@ Protocol
  * modifiers/patches!!! 
  * script or url events
  * there is no length check on message... could crash thing :-)
+ * did I accidently switch carafe required bit?
 
 
 Interfaces
@@ -314,9 +315,9 @@ you can also use them on the command line as arguments, note that [] are mandito
   Smarter Coffee  Commands
     beans                  use beans for coffee
     brew (cups (hotplate (grind (strength)))) brew coffee
-    brew default           brew coffee with default settings
+    brew default           brew coffee with stored user default settings
     carafe                 returns if carafe is required
-    carafe [state]         set carafe is required [on or off]
+    carafe [state]         set carafe is required [true or false]
     cups [number]          set number of cups [1..12]
     descaling              descale coffee machine
     filter                 use pregrind beans in filter for coffee
