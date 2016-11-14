@@ -2,6 +2,11 @@
 
 [iKettle 2.0](http://smarter.am/ikettle) and [Smarter Coffee](http://smarter.am/coffee) Interface
 
+## Hot! News
+
+_Smarter Coffee & iKettle 2.0 Simulation!_
+
+[iSamsungTV](https://github.com/Tristan79/iSamsungTV) the command line interface to Samsung TV series C, D, E and F
 
 ## Introduction
 iBrew is an interface to the iKettle 2.0 and Smarter Coffee devices. 
@@ -10,13 +15,13 @@ _Stand alone, no internet or Smarter app needed!_
 
 It features!
 
-For smarthome fans! 
+_For smarthome fans!__
  * Support unlimited iKettle 2.0 or Smarter Coffee appliances! As many as you like!
  * Usage statistics!
  * No tracking!
  * Stand alone or bridge mode!
  
-iBrew Interfaces & Bridges 
+__iBrew Interfaces & Bridges__
  * Command Line 
  * Web (almost finished, help appreciated!)
  * JSON REST 
@@ -24,14 +29,14 @@ iBrew Interfaces & Bridges
  * [Python] (https://github.com/Tristan79/iBrew/tree/master/smarter) 
  * Message relay (works with Smarter app!)
  
-Connection Guides
+__Connection Guides__
  * __HomeKit__ (using HomeBridge)
  * [Domoticz](http://www.domoticz.com/) (coming soon!)
  * Please share your favorite smarthome controller setup!
 
 _No tracking of you or your appliances usage!_
  
-For the Smarthome and Domotics Interface experts!
+__For the Smarthome and Domotics Interface experts!__
  * Kettle and coffee machine simulation (works with Smarter app!)
  * Console for Smarter protocol debugging
  * Monitor
@@ -49,16 +54,13 @@ __Donations welcome! Tea, jokes, smarthome stuff, apple cakes, indian food, hugs
 Please share any bugs, jokes, problems, discoveries you made! 
 
 
-## Hot! News
-
-[iSamsungTV](https://github.com/Tristan79/iSamsungTV) the command line interface to Samsung TV series C, D, E and F
-
+## News 
 __Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__.
 
 If you are a plugin coder or scripter and you do not have an iKettle or Smarter Coffee, __just simulate one!__
 
-* Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
-* Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
+* Simulates iKettle 2.0 ```ibrew simulate```
+* Simulates Smarter Coffee machine ```ibrew simulate```
 
         
 ### iBrew in the Media
