@@ -1134,7 +1134,7 @@ class SmarterProtocol:
     def cupsmerged_to_raw(self,cups,cupsbrew):
         self.check_cups(cups)
         self.check_cups_brew(cupsbrew)
-        return self.number_to_raw(cups + (cupsbrew << 4))
+        return self.number_to_raw(cups + (cupsbrew * 16))
     
 
     def string_to_cups(self,string):
@@ -1300,7 +1300,7 @@ class SmarterProtocol:
 
 
     def coffeeStatus_to_raw(self,carafe,grind,ready,grinder,heater,hotplate,working,timer):
-        return Smarter.number_to_raw((carafe << 0) + (grind << 1) + (ready << 2) + (grinder << 3) + (heater << 4) + (hotplate << 5) + (working << 6) + (timer << 7))
+        return Smarter.number_to_raw((carafe << 0) + (grind << 1) + (ready << 2) + (grinder << 3) + (heater << 4) + (hotplate << 6) + (working << 5) + (timer << 7))
 
     def grind_to_string(self,grind):
         s = self.CoffeeStringFilter
@@ -1340,7 +1340,7 @@ class SmarterProtocol:
         if working:
             s += "working "
         if heating:
-            s += "brewing " + self.cups_to_string(cups) + " cups"
+            s += "brewing " + self.cups_to_string(cups) + " "
         if hotPlateOn:
             s += "hotplate warming "
         if grinderOn:
@@ -1603,7 +1603,7 @@ class SmarterProtocol:
                                     (CoffeeWaterHalf,WaterLevel[CoffeeWaterHalf]),
                                     (CoffeeWaterFull,WaterLevel[CoffeeWaterFull])]),
         ArgCoffeeStatus   : ('BIT',"CoffeeStatus",[(0,1,ArgCarafe),(1,1,ArgGrind),(2,1,ArgReady),(3,1,ArgGrinder),
-                                                        (4,1,ArgHeater),(5,1,ArgHotPlateOn),(6,1,ArgWorking),(7,1,ArgTimerEvent)]),
+                                                        (4,1,ArgHeater),(5,1,ArgWorking),(6,1,ArgHotPlateOn),(7,1,ArgTimerEvent)]),
         ArgWaterLevelRaw  : ('BIT',"WaterLevelAndEnough",[(0,4,ArgWaterLevel),(4,1,ArgWaterEnough)]),
         ArgCups           : ('NUMBER',"Cups",(1,12),"number of cups selected [1..12]"),
         ArgCupsBrew       : ('NUMBER',"CupsBrew",(1,12),"number of cups brew(ed) [1..12]"),

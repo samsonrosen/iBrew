@@ -179,25 +179,32 @@ Start iBrewUI with python to get a taskbar icon. I failed to create a working pa
 ### Upcoming for the last 3 versions  
 
 Protocol
- * Timers protocol
- * v0.5 Missing Coffee Smarter codes (working bit only?)
- * descaling data bit? (the smarter app has it...)
- * Time arguments (have not figured that out)
- * History message is not finished
- * Fahrenheid not finished, please to not use.
- * watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
- * have not looked at single cup... needs a remote coffee machine session ;-)
- * modifiers/patches!!! 
- * script or url events
- * there is no length check on message... could crash thing :-)
-
+ * PROTOCOL: History message is not finished
+ * PROTOCOL: Modifiers/patches!!! 
+ * PROCOCOL: Script or url events
+ * PROCOCOL: Time arguments (have not figured that out)
+ * PYTHON: Better error handling
+ * PYTHON: There is no length check on message... could crash thing :-)
+ * IKETTLE20: Fahrenheid not finished, please to not use.
+ * IKETTLE20: Watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
+ * SMARTER COFFEE: Have not looked at single cup... needs a remote coffee machine session ;-)
+ * SMARTER COFFEE: Did I accidently switch carafe required bit?
+ * SMARTER COFFEE: Cups from the status and cups from the display setting is differen 
+ * SMARTER COFFEE: Timers protocol
+ * SMARTER COFFEE: v0.5 Missing Coffee Smarter codes (working bit only?)
+ * SMARTER COFFEE: Descaling data bit? (the smarter app has it...)
+ * HELP: Add the missing pieces
+ * SIMULATOR: Add carafe removal and water filling
+ * SIMULATOR: Fix waterlevel and fix cups?
 
 Interfaces
- * RELAY: simulate brew or heating process if not connected.
  * PYTHON: Better error handling
+ * PYTHON: Make the print stuff more general
  * PYTHON: Strip zero from ip
  * PYTHON: fix wireless with the same name
  * PYTHON: filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
+ * CLI: make on/off true/false universal with string_to_bool
+ * CLI: Simulation command
  * CLI: Currently the default values in fast mode are not initalized use slow or give all values
  * CLI: Sometimes it does not quit :-)
  * CLI: Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
@@ -314,9 +321,9 @@ you can also use them on the command line as arguments, note that [] are mandito
   Smarter Coffee  Commands
     beans                  use beans for coffee
     brew (cups (hotplate (grind (strength)))) brew coffee
-    brew default           brew coffee with default settings
+    brew default           brew coffee with stored user default settings
     carafe                 returns if carafe is required
-    carafe [state]         set carafe is required [on or off]
+    carafe [state]         set carafe is required [true or false]
     cups [number]          set number of cups [1..12]
     descaling              descale coffee machine
     filter                 use pregrind beans in filter for coffee

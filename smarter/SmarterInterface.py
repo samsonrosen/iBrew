@@ -76,65 +76,8 @@ class SmarterClient:
     """
     
     
-    def __init_simulation(self):
-
-
-        self.sim_heaterOn               = False
-        self.sim_unknown                = 0
-
-
-        # internal kettle variable
-        self.sim_setTemperature         = 100
-        self.sim_setKeepWarmTime        = 0
-        self.sim_setFormulaTemperature  = 75
-        self.sim_setFormula             = False
-        self.sim_keepwarm_timeout       = 0
-        self.sim_cooling_timeout        = 0
-        self.sim_onbase_timeout         = 0
-
-        self.sim_waterSensorBase        = 974
-        self.sim_waterSensor            = 2010
-        self.sim_waterSensorEmpty       = 1975
-        self.sim_waterSensorFull        = 2100
-        self.sim_kettleStatus           = Smarter.KettleReady
-        self.sim_onBase                 = True
-        self.sim_keepWarmOn             = False
-        self.sim_formulaCoolingOn          = False
-        self.sim_temperature            = 24
-        
-        self.sim_defaultTemperature     = 100
-        self.sim_defaultKeepWarmTime    = 0
-        self.sim_defaultFormula         = False
-        self.sim_defaultFormulaTemperature = 75
-        
-        self.sim_waterLevel             = Smarter.CoffeeWaterFull
-        self.sim_strength               = Smarter.CoffeeMedium
-        self.sim_cups                   = 1
-        self.sim_hotPlate               = 0
-        self.sim_grind                  = False
-        
-        self.sim_defaultCups            = 1
-        self.sim_defaultStrength        = Smarter.CoffeeMedium
-        self.sim_defaultGrind           = False
-        self.sim_defaultHotPlate        = 0
-        
-        self.sim_mode                   = False
-        self.sim_carafeRequired         = False
-        self.sim_cupsBrew               = 0
-        
-        self.sim_waterEnough            = False
-        self.sim_carafe                 = True
-        self.sim_timerEvent             = False
-        self.sim_ready                  = True
-        self.sim_hotPlateOn             = False
-        self.sim_grinderOn              = False
-        self.sim_working                = False
-        
-        self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
-
-
     def __init(self):
-        self.__init_simulation()
+        self.__simulation_default()
     
         # network
         self.port                       = Smarter.Port
@@ -456,8 +399,8 @@ class SmarterClient:
             config.write(f)
 
         
-        if self.dump:
-            self.print_stats()
+        #if self.dump:
+        #    self.print_stats()
 
 
     #------------------------------------------------------
@@ -532,98 +475,6 @@ class SmarterClient:
             raise SmarterError(0,"UPD Response Device Info already started")
 
 
-
-    #------------------------------------------------------
-    # BLOCKING CONNECTION (FIREWALL)
-    #------------------------------------------------------
-
-
-    def __splitrules(self,string):
-        s = string.lower().split(",")
-        d = []
-        r = []
-        for i in s:
-            if i[0:3] == "in:":
-                r += [i[3:]]
-            if i[0:4] == "out:":
-                d += [i[4:]]
-        return (d,r)
-
-
-
-    def string_rules(self):
-        groups, ids = Smarter.idsListEncode(self.__rules)
-        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
-
-
-
-    def string_rules_relay(self):
-        groups, ids = Smarter.idsListEncode(self.__rules_relay)
-        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
-
-
-
-    def print_rules_short(self):
-        print "Device blocks: " + self.string_rules()
-        print "Relay blocks:  " + self.string_rules_relay()
- 
- 
- 
-    def print_rules(self):
-        print
-        print "Device blocks: " + self.string_rules()
-        print
-        print "    ID Description"
-        print "    ___________________________________________"
-        print
-        for id in sorted(self.__rules):
-            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
-        print
-        print
-        print "Relay blocks:  " + self.string_rules_relay()
-        print
-        print "    ID Description"
-        print "    ___________________________________________"
-        print
-        for id in sorted(self.__rules_relay):
-            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
-        print
-
-
-    
-    def block(self,string):
-        """
-        Block messages from the list of ids
-        """
-        d, r  = self.__splitrules(string)
-        did = Smarter.groupsListDecode(d)
-
-        rid = Smarter.groupsListDecode(r)
-        
-        self.__rules = Smarter.idsAdd(self.__rules,did)
-        self.__rules_relay = Smarter.idsAdd(self.__rules_relay,rid)
-        if did != []:
-            logging.info("Blocked: " + " ".join(d))
-        if rid != []:
-            logging.info("Blocked relay: " + " ".join(r))
-    
-        
-
-    def unblock(self,string):
-        """
-        Block messages from the list of ids
-        """
-        d, r  = self.__splitrules(string)
-        did = Smarter.groupsListDecode(d)
-        rid = Smarter.groupsListDecode(r)
-        
-        self.__rules = Smarter.idsRemove(self.__rules,did)
-        self.__rules_relay = Smarter.idsRemove(self.__rules_relay,rid)
-        if did != []:
-            logging.info("Unblocked: " + " ".join(d))
-        if rid != []:
-            logging.info("Unblocked relay: " + " ".join(r))
-    
 
     #------------------------------------------------------
     # SERVER CONNECTION
@@ -738,109 +589,7 @@ class SmarterClient:
     # CLIENT CONNECTION
     #------------------------------------------------------
 
-    def __simulate_device(self):
-        if self.dump:
-            logging.info("Simulation Running")
-        self.simulator_run = True
-        while self.simulator_run:
-            self.sim_cooling_timeout += 1
-            self.sim_onbase_timeout += 1
 
-            if self.deviceId == Smarter.DeviceKettle:
-                # take kettle off base
-                if (self.sim_heaterOn and self.sim_onbase_timeout % 50) and (not self.sim_heaterOn and self.sim_onbase_timeout % 30 == 10) and self.sim_onBase and 1 != random.randint(1,3):
-                    
-                    if self.dump and self.dump_status:
-                        logging.debug("Simulation kettle ready and off base")
-                    self.sim_onBase = False
-                    self.sim_heaterOn = False
-                    self.sim_kettleStatus = Smarter.KettleReady
-                    self.sim_keepWarmOn = False
-                    self.sim_formulaCoolingOn = False
-                    self.sim_keepwarm_timeout = 0
-                
-                # water lever up when almost empty... or else if heated enough one cup
-                elif self.sim_onbase_timeout % 10 and not self.sim_onBase:
-                    self.sim_onBase = True
-                    
-                    if self.dump and self.dump_status:
-                        logging.debug("Simulation kettle on base")
-                    if self.sim_heaterOn and self.sim_setTemperature < 15 + self.sim_temperature:
-                        self.sim_waterSensor -= 50 + random.randint(-5,5)
-                        if self.sim_waterSensorEmpty > self.sim_waterSensor:
-                            self.sim_waterSensor = self.sim_waterSensorEmpty + random.randint(-5,5)
-                    if self.sim_waterSensor < self.sim_waterSensorEmpty + 50 + random.randint(-5,5):
-                        self.sim_waterSensor = self.sim_waterSensorFull - random.randint(0,20)
-                    # and water is cooling off base!!!
-                    self.sim_temperature -= random.randint(0,5)
-                    if self.sim_temperature < 10:
-                        self.sim_temperature = 23
-        
-                # heatin water time
-                elif self.sim_heaterOn:
-                    self.sim_temperature += 1
-                    print self.sim_setTemperature
-                    print self.sim_temperature
-                    print
-                    if self.sim_setTemperature <= self.sim_temperature or 100 == self.sim_temperature:
-                        if self.sim_setFormula:
-                            self.sim_kettleStatus = Smarter.KettleFormulaCooling
-                            self.sim_formulaCoolingOn  = True
-                            self.sim_keepwarm_timeout = 0
-                            if self.dump and self.dump_status:
-                                logging.debug("Simulation kettle formula cooling")
-                        elif self.sim_setKeepWarmTime > 0:
-                            if self.dump and self.dump_status:
-                                logging.debug("Simulation kettle keepwarm")
-                            self.sim_keepWarmOn = True
-                            self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
-                            self.sim_kettleStatus = Smarter.KettleKeepWarm
-                        else:
-                            if not self.dump:
-                                logging.debug("Simulation kettle ready")
-                            self.sim_kettleStatus = Smarter.KettleReady
-                            self.sim_keepwarm_timeout = 0
-                        self.sim_heaterOn = False
-
-
-
-                # keepwarm time
-                if (time.time() > self.sim_keepwarm_timeout) and self.sim_keepWarmOn:
-                    if self.dump and self.dump_status:
-                        logging.debug("Simulation kettle ready")
-                    self.sim_keepWarmOn = False
-                    self.sim_kettleStatus = Smarter.KettleReady
-                    self.sim_keepwarm_timeout = 0
-                
-
-            
-                # cooling down water time
-                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timeout % 20 and self.sim_temperature > 22:
-                    self.sim_temperature -= 1
-                    
-                # formula cooling down water trigger time
-                if self.sim_formulaCoolingOn and self.sim_temperature <= self.sim_setFormulaTemperature:
-                    if self.sim_setKeepWarmTime > 0:
-                        if self.dump and self.dump_status:
-                            logging.debug("Simulation kettle keepwarm")
-                        self.sim_keepWarmOn = True
-                        self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
-                        self.sim_kettleStatus = Smarter.KettleKeepWarm
-                    else:
-                        if self.dump and self.dump_status:
-                            logging.debug("Simulation kettle ready")
-                        self.sim_kettleStatus = Smarter.KettleReady
-                        self.sim_keepwarm_timeout = 0
-                    self.sim_formulaCoolingOn = False
-
-                
-            elif self.deviceId == Smarter.DeviceCoffee:
-                pass
-            time.sleep(1)
-            
-        if self.dump:
-            logging.info("Simulation Stopped")
-    
     
     def __monitor_device(self):
         if self.dump:
@@ -1314,10 +1063,116 @@ class SmarterClient:
 
 
 
+
     #------------------------------------------------------
-    # MESSAGE COMMAND & RESPONSE
+    # iBrew: iKettle 2.0 and Smarter Coffee Firewall
     #------------------------------------------------------
+    #
+    # History:
+    # v0.1 Hot Chocolade Engine
+    #------------------------------------------------------
+    
+   
+    def __splitrules(self,string):
+        s = string.lower().split(",")
+        d = []
+        r = []
+        for i in s:
+            if i[0:3] == "in:":
+                r += [i[3:]]
+            if i[0:4] == "out:":
+                d += [i[4:]]
+        return (d,r)
+
+
+
+    def string_rules(self):
+        groups, ids = Smarter.idsListEncode(self.__rules)
+        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
+
+
+
+    def string_rules_relay(self):
+        groups, ids = Smarter.idsListEncode(self.__rules_relay)
+        return Smarter.groupsString(groups) + " " + Smarter.ids_to_string(ids)
+
+
+    #------------------------------------------------------
+    # Firewall Rules Printers
+    #------------------------------------------------------
+    
+
+    def print_rules_short(self):
+        print "Device blocks: " + self.string_rules()
+        print "Relay blocks:  " + self.string_rules_relay()
  
+ 
+
+    def print_rules(self):
+        print
+        print "Device blocks: " + self.string_rules()
+        print
+        print "    ID Description"
+        print "    ___________________________________________"
+        print
+        for id in sorted(self.__rules):
+            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
+        print
+        print
+        print "Relay blocks:  " + self.string_rules_relay()
+        print
+        print "    ID Description"
+        print "    ___________________________________________"
+        print
+        for id in sorted(self.__rules_relay):
+            print "    " + Smarter.number_to_code(id) + " " + Smarter.message_description(id)
+        print
+
+
+    #------------------------------------------------------
+    # Firewall Interface
+    #------------------------------------------------------
+    
+    
+    def block(self,string):
+        """
+        Block messages from the list of ids
+        """
+        d, r  = self.__splitrules(string)
+        did = Smarter.groupsListDecode(d)
+
+        rid = Smarter.groupsListDecode(r)
+        
+        self.__rules = Smarter.idsAdd(self.__rules,did)
+        self.__rules_relay = Smarter.idsAdd(self.__rules_relay,rid)
+        if did != []:
+            logging.info("Blocked: " + " ".join(d))
+        if rid != []:
+            logging.info("Blocked relay: " + " ".join(r))
+    
+        
+
+    def unblock(self,string):
+        """
+        Block messages from the list of ids
+        """
+        d, r  = self.__splitrules(string)
+        did = Smarter.groupsListDecode(d)
+        rid = Smarter.groupsListDecode(r)
+        
+        self.__rules = Smarter.idsRemove(self.__rules,did)
+        self.__rules_relay = Smarter.idsRemove(self.__rules_relay,rid)
+        if did != []:
+            logging.info("Unblocked: " + " ".join(d))
+        if rid != []:
+            logging.info("Unblocked relay: " + " ".join(r))
+
+
+
+    #------------------------------------------------------
+    # Firewall Simulate Messages
+    #------------------------------------------------------
+
 
     def __block_command(self,message):
         """
@@ -1399,6 +1254,242 @@ class SmarterClient:
         return response
 
 
+
+    #------------------------------------------------------
+    # iBrew: iKettle 2.0 and Smarter Coffee Simulator
+    #------------------------------------------------------
+    #
+    # History:
+    # v0.1 Black Water Engine
+    # v0.2 iSmarter.am Engine
+    #------------------------------------------------------
+
+    def __simulation_default(self):
+
+
+        self.sim_heaterOn               = False
+        self.sim_unknown                = 0
+        
+        self.sim_waterSensorBase        = 974
+        self.sim_waterSensor            = 2010
+        self.sim_kettleStatus           = Smarter.KettleReady
+        self.sim_onBase                 = True
+        self.sim_keepWarmOn             = False
+        self.sim_formulaCoolingOn          = False
+        self.sim_temperature            = 24
+        
+        self.sim_defaultTemperature     = 100
+        self.sim_defaultKeepWarmTime    = 0
+        self.sim_defaultFormula         = False
+        self.sim_defaultFormulaTemperature = 75
+        
+        self.sim_waterLevel             = Smarter.CoffeeWaterFull
+        self.sim_strength               = Smarter.CoffeeMedium
+        self.sim_cups                   = 1
+        self.sim_hotPlate               = 0
+        self.sim_grind                  = False
+        
+        self.sim_defaultCups            = 1
+        self.sim_defaultStrength        = Smarter.CoffeeMedium
+        self.sim_defaultGrind           = False
+        self.sim_defaultHotPlate        = 0
+        
+        self.sim_mode                   = False
+        self.sim_carafeRequired         = False
+        self.sim_cupsBrew               = 0
+        
+        self.sim_waterEnough            = True
+        self.sim_carafe                 = True
+        self.sim_timerEvent             = False
+        self.sim_ready                  = True
+        self.sim_hotPlateOn             = False
+        self.sim_grinderOn              = False
+        self.sim_working                = False
+        
+        self.sim_WifiFirmware           = "6b41542b474d520d0d0a41542076657273696f6e3a392e34302e302e302841756720203820323031352031343a34353a3538290d0a53444b2076657273696f6e3a312e332e300d0a636f6d70696c652074696d653a41756720203820323031352031373a31393a33380d0a4f4b7e"
+
+        # internal data kettle variable
+        self.sim_setTemperature         = 100
+        self.sim_setKeepWarmTime        = 0
+        self.sim_setFormulaTemperature  = 75
+        self.sim_setFormula             = False
+        
+        self.sim_keepwarm_timeout       = 0
+        self.sim_cooling_timer          = 0
+        self.sim_cooling_timeout        = 20
+        self.sim_onbase_timer           = 0
+        self.sim_onbase_timeout1        = 50
+        self.sim_onbase_timeout2        = 30
+        self.sim_onbase_timeout3        = 10
+        
+        # constants
+        self.sim_rangeTemperature       = 20
+        self.sim_roomTemperature        = 21
+        self.sim_waterSensorEmpty       = 1975
+        self.sim_waterSensorFull        = 2100
+        self.sim_waterSensorCup         = 50
+        self.sim_wiggleSmallWaterSensor = 5
+        self.sim_wiggleLargeWaterSensor = 20
+        self.sim_wiggleTemperature      = 5
+        self.sim_coolTemperature        = 11
+        self.sim_lowestTemperature      = 10
+        self.sim_chance                 = 3
+        
+        
+        # internal data coffee machine variable
+        self.sim_waterLevelCups         = 10
+        self.sim_useHotPlate            = False
+        self.sim_hotPlate_timout        = 0
+        self.sim_grinder_timeout        = 5
+        self.sim_heating_timeout        = 15
+        self.sim_heating_cup_timeout    = 3
+        self.sim_grinder_timer          = 0
+        self.sim_heating_timer          = 0
+        self.sim_setCups                = 1
+        self.sim_setStrength            = Smarter.CoffeeMedium
+        self.sim_setGrind               = False
+        self.sim_setHotPlate            = 0
+
+    
+    
+    
+    def __simulate_device(self):
+        if self.dump:
+            logging.info("Simulation Running")
+        self.simulator_run = True
+        while self.simulator_run:
+
+            if self.deviceId == Smarter.DeviceKettle:
+            
+                self.sim_cooling_timer += 1
+                self.sim_onbase_timer += 1
+                
+                # take kettle off base
+                if (self.sim_heaterOn and self.sim_onbase_timer % self.sim_onbase_timeout1) and (not self.sim_heaterOn and self.sim_onbase_timer % self.sim_onbase_timeout2) and self.sim_onBase and 1 != random.randint(1,self.sim_chance):
+                    
+                    if self.dump and self.dump_status:
+                        logging.debug("Simulation kettle ready and off base")
+                    self.sim_onBase = False
+                    self.sim_heaterOn = False
+                    self.sim_kettleStatus = Smarter.KettleReady
+                    self.sim_keepWarmOn = False
+                    self.sim_formulaCoolingOn = False
+                    self.sim_keepwarm_timeout = 0
+                
+                # water lever up when almost empty... or else if heated enough one cup
+                elif self.sim_onbase_timer % self.sim_onbase_timeout3 and not self.sim_onBase:
+                    self.sim_onBase = True
+                    
+                    if self.dump and self.dump_status:
+                        logging.debug("Simulation kettle on base")
+                    if self.sim_heaterOn and self.sim_setTemperature < self.sim_rangeTemperature + self.sim_temperature:
+                        self.sim_waterSensor -= self.sim_waterSensorCup + random.randint(-self.sim_wiggleSmallWaterSensor,self.sim_wiggleSmallWaterSensor)
+                        if self.sim_waterSensorEmpty > self.sim_waterSensor:
+                            self.sim_waterSensor = self.sim_waterSensorEmpty + random.randint(-self.sim_wiggleSmallWaterSensor,self.sim_wiggleSmallWaterSensor)
+                    if self.sim_waterSensor < self.sim_waterSensorEmpty + self.sim_waterSensorCup + random.randint(-self.sim_wiggleSmallWaterSensor,self.sim_wiggleSmallWaterSensor):
+                        self.sim_waterSensor = self.sim_waterSensorFull - random.randint(0,self.sim_wiggleLargeWaterSensor)
+                    # and water is cooling off base!!!
+                    self.sim_temperature -= random.randint(0,self.sim_coolTemperature)
+                    if self.sim_temperature < self.sim_lowestTemperature:
+                        self.sim_temperature = self.sim_roomTemperature
+        
+                # heatin water time
+                elif self.sim_heaterOn:
+                    self.sim_temperature += 1
+                    if self.sim_setTemperature <= self.sim_temperature or 100 == self.sim_temperature:
+                        if self.sim_setFormula:
+                            self.sim_kettleStatus = Smarter.KettleFormulaCooling
+                            self.sim_formulaCoolingOn  = True
+                            self.sim_keepwarm_timeout = 0
+                            if self.dump and self.dump_status:
+                                logging.debug("Simulation kettle formula cooling")
+                        elif self.sim_setKeepWarmTime > 0:
+                            if self.dump and self.dump_status:
+                                logging.debug("Simulation kettle keepwarm")
+                            self.sim_keepWarmOn = True
+                            self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
+                            self.sim_kettleStatus = Smarter.KettleKeepWarm
+                        else:
+                            if not self.dump:
+                                logging.debug("Simulation kettle ready")
+                            self.sim_kettleStatus = Smarter.KettleReady
+                            self.sim_keepwarm_timeout = 0
+                        self.sim_heaterOn = False
+
+
+
+                # keepwarm time
+                if (time.time() > self.sim_keepwarm_timeout) and self.sim_keepWarmOn:
+                    if self.dump and self.dump_status:
+                        logging.debug("Simulation kettle ready")
+                    self.sim_keepWarmOn = False
+                    self.sim_kettleStatus = Smarter.KettleReady
+                    self.sim_keepwarm_timeout = 0
+                
+
+            
+                # cooling down water time
+                if not self.sim_heaterOn and not self.sim_keepWarmOn and self.sim_cooling_timer % self.sim_cooling_timeout and self.sim_temperature > self.sim_roomTemperature:
+                    self.sim_temperature -= 1
+                    
+                # formula cooling down water trigger time
+                if self.sim_formulaCoolingOn and self.sim_temperature <= self.sim_setFormulaTemperature:
+                    if self.sim_setKeepWarmTime > 0:
+                        if self.dump and self.dump_status:
+                            logging.debug("Simulation kettle keepwarm")
+                        self.sim_keepWarmOn = True
+                        self.sim_keepwarm_timeout = time.time() + (self.sim_setKeepWarmTime * 60)
+                        self.sim_kettleStatus = Smarter.KettleKeepWarm
+                    else:
+                        if self.dump and self.dump_status:
+                            logging.debug("Simulation kettle ready")
+                        self.sim_kettleStatus = Smarter.KettleReady
+                        self.sim_keepwarm_timeout = 0
+                    self.sim_formulaCoolingOn = False
+
+                
+            elif self.deviceId == Smarter.DeviceCoffee:
+            
+                if self.sim_grinderOn:
+                    print "Grinding"
+                    if (self.sim_grinder_timeout * self.sim_setStrength) <= self.sim_grinder_timer:
+                        self.sim_grinderOn = False
+                        self.sim_grinder_timer = 0
+                        self.sim_heaterOn = True
+                    else:
+                        self.sim_grinder_timer += 1
+                    
+                elif self.sim_heaterOn:
+                    print "Heating"
+                    if (self.sim_heating_timeout + self.sim_heating_cup_timeout * self.sim_setCups) <= self.sim_heating_timer:
+                        self.sim_heaterOn = False
+                        self.sim_heating_timer = 0
+                        self.sim_ready = True
+                        
+                        self.sim_waterLevelCups -= self.sim_cupsBrew
+                        self.sim_waterLevel = self.sim_waterLevelCups / 4
+                        self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
+                        
+                        if self.sim_useHotPlate:
+                            self.sim_hotPlateOn = True
+                            self.sim_useHotPlate = False
+                            self.sim_hotPlate_timout = time.time() + (self.sim_setHotPlate * 60)
+                        else:
+                            self.sim_working = False
+                    else:
+                        self.sim_heating_timer += 1
+                    
+                elif self.sim_hotPlateOn:
+                     if (time.time() > self.sim_hotPlate_timout):
+                        self.sim_hotPlateOn = False
+                        self.sim_working = False
+                        self.sim_hotPlate_timout = 0
+                
+            time.sleep(1)
+            
+        if self.dump:
+            logging.info("Simulation Stopped")
+
     
     #------------------------------------------------------
     # MESSAGE SIMULATE RESPONSES
@@ -1407,12 +1498,12 @@ class SmarterClient:
 
 
     def __simulate_KettleStatus(self):
-        return self.__encode_KettleStatus(self.sim_kettleStatus,self.sim_temperature, self.sim_waterSensor + random.randint(-5,5), self.sim_onBase, self.sim_unknown)
+        return self.__encode_KettleStatus(self.sim_kettleStatus,self.sim_temperature, self.sim_waterSensor + random.randint(-self.sim_wiggleTemperature,self.sim_wiggleTemperature), self.sim_onBase, self.sim_unknown)
         
 
 
     def __simulate_CoffeeStatus(self):
-        return self.__encode_CoffeeStatus(self.sim_cups,self.sim_strenght,self.sim_cupsBrew, self.sim_waterLevel, self.sim_waterEnough, self.sim_carafe, self.sim_grind, self.sim_ready, self.sim_grinderOn, self.sim_heaterOn, self.sim_hotPlateOn, self.sim_working, self.sim_timerEvent, self.sim_unknown)
+        return self.__encode_CoffeeStatus(self.sim_cups,self.sim_strength, self.sim_cupsBrew, self.sim_waterLevel, self.sim_waterEnough, self.sim_carafe, self.sim_grind, self.sim_ready, self.sim_grinderOn, self.sim_heaterOn, self.sim_hotPlateOn, self.sim_working, self.sim_timerEvent, self.sim_unknown)
     
 
 
@@ -1429,7 +1520,7 @@ class SmarterClient:
         """
         Simulate response on command ResetSettings
         """
-        self.__init_simulation()
+        self.__simulation_default()
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
        
@@ -1438,6 +1529,39 @@ class SmarterClient:
         """
         Simulate response on command Brew
         """
+
+        if self.sim_carafeRequired and not self.sim_carafe:
+            return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        
+
+        if self.sim_heaterOn or self.sim_grinderOn:
+            return self.__encode_CommandStatus(Smarter.StatusBusy)
+        
+        try:
+            self.sim_setCups         = Smarter.raw_to_cups(message[1])
+            self.sim_setKeepWarmTime = Smarter.raw_to_strength(message[2])
+            self.sim_setHotPlate     = Smarter.raw_to_hotplate(message[3])
+            self.sim_setGrind        = Smarter.raw_to_bool(message[4])
+        except SmarterError:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
+
+        if self.sim_cups > self.sim_waterLevelCups:
+            return self.__encode_CommandStatus(Smarter.StatusNoWater)
+        
+        self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
+        
+        self.sim_ready = False
+        self.sim_working = True
+        self.sim_grinderOn = (Smarter.CoffeeBeans == self.sim_setGrind)
+
+        if self.sim_setHotPlate != 0:
+            self.sim_useHotPlate = True
+
+        if not self.sim_grinderOn:
+            self.sim_heaterOn = True
+
+        self.sim_cupsBrew = self.sim_setCups
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -1446,6 +1570,21 @@ class SmarterClient:
         """
         Simulate response on command CoffeeStop
         """
+        
+        if self.sim_heaterOn:
+            self.sim_waterLevelCups -= self.sim_cupsBrew
+            self.sim_waterLevel = self.sim_waterLevelCups / 4
+            self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
+
+        self.sim_heaterOn               = False
+        self.sim_ready                  = True
+        self.sim_hotPlateOn             = False
+        self.sim_grinderOn              = False
+        self.sim_working                = False
+        self.sim_hotPlate_timout        = 0
+        self.sim_grinder_timer          = 0
+        self.sim_heating_timer          = 0
+        self.sim_useHotPlate            = False
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -1454,9 +1593,80 @@ class SmarterClient:
         """
         Simulate response on command BrewDefault
         """
+        
+        if self.sim_carafeRequired and not self.sim_carafe:
+            return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        if self.sim_heaterOn or self.sim_grinderOn:
+            return self.__encode_CommandStatus(Smarter.StatusBusy)
+        
+        if self.sim_cups > self.sim_waterLevelCups:
+            return self.__encode_CommandStatus(Smarter.StatusNoWater)
+        
+        self.sim_setStrength = self.sim_strength
+        self.sim_setHotPlate = self.sim_hotPlate
+        self.sim_setCups = self.sim_cups
+        self.sim_waterEnough = (self.sim_setCups <= self.sim_waterLevelCups)
+        self.sim_ready = False
+        self.sim_working = True
+        self.sim_grinderOn = (Smarter.CoffeeBeans == self.sim_grind)
+        
+        if self.sim_setHotPlate != 0:
+            self.sim_useHotPlate = True
+        
+        if not self.sim_grinderOn:
+            self.sim_heaterOn = True
+        
+        self.sim_cupsBrew = self.sim_setCups
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
+    
+    def __simulate_HotplateOn(self,message):
+        """
+        Simulate response on command HotplateOn
+        """
+        
+        if self.sim_heaterOn or self.sim_grinderOn:
+            return self.__encode_CommandStatus(Smarter.StatusBusy)
+        
+        # assumption, mother of all f.. ups, hope it works like this...
+        if not self.sim_carafe or self.sim_mode:
+            return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        
+        # if no message then use default.
+        if message[1] == Smarter.MessageTail:
+            self.sim_hotPlate = self.sim_defaultHotPlate
+        else:
+            try:
+                hotPlate = Smarter.raw_to_hotplate(message[1])
+            except SmarterError:
+                return self.__encode_CommandStatus(Smarter.StatusFailed)
+        
+        if hotPlate == 0:
+            self.sim_hotPlateOn = False
+            if not self.sim_heaterOn and not self.sim_grinderOn:
+                self.sim_working = False
+        else:
+            self.sim_hotPlateOn = True
+            self.sim_working = True
+            self.sim_hotPlate_timout = time.time() + (hotPlate * 60)
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+    
+    
+    
+    def __simulate_HotplateOff(self):
+        """
+        Simulate response on command HotplateOff
+        """
+        if not self.sim_heaterOn and not self.sim_grinderOn:
+            self.sim_working = False
+        self.sim_hotPlateOn = False
+        self.sim_hotPlate_timout = 0
+        return self.__encode_CommandStatus(Smarter.StatusSucces)
+
+
 
     def __simulate_StoreTimer(self,message):
         """
@@ -1589,7 +1799,6 @@ class SmarterClient:
         """
         Simulate response on command Coffee Store Settings
         """
-        
         try:
             self.sim_defaultHotPlate    = Smarter.raw_to_hotplate(message[4])
             self.sim_defaultCups        = Smarter.raw_to_cups(message[2])
@@ -1627,41 +1836,20 @@ class SmarterClient:
         Simulate response on command Cups
         """
         try:
-            self.sim_cups = Smarter.raw_to_cups(message[1])
+            cups = Smarter.raw_to_cups(message[1])
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
+
+        if self.sim_mode and cups > 3:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
+
+        self.sim_cups = cups
+
+        self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
         # if cup mode no more then 3? FIX
         return self.__encode_CommandStatus(Smarter.StatusSucces)
     
     
-    
-    def __simulate_HotplateOn(self,message):
-        """
-        Simulate response on command HotplateOn
-        """
-        
-        # if no message then use default.
-        if message[1] == Smarter.MessageTail:
-            self.sim_hotPlate = self.sim_defaultHotPlate
-        else:
-            try:
-                self.sim_hotPlate = Smarter.raw_to_hotplate(message[1])
-            except SmarterError:
-                return self.__encode_CommandStatus(Smarter.StatusFailed)
-        
-        # Start hotplate timer here FIX
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-    
-    
-    
-    def __simulate_HotplateOff(self):
-        """
-        Simulate response on command HotplateOff
-        """
-        self.sim_hotPlateOn = False
-        return self.__encode_CommandStatus(Smarter.StatusSucces)
-
-
 
     def __simulate_Carafe(self):
         """
@@ -1699,6 +1887,8 @@ class SmarterClient:
             self.sim_mode = Smarter.raw_to_bool(message[1])
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
+        if self.sim_mode and self.sim_cups > 3:
+            self.sim_cups = 3
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
@@ -1860,6 +2050,7 @@ class SmarterClient:
         return [Smarter.number_to_raw(Smarter.ResponseCoffeeStatus) + coffeestatus + watermerged + Smarter.number_to_raw(unknown) + Smarter.strength_to_raw(strenght) + cupsmerged + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
+
     def __encode_Timers(self):
         """
         Encode Timers response message
@@ -1898,7 +2089,7 @@ class SmarterClient:
         """
         Encode Kettle Settings response message
         """
-        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(self.defaultTemperature) + Smarter.keepwarm_to_raw(self.defaultKeepWarmTime) + Smarter.temperature_to_raw(self.defaultFormulaTemperature) + Smarter.number_to_raw(Smarter.MessageTail)
+        response =  Smarter.number_to_raw(Smarter.ResponseKettleSettings) + Smarter.temperature_to_raw(temperature) + Smarter.keepwarm_to_raw(keepwarm) + Smarter.temperature_to_raw(formulatemperature) + Smarter.number_to_raw(Smarter.MessageTail)
         # emulate bug in v22
         response += Smarter.number_to_raw(0)
         return [response]
@@ -1925,7 +2116,7 @@ class SmarterClient:
         """
         Encode coffee machine settings response message
         """
-        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(self.cups) + Smarter.strength_to_raw(self.strength) + Smarter.bool_to_raw(self.grind) + Smarter.hotplate_to_raw(self.hotPlate) + Smarter.number_to_raw(Smarter.MessageTail)]
+        return [Smarter.number_to_raw(Smarter.ResponseCoffeeSettings) + Smarter.cups_to_raw(cups) + Smarter.strength_to_raw(strength) + Smarter.bool_to_raw(grind) + Smarter.hotplate_to_raw(hotplate) + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
 
@@ -2987,7 +3178,7 @@ class SmarterClient:
         """
         if self.fast or self.isCoffee:
             self.__send_command(Smarter.CommandHotplateOff)
-            set.hotPlate = 0
+            self.hotPlate = self.defaultHotPlate
         else:
             raise SmarterError(Smarter.CoffeeNoMachineHotplateOff,"You need a coffee machine to turn off the hotplate")
 
@@ -2999,15 +3190,16 @@ class SmarterClient:
         Turns the hotplate on
         """
         
-        if hotplate == -1:  hp = self.defaultHotPlate
-        else:               hp = hotplate
+        if hotplate == -1:  minutes = self.defaultHotPlate
+        else:               minutes = hotplate
        
         if self.fast or self.isCoffee:
-            if timer == 0:
+            if minutes == 0:
                 self.__send_command(Smarter.CommandHotplateOff)
+                self.hotPlate = self.defaultHotPlate
             else:
-                self.__send_command(Smarter.CommandHotplateOn,Smarter.hotplate_to_raw(hp))
-            self.hotPlate = timer
+                self.__send_command(Smarter.CommandHotplateOn,Smarter.hotplate_to_raw(minutes))
+                self.hotPlate = minutes
         else:
             raise SmarterError(Smarter.CoffeeNoMachineHotplateOn,"You need a coffee machine to turn on the hotplate")
 

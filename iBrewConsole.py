@@ -490,8 +490,8 @@ class iBrewConsole:
                     self.console = True
                     if numarg == 1:
                         self.client.block(arguments[0])
-                    if self.client.dump:
-                        self.client.print_rules()
+                    #if self.client.dump:
+                    #    self.client.print_rules()
                 
             if command == "status":
                 self.client.fast = False
@@ -676,9 +676,9 @@ class iBrewConsole:
                                                 print "iBrew: hotplate missing [on/off]"
             elif command == "carafe":
                                             if numarg >= 1:
-                                                if arguments[0].lower() == "off":
+                                                if arguments[0].lower() == "False":
                                                     self.client.coffee_carafe_required_off()
-                                                elif arguments[0].lower() == "on":
+                                                elif arguments[0].lower() == "True":
                                                     self.client.coffee_carafe_required_on()
                                             else:
                                                 self.client.coffee_carafe_required()
@@ -960,9 +960,9 @@ class iBrewConsole:
         print "  Smarter Coffee  Commands"
         print "    beans                  use beans for coffee"
         print "    brew (cups (hotplate (grind (strength)))) brew coffee"
-        print "    brew default           brew coffee with default settings"
+        print "    brew default           brew coffee with stored user default settings"
         print "    carafe                 returns if carafe is required"
-        print "    carafe [state]         set carafe is required [on or off]"
+        print "    carafe [state]         set carafe is required [true or false]"
         print "    cups [number]          set number of cups [1..12]"
         print "    descaling              descale coffee machine"
         print "    filter                 use pregrind beans in filter for coffee"
