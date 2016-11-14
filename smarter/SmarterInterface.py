@@ -429,8 +429,9 @@ class SmarterClient:
                 # '0x64 type version 0x7e
                 if Smarter.raw_to_number(message[0]) == Smarter.ResponseDeviceInfo and Smarter.raw_to_number(message[3]) == Smarter.MessageTail:
                     devices.append((server[0],Smarter.raw_to_number(message[1]),Smarter.raw_to_number(message[2])))
-        except socket.error:
-            pass
+        except socket.error, e:
+            # FIX
+            pass #print 'iBrew:' + str(e)
         finally:
             cs.close()
         return devices
@@ -580,7 +581,8 @@ class SmarterClient:
 
 
     def relay_stop(self):
-        self.__utp_ResponseDeviceInfo = False
+    
+        self.__broadcast_device_stop()
         self.__server_run = False
 
 

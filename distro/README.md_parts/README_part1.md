@@ -50,6 +50,9 @@ Please share any bugs, jokes, problems, discoveries you made!
 
 
 ## Hot! News
+
+[iSamsungTV](https://github.com/Tristan79/iSamsungTV) the command line interface to Samsung TV series C, D, E and F
+
 __Please post links, information or help on interfacing with smarthome controllers software in the issues! There are too many out there for me to test and write guides for them all!__.
 
 If you are a plugin coder or scripter and you do not have an iKettle or Smarter Coffee, __just simulate one!__
@@ -188,6 +191,7 @@ Network trouble
  * Does ```./ibrew list``` work?
  * Make sure that your kettle/coffee machine is on the same network and subnet as your pc and your phone.
  * It could be that your router is blocking utp broadcast messages (some do, so it never auto detects). 
+ * Running it on a computer with only a loopback device will result in auto detection be disabled (when using the simulator)
 
 Static IP address
  * Look up the IP address of the appliance in your router (dhpc server)
