@@ -160,63 +160,44 @@ For the requirements either use ```pip install requirements.txt``` or install ma
 On windows download the additional [win32 package](https://sourceforge.net/projects/pywin32/files/pywin32/).
 Start iBrewUI with python to get a taskbar icon. I failed to create a working package :-)
 
-## Versions
- * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
- * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
- * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
- * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
- * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
- *                          v0.4.4 Intermezzo! <-- We are here!
- * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
- * PHASE 7: [FINALCUT]      v1.0 Out of order!
+#### Troubleshooting
 
-### Fixes 
- * 13-11-2016 Fixed firewall added coffee machine and kettle simulator
- * 10-11-2016 Fixed relay so you can simulate an smarter coffee or ikettle
- *  4-11-2016 Fixed status not working for homebridge :-)
- *  4-11-2016 Example Homebridge config file!
- 
-### Upcoming for the last 3 versions  
+Please post any bug or [issues](https://github.com/Tristan79/iBrew/issues) here on github!
+The error handling is still kinda broken... :-) now use dump to see more. Will revert to debug, info, logging (wip)
 
-Protocol
- * PROTOCOL: History message is not finished
- * PROTOCOL: Modifiers/patches!!! 
- * PROCOCOL: Script or url events
- * PROCOCOL: Time arguments (have not figured that out)
- * PYTHON: Better error handling
- * PYTHON: There is no length check on message... could crash thing :-)
- * IKETTLE20: Fahrenheid not finished, please to not use.
- * IKETTLE20: Watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
- * SMARTER COFFEE: Have not looked at single cup... needs a remote coffee machine session ;-)
- * SMARTER COFFEE: Did I accidently switch carafe required bit?
- * SMARTER COFFEE: Cups from the status and cups from the display setting is differen 
- * SMARTER COFFEE: Timers protocol
- * SMARTER COFFEE: v0.5 Missing Coffee Smarter codes (working bit only?)
- * SMARTER COFFEE: Descaling data bit? (the smarter app has it...)
- * HELP: Add the missing pieces
- * SIMULATOR: Add carafe removal and water filling
- * SIMULATOR: Fix waterlevel and fix cups?
+### Log location
 
-Interfaces
- * PYTHON: Better error handling
- * PYTHON: Make the print stuff more general
- * PYTHON: Strip zero from ip
- * PYTHON: fix wireless with the same name
- * PYTHON: filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
- * CLI: make on/off true/false universal with string_to_bool
- * CLI: Simulation command
- * CLI: Currently the default values in fast mode are not initalized use slow or give all values
- * CLI: Sometimes it does not quit :-)
- * CLI: Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
- * CLI: # Bug in ./iBrew slow dump calibrate 10.0.0.3
- * WEB: it also hangs if you scan wifi too much (luckily it reconnects, can not fix this)
- * WEB: Web interface 
- * WEB: Auto relay when in web mode
- * WEB: API key, login
- * WEB: Settings iBrew (like blocking, patches, other stuff)
- * JAVASCRIPT: JSON Rest API
- * OTHER: Guides to Smarthome controllers
- * ME: hugs!
+ * macOS ```~/Library/Application Support/iBrew/logs```
+ * unix  ```~/.iBrew/logs```
+ * windows ```~%APPDATA%\iBrew\logs```
+
+### Unable to connect to iKettle 2.0 or Smarter Coffee appliance
+
+```
+MoonTwo:iBrew Tristan$ ./ibrew list
+[10.0.0.3:2016-11-13 12:38:24] Found iKettle 2.0 (iBrew certified firmware v19)
+[10.0.0.98:2016-11-13 12:38:24] Found Smarter Coffee (iBrew certified firmware v20)
+[10.0.0.99:2016-11-13 12:38:24] Found iKettle 2.0 (iBrew certified firmware v19)
+```
+Some hints
+* Did you download, clone or pull iBrew from git to get the latest version with all the bug fixes?
+
+Network trouble
+ * Does the Smarter app autodetects it?
+ * Is a firewall blocking port 2081 on your computer (or on your router)?
+ * Does ```./ibrew list``` work?
+ * Make sure that your kettle/coffee machine is on the same network and subnet as your pc and your phone.
+ * It could be that your router is blocking utp broadcast messages (some do, so it never auto detects). 
+
+Static IP address
+ * Look up the IP address of the appliance in your router (dhpc server)
+ * Set up a static IP address in your router (dhpc server) for your appliance
+
+Reset wireless network
+ * Reset appliance (iKettle is longer then 10 seconds button hold on base, coffee machine, eeuh I forgot which button but you can use the smarter app to reset your appliance wireless network to direct mode [FIX])
+ * If the appliance is reset. Try connect with your wifi of your pc (if it has wifi) to the appliance its wireless network access point iKettle:?? or SmarterCoffee:?? try if iBrew works.
+ * Reconnect to your wifi network (and if you are lucky and could connect with iBrew in direct mode, the command is ./ibrew join namewireless password) else use your phone app.
+
 
 
 ## Usage
@@ -260,34 +241,6 @@ See the console section for the commands.
 
 
 ```
-
-#### Can not connect to iKettle 2.0 or Smarter Coffee 
-
-```
-MoonTwo:iBrew Tristan$ ./ibrew list
-[10.0.0.3:2016-11-13 12:38:24] Found iKettle 2.0 (iBrew certified firmware v19)
-[10.0.0.98:2016-11-13 12:38:24] Found Smarter Coffee (iBrew certified firmware v20)
-[10.0.0.99:2016-11-13 12:38:24] Found iKettle 2.0 (iBrew certified firmware v19)
-```
-Some hints
-* Did you download, clone or pull iBrew from git to get the latest version with all the bug fixes?
-
-Network trouble
- * Does the Smarter app autodetects it?
- * Is a firewall blocking port 2081 on your computer (or on your router)?
- * Does ```./ibrew list``` work?
- * Make sure that your kettle/coffee machine is on the same network and subnet as your pc and your phone.
- * It could be that your router is blocking utp broadcast messages (some do, so it never auto detects). 
-
-Static IP address
- * Look up the IP address of the appliance in your router (dhpc server)
- * Set up a static IP address in your router (dhpc server) for your appliance
-
-Reset wireless network
- * Reset appliance (iKettle is longer then 10 seconds button hold on base, coffee machine, eeuh I forgot which button but you can use the smarter app to reset your appliance wireless network to direct mode [FIX])
- * If the appliance is reset. Try connect with your wifi of your pc (if it has wifi) to the appliance its wireless network access point iKettle:?? or SmarterCoffee:?? try if iBrew works.
- * Reconnect to your wifi network (and if you are lucky and could connect with iBrew in direct mode, the command is ./ibrew join namewireless password) else use your phone app.
-
 
 ### Console
 Start the console with the command `iBrew console`. The following commands are available within the console,
@@ -346,7 +299,6 @@ you can also use them on the command line as arguments, note that [] are mandito
     block [rules]          block messages with groups or ids
     disconnect             disconnect connected device
     unblock [rules]        unblock messages groups or ids
-    relay (port)           start relay device
     relay stop             stop relay device
     rules (full)           show blocking rules
     stats                  show traffic statistics
@@ -368,38 +320,9 @@ you can also use them on the command line as arguments, note that [] are mandito
     dump                   toggle 'dump raw messages'
     monitor                monitor incomming traffic
     modify (modifiers)     patch or unpatch messages
+    relay (port)           start relay device
+    simulate               start kettle (or coffee simulation)
     sweep (id)             [developer only] try (all or start with id) unknown command codes
-
-  NOT IMPLEMENTED Modifiers Rules
-    [in:|out:]var=(value)(,[in:|out:]var=(value))*
-
-    VAR           VALUE
-    version       [00..FF]               override device firmware version
-    heater        disable                coffee machine or kettle heater disabled
-
-    base          [00..4000]             override default calibration base
-    formula       [0..100]               override default formula temperature
-    temperature   [0..100]               override default temperature
-    keepwarm      off or [5..?]          override default keepwarm time
-    formula       disable/enabled        override formula mode
-
-    carafe        optional or required   override carafe detection
-    cups          [1..12]                override default number of cups
-    grind         beans or filter        override default grind
-    hotplate      off or [5..?]          override default hotplate time
-    mode          carafe or cup          override mode
-    strength      weak, medium or strong override default strength
-    water                                correct cups according to water level
-    limit         [1..12]                limit the number of cups to be selected
-    grinder       disable                force use of filter
-    hotplate      disable                coffee machine hotplate disabled
-    child         lock                   kettle can not heat above 45 degrees
-
-    if no value it clears the patch
-
-  NOT IMPLEMENTED Debug Coffee Timer
-    timer [index] (erase|[time]) set/erase timer
-    timers                 show timers
 
   Help Commands
     examples               show examples of commands
@@ -471,8 +394,10 @@ __Advantages__
 
 ### Simulation
 
-* Simulates iKettle 2.0 ```ibrew dump coffee relay out:GOD,in:32```
-* Simulates Smarter Coffee machine ```ibrew dump kettle relay out:GOD,in:14 ```
+* Simulates iKettle 2.0 ```ibrew coffee simulate```
+* Simulates Smarter Coffee machine ```ibrew kettle simulate```
+
+You can use to dump actionto see more info...
 
 ### Web
 
@@ -666,6 +591,66 @@ example config file for iKettle 2.0.
 ### Other
 
 Have any links, info or help on other Smarthome controller software, please post in the issues!
+
+## Versions
+ * PHASE 1: [BRAINSTORMING] v0.0 Bean Grinder Pack 
+ * PHASE 2: [PROTOTYPE]     v0.1 White Tealeaf Edition 
+ * PHASE 3: [PROTOCOL]      v0.2 Tea Noire Sweet 
+ * PHASE 4: [CONSOLE]       v0.3 Kettle Rattle 
+ * PHASE 5: [WEB]           v0.4 Brewing on the 7th day 
+ *                          v0.4.4 Intermezzo! <-- We are here!
+ * PHASE 6: [PRERELEASE]    v0.5 The conundrum struggle
+ * PHASE 7: [FINALCUT]      v1.0 Out of order!
+
+### Fixes 
+ * 13-11-2016 Fixed firewall added coffee machine and kettle simulator
+ * 10-11-2016 Fixed relay so you can simulate an smarter coffee or ikettle
+ *  4-11-2016 Fixed status not working for homebridge :-)
+ *  4-11-2016 Example Homebridge config file!
+ 
+### Upcoming for the last 3 versions  
+
+Protocol
+ * PROTOCOL: History message is not finished
+ * PROTOCOL: Modifiers/patches!!! 
+ * PROCOCOL: Script or url events
+ * PROCOCOL: Time arguments (have not figured that out)
+ * PYTHON: Better error handling
+ * PYTHON: There is no length check on message... could crash thing :-)
+ * IKETTLE20: Fahrenheid not finished, please to not use.
+ * IKETTLE20: Watersensor to something usefull (like the stupid left or right side handle, cuz the kettle weight balance is off, its inaccurate as fuck even in the smarter app :-/)
+ * SMARTER COFFEE: Have not looked at single cup... needs a remote coffee machine session ;-)
+ * SMARTER COFFEE: Did I accidently switch carafe required bit?
+ * SMARTER COFFEE: Cups from the status and cups from the display setting is differen 
+ * SMARTER COFFEE: Timers protocol
+ * SMARTER COFFEE: v0.5 Missing Coffee Smarter codes (working bit only?)
+ * SMARTER COFFEE: Descaling data bit? (the smarter app has it...)
+ * HELP: Add the missing pieces
+ * SIMULATOR: Add carafe removal and water filling
+ * SIMULATOR: Fix waterlevel and fix cups?
+
+Interfaces
+ * PYTHON: Better error handling
+ * PYTHON: Make the print stuff more general
+ * PYTHON: Strip zero from ip
+ * PYTHON: fix wireless with the same name
+ * PYTHON: filter out wrong responses... of know commands??? or atleast acknowledge them, (03 responses)
+ * CLI: make on/off true/false universal with string_to_bool
+ * CLI: relay has no port neither has ibrew, we need port numbers...
+ * CLI: Fix Simulation command and relay...
+ * CLI: Currently the default values in fast mode are not initalized use slow or give all values
+ * CLI: Sometimes it does not quit :-)
+ * CLI: Connecting in console mode... fails sometimes, and after reconnect is had strange data... stupid threads... missing...
+ * CLI: # Bug in ./iBrew slow dump calibrate 10.0.0.3
+ * WEB: it also hangs if you scan wifi too much (luckily it reconnects, can not fix this)
+ * WEB: Web interface 
+ * WEB: Auto relay when in web mode
+ * WEB: API key, login
+ * WEB: Settings iBrew (like blocking, patches, other stuff)
+ * JAVASCRIPT: JSON Rest API
+ * OTHER: Guides to Smarthome controllers
+ * ME: hugs!
+
 
 ## LICENSE
 

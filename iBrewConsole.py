@@ -323,6 +323,7 @@ class iBrewConsole:
                     else:
                         return
 
+
             if command == "shout":
                 if self.console or numarg == 0:
                     print "iBrew: Can't hear you. Drinking tea at a dinner on the other side of the universe!"
@@ -337,6 +338,22 @@ class iBrewConsole:
                     self.client.isCoffee   = True
                 else:
                     print "iBrew: \'shout\' not available in the console"
+
+
+
+            if command == "slow":
+                if self.console or numarg == 0:
+                    print "iBrew: As you command, but it can take a while!"
+                    return
+                if numarg > 0:
+                    command = arguments[0].lower()
+                    arguments = arguments[1:]
+                    numarg -= 1
+                if not self.console:
+                    self.client.fast   = False
+                else:
+                    print "iBrew: \'kettle\' not available in the console"
+
 
 
             if command == "coffee":
@@ -384,21 +401,6 @@ class iBrewConsole:
                 #    print "iBrew: \'kettle\' not available in the console"
 
 
-            if command == "slow":
-                if self.console or numarg == 0:
-                    print "iBrew: As you command, but it can take a while!"
-                    return
-                if numarg > 0:
-                    command = arguments[0].lower()
-                    arguments = arguments[1:]
-                    numarg -= 1
-                if not self.console:
-                    self.client.fast   = False
-                else:
-                    print "iBrew: \'kettle\' not available in the console"
-
-
-
             if command == "fahrenheid":
                 if numarg == 0 and not self.console:
                     print "iBrew: Kelvin, stop that!"
@@ -428,6 +430,19 @@ class iBrewConsole:
                         print "iBrew: Temperature in celsius"
                         return
 
+            self.simulate = False
+            if command == "simulate":
+                self.simulate = True
+                command = "relay"
+                if self.client.isCoffee:
+                    self.client.switch_coffee_device()
+                    numarg = 1
+                    arguments = ["out:GOD,in:32"]
+                else:
+                    self.client.switch_kettle_device()
+                    numarg = 1
+                    arguments = ["out:GOD,in:14"]
+
             self.haveHost = False
             
             if numarg > 0:
@@ -454,7 +469,7 @@ class iBrewConsole:
             if command == "monitor":
                 self.client.fast = False
 
-            if (command == "relay" and not self.console) or ((not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "groups" and command != "group" and command != "examples" and command != "messages"):
+            if (command == "relay" and not self.console) or ((not self.client.connected or self.haveHost) and command != "help" and command != "?" and command != "list" and command != "message" and command != "usage" and command != "commands" and command != "web" and command != "joke" and command != "license" and command != "protocol" and command != "structure" and command != "notes" and command != "groups" and command != "group" and command != "examples" and command != "messages" and command != "rules" and command != "rule"):
 
 
                 if not self.haveHost and command != "relay":
@@ -476,7 +491,7 @@ class iBrewConsole:
                         print
                         print "  Starting please wait..."
                         print
-                    if not (self.console and command == "relay"):
+                    if not (self.console and command == "relay") and not self.simulate:
                         self.client.connect()
                     
                     
@@ -485,13 +500,16 @@ class iBrewConsole:
                     logging.info("iBrew: Could not connect to [" + self.client.host + "]")
                     if command != "console" and command != "connect" and command != "relay":
                         return
-                
+
+                # FIX RELAY SHOULD NOT BE HERE
                 if command == "console" or command == "connect" or command == "relay":
                     self.console = True
+
+                if command == "console" or command == "connect" or command == "relay":
                     if numarg == 1:
                         self.client.block(arguments[0])
-                    #if self.client.dump:
-                    #    self.client.print_rules()
+                    if self.client.dump:
+                        self.client.print_rules_short()
                 
             if command == "status":
                 self.client.fast = False
@@ -538,12 +556,10 @@ class iBrewConsole:
             elif command == "unblock":      self.client.unblock(arguments[0])
             elif command == "block":        self.client.block(arguments[0])
             elif command == "relay":
-                                            if numarg >= 1:
-                                                if self.console:
-                                                    self.client.relay_stop()
-                                                else:
-                                                    print "iBrew: If you spin something around and around real fast, it looks like its standing still..."
-                                            self.client.relay_start()
+                                            if numarg >= 1 and arguments[0] == "stop":
+                                                self.client.relay_stop()
+                                            else:
+                                                self.client.relay_start()
                                             return
             
             elif command == "commands":     self.commands()
@@ -987,11 +1003,11 @@ class iBrewConsole:
         print "    block [rules]          block messages with groups or ids"
         print "    disconnect             disconnect connected device"
         print "    unblock [rules]        unblock messages groups or ids"
-        print "    relay (port)           start relay device"
         print "    relay stop             stop relay device"
         print "    rules (full)           show blocking rules"
         print "    stats                  show traffic statistics"
         print
+        
         print "  Block Rules"
         print "    Consists of rules, in: is for outgoing connection to the device, out: is for incomming connection from relay client."
         print
@@ -1009,10 +1025,12 @@ class iBrewConsole:
         print "    dump                   toggle \'dump raw messages\'"
         print "    monitor                monitor incomming traffic"
         print "    modify (modifiers)     patch or unpatch messages"
+        print "    relay (port)           start relay device"
+        print "    simulate               start kettle (or coffee simulation)"
         print "    sweep (id)             [developer only] try (all or start with id) unknown command codes"
         print
         
-        
+        """
         print "  NOT IMPLEMENTED Modifiers Rules"
         print "    [in:|out:]var=(value)(,[in:|out:]var=(value))*"
         print
@@ -1044,6 +1062,7 @@ class iBrewConsole:
         print "    timer [index] (erase|[time]) set/erase timer"
         print "    timers                 show timers"
         print
+        """
         
         print "  Help Commands"
         print "    examples               show examples of commands"
