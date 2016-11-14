@@ -1342,6 +1342,7 @@ class SmarterClient:
         self.sim_hotPlate_timout        = 0
         self.sim_grinder_timeout        = 5
         self.sim_heating_timeout        = 15
+        self.sim_heating_cup_timeout    = 3
         self.sim_grinder_timer          = 0
         self.sim_heating_timer          = 0
         self.sim_setCups                = 1
@@ -1460,15 +1461,11 @@ class SmarterClient:
                     
                 elif self.sim_heaterOn:
                     print "Heating"
-                    print str(self.sim_heating_timeout * self.sim_setCups) + " " + str(self.sim_heating_timer)
-                    self.sim_cupsBrewed = (self.sim_setCups * self.sim_heating_timeout) / (self.sim_heating_timer + 1)
-                    print str(self.sim_cupsBrewed)
-                    if (self.sim_heating_timeout * self.sim_setCups) <= self.sim_heating_timer:
+                    if (self.sim_heating_timeout + self.sim_heating_cup_timeout * self.sim_setCups) <= self.sim_heating_timer:
                         self.sim_heaterOn = False
                         self.sim_heating_timer = 0
                         self.sim_ready = True
-                        self.sim_cupsBrew = self.sim_cupsBrewed
-                        self.sim_cupsBrewed = 0
+                        self.sim_cupsBrew = self.sim_setCups
                         
                         self.sim_waterLevelCups -= self.sim_cupsBrew
                         self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
@@ -1574,7 +1571,7 @@ class SmarterClient:
         """
         
         if self.sim_heaterOn:
-            self.sim_cupsBrew = self.sim_cupsBrewed
+            self.sim_cupsBrew = self.sim_setCups
             self.sim_waterLevelCups -= self.sim_cupsBrew
             self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
         
