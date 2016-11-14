@@ -14,3 +14,5 @@ test/*
 .ibrew
 *.tmp
 ibrew.py
+
+*.dmg
