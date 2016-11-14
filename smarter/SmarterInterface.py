@@ -1298,7 +1298,7 @@ class SmarterClient:
         self.sim_carafeRequired         = False
         self.sim_cupsBrew               = 0
         
-        self.sim_waterEnough            = False
+        self.sim_waterEnough            = True
         self.sim_carafe                 = True
         self.sim_timerEvent             = False
         self.sim_ready                  = True
@@ -1337,11 +1337,11 @@ class SmarterClient:
         
         
         # internal data coffee machine variable
-        self.sim_waterLevelCups         = 12
+        self.sim_waterLevelCups         = 10
         self.sim_useHotPlate            = False
         self.sim_hotPlate_timout        = 0
         self.sim_grinder_timeout        = 5
-        self.sim_heating_timeout        = 25
+        self.sim_heating_timeout        = 15
         self.sim_grinder_timer          = 0
         self.sim_heating_timer          = 0
         self.sim_setCups                = 1
@@ -1449,7 +1449,8 @@ class SmarterClient:
             elif self.deviceId == Smarter.DeviceCoffee:
             
                 if self.sim_grinderOn:
-                    if self.sim_grinder_timeout <= (self.sim_grinder_timer * self.sim_setStrength):
+                    print "Grinding"
+                    if (self.sim_grinder_timeout * self.sim_setStrength) <= self.sim_grinder_timer:
                         self.sim_grinderOn = False
                         self.sim_grinder_timer = 0
                         self.sim_heaterOn = True
@@ -1457,10 +1458,16 @@ class SmarterClient:
                         self.sim_grinder_timer += 1
                     
                 elif self.sim_heaterOn:
-                    if self.sim_heating_timeout <= (self.sim_heating_timer * self.sim_setCups):
+                    print "Heating"
+                    self.sim_cupsBrewed = int(self.sim_heating_timer / self.sim_setCups)
+                    self.sim_heating_timer
+                    if (self.sim_heating_timeout * self.sim_setCups) <= self.sim_heating_timer:
                         self.sim_heaterOn = False
                         self.sim_heating_timer = 0
                         self.sim_ready = True
+                        self.sim_cupsBrew = self.sim_cupsBrewed
+                        self.sim_cupsBrewed = 0
+                        
                         if self.sim_useHotPlate:
                             self.sim_hotPlateOn = True
                             self.sim_useHotPlate = False
@@ -1523,6 +1530,8 @@ class SmarterClient:
 
         if self.sim_carafeRequired and not self.sim_carafe:
             return self.__encode_CommandStatus(Smarter.StatusNoCarafe)
+        
+        
 
         if self.sim_heaterOn or self.sim_grinderOn:
             return self.__encode_CommandStatus(Smarter.StatusBusy)
@@ -1535,6 +1544,8 @@ class SmarterClient:
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
 
+        self.sim_waterEnough = (self.sim_setCups <= self.sim_waterLevelCups)
+        
         self.sim_ready = False
         self.sim_working = True
         self.sim_grinderOn = (Smarter.CoffeeBeans == self.sim_setGrind)
@@ -1554,6 +1565,9 @@ class SmarterClient:
         Simulate response on command CoffeeStop
         """
         
+        if self.sim_heaterOn:
+            self.sim_cupsBrew = self.sim_cupsBrewed
+        self.sim_cupsBrewed             = 0
         self.sim_heaterOn               = False
         self.sim_ready                  = True
         self.sim_hotPlateOn             = False
@@ -1563,14 +1577,6 @@ class SmarterClient:
         self.sim_grinder_timer          = 0
         self.sim_heating_timer          = 0
         self.sim_useHotPlate            = False
-        
-        # remove water from sensor
-        
-        # self.sim_waterEnough            = False
-        # self.sim_waterLevel
-        
-        #self.sim_cupsBrew               = 0
-        
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -1590,6 +1596,7 @@ class SmarterClient:
         self.sim_setStrength = self.sim_strength
         self.sim_setHotPlate = self.sim_hotPlate
         self.sim_setCups = self.sim_cups
+        self.sim_waterEnough = (self.sim_setCups <= self.sim_waterLevelCups)
         self.sim_ready = False
         self.sim_working = True
         self.sim_grinderOn = (Smarter.CoffeeBeans == self.sim_grind)
@@ -1622,18 +1629,18 @@ class SmarterClient:
             self.sim_hotPlate = self.sim_defaultHotPlate
         else:
             try:
-                self.sim_setHotPlate = Smarter.raw_to_hotplate(message[1])
+                hotPlate = Smarter.raw_to_hotplate(message[1])
             except SmarterError:
                 return self.__encode_CommandStatus(Smarter.StatusFailed)
         
-        if self.sim_setHotPlate == 0:
+        if hotPlate == 0:
             self.sim_hotPlateOn = False
             if not self.sim_heaterOn and not self.sim_grinderOn:
                 self.sim_working = False
         else:
             self.sim_hotPlateOn = True
             self.sim_working = True
-            self.sim_hotPlate_timout = time.time() + (self.sim_setHotPlate * 60)
+            self.sim_hotPlate_timout = time.time() + (hotPlate * 60)
         return self.__encode_CommandStatus(Smarter.StatusSucces)
     
     
@@ -1819,9 +1826,16 @@ class SmarterClient:
         Simulate response on command Cups
         """
         try:
-            self.sim_cups = Smarter.raw_to_cups(message[1])
+            cups = Smarter.raw_to_cups(message[1])
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
+
+        if self.sim_mode and cups > 3:
+            return self.__encode_CommandStatus(Smarter.StatusFailed)
+
+        self.sim_cups = cups
+
+        self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
         # if cup mode no more then 3? FIX
         return self.__encode_CommandStatus(Smarter.StatusSucces)
     
@@ -1863,6 +1877,8 @@ class SmarterClient:
             self.sim_mode = Smarter.raw_to_bool(message[1])
         except SmarterError:
             return self.__encode_CommandStatus(Smarter.StatusFailed)
+        if self.sim_mode and self.sim_cups > 3:
+            self.sim_cups = 3
         return self.__encode_CommandStatus(Smarter.StatusSucces)
 
 
@@ -2021,6 +2037,7 @@ class SmarterClient:
         coffeestatus = Smarter.coffeeStatus_to_raw(carafe,grind,ready,grinder,heater,hotplate,working,timer)
         cupsmerged   = Smarter.cupsmerged_to_raw(cups,cupsbrew)
         watermerged  = Smarter.waterlevel_to_raw(waterlevel,waterenough)
+        print Smarter.raw_to_code(watermerged) + "merged" + str(waterlevel) + " " + str(waterenough)
         return [Smarter.number_to_raw(Smarter.ResponseCoffeeStatus) + coffeestatus + watermerged + Smarter.number_to_raw(unknown) + Smarter.strength_to_raw(strenght) + cupsmerged + Smarter.number_to_raw(Smarter.MessageTail)]
 
 
@@ -3151,7 +3168,7 @@ class SmarterClient:
         """
         if self.fast or self.isCoffee:
             self.__send_command(Smarter.CommandHotplateOff)
-            set.hotPlate = 0
+            self.hotPlate = self.defaultHotPlate
         else:
             raise SmarterError(Smarter.CoffeeNoMachineHotplateOff,"You need a coffee machine to turn off the hotplate")
 
@@ -3163,15 +3180,16 @@ class SmarterClient:
         Turns the hotplate on
         """
         
-        if hotplate == -1:  hp = self.defaultHotPlate
-        else:               hp = hotplate
+        if hotplate == -1:  minutes = self.defaultHotPlate
+        else:               minutes = hotplate
        
         if self.fast or self.isCoffee:
-            if timer == 0:
+            if minutes == 0:
                 self.__send_command(Smarter.CommandHotplateOff)
+                self.hotPlate = self.defaultHotPlate
             else:
                 self.__send_command(Smarter.CommandHotplateOn,Smarter.hotplate_to_raw(hp))
-            self.hotPlate = timer
+                self.hotPlate = minutes
         else:
             raise SmarterError(Smarter.CoffeeNoMachineHotplateOn,"You need a coffee machine to turn on the hotplate")
 
