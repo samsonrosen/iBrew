@@ -960,7 +960,7 @@ class iBrewConsole:
         print "  Smarter Coffee  Commands"
         print "    beans                  use beans for coffee"
         print "    brew (cups (hotplate (grind (strength)))) brew coffee"
-        print "    brew default           brew coffee with default settings"
+        print "    brew default           brew coffee with stored user default settings"
         print "    carafe                 returns if carafe is required"
         print "    carafe [state]         set carafe is required [on or off]"
         print "    cups [number]          set number of cups [1..12]"
