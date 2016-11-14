@@ -1349,7 +1349,7 @@ class SmarterClient:
         self.sim_setStrength            = Smarter.CoffeeMedium
         self.sim_setGrind               = False
         self.sim_setHotPlate            = 0
-        self.sim_cupsBrewed             = 0
+
     
     
     
@@ -1465,9 +1465,9 @@ class SmarterClient:
                         self.sim_heaterOn = False
                         self.sim_heating_timer = 0
                         self.sim_ready = True
-                        self.sim_cupsBrew = self.sim_setCups
                         
                         self.sim_waterLevelCups -= self.sim_cupsBrew
+                        self.sim_waterLevel = self.sim_waterLevelCups / 4
                         self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
                         
                         if self.sim_useHotPlate:
@@ -1561,6 +1561,7 @@ class SmarterClient:
         if not self.sim_grinderOn:
             self.sim_heaterOn = True
 
+        self.sim_cupsBrew = self.sim_setCups
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -1571,11 +1572,10 @@ class SmarterClient:
         """
         
         if self.sim_heaterOn:
-            self.sim_cupsBrew = self.sim_setCups
             self.sim_waterLevelCups -= self.sim_cupsBrew
+            self.sim_waterLevel = self.sim_waterLevelCups / 4
             self.sim_waterEnough = (self.sim_cups <= self.sim_waterLevelCups)
-        
-        self.sim_cupsBrewed             = 0
+
         self.sim_heaterOn               = False
         self.sim_ready                  = True
         self.sim_hotPlateOn             = False
@@ -1617,6 +1617,7 @@ class SmarterClient:
         if not self.sim_grinderOn:
             self.sim_heaterOn = True
         
+        self.sim_cupsBrew = self.sim_setCups
         return self.__encode_CommandStatus(Smarter.StatusSucces)
         
         
@@ -2047,6 +2048,7 @@ class SmarterClient:
         cupsmerged   = Smarter.cupsmerged_to_raw(cups,cupsbrew)
         watermerged  = Smarter.waterlevel_to_raw(waterlevel,waterenough)
         return [Smarter.number_to_raw(Smarter.ResponseCoffeeStatus) + coffeestatus + watermerged + Smarter.number_to_raw(unknown) + Smarter.strength_to_raw(strenght) + cupsmerged + Smarter.number_to_raw(Smarter.MessageTail)]
+
 
 
     def __encode_Timers(self):
