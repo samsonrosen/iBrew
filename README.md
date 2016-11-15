@@ -6,7 +6,7 @@
 
 _Smarter Coffee & iKettle 2.0 Simulation!_
 
-[iSamsungTV](https://github.com/Tristan79/iSamsungTV) the command line interface to Samsung TV series C, D, E and F
+[iSamsungTV](https://github.com/Tristan79/iSamsungTV) the command line interface to Samsung TV series C, D, E, F and Blue Ray Disc Players with Smart Hub feature.
 
 ## Introduction
 iBrew is an interface to the iKettle 2.0 and Smarter Coffee devices. 
